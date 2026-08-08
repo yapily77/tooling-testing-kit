@@ -1,11 +1,54 @@
-<div align="center">
+# Enterprise Quality & Sanitizer Toolkit
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+> **Prepared for Accenture Technical Demonstration & Open-Source Community**
 
-  <h1>Built with AI Studio</h2>
+A production-grade quality engineering showcase designed to demonstrate **clean code architecture, portable scripting, environment configuration (.env), and automated path scrubbing**.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+---
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## 🌟 Key Highlights for Technical Evaluation
 
-</div>
+1. **Zero Hardcoded Paths**: Automatically scrubs legacy names (e.g. `baziforecaster` -> `my-repo`) and absolute machine paths.
+2. **Environment Configuration**: Dynamic `.env` driven settings with `.env.example` templates.
+3. **Multi-Tier Quality Harness**: Integrated snapshot locks, unit bedrock, property fuzzing, static analysis gates, and tech debt auditing.
+4. **1-Click Community Bootstrap**: Includes `tools/bootstrap.sh` and `tools/scrub_paths.py` for immediate open-source execution.
+
+---
+
+## 🚀 Quick Start Guide
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/my-repo.git
+cd my-repo
+
+# 2. Run automated bootstrap & path scrubbing
+bash tools/bootstrap.sh
+
+# 3. Launch interactive web dashboard
+npm run dev
+```
+
+---
+
+## 📂 Repository Architecture
+
+- `/.env.example` — Public configuration template
+- `/tools/scrub_paths.py` — Python string/path sanitizer utility
+- `/tools/bootstrap.sh` — 1-click environment initializer
+- `/hygiene/scanners/` — Static analysis and debt scanners
+- `/tests/` — 10-tier quality and snapshot testing suite
+- `/src/` — Interactive React dashboard and UI suite
+
+---
+
+## ⚡ Automated Path Scrubbing
+
+To scrub custom strings across the repository:
+```bash
+python3 tools/scrub_paths.py "legacy_string" "new_string"
+```
+
+---
+
+*Engineered with quality, portability, and clean code principles.*

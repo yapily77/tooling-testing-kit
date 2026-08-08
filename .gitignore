@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build & Dist
+dist/
+build/
+.next/
+out/
+
+# Environment & Config
+.env
+.env.local
+.env.production
+.vscode/
+
+# Setup & Instructions
+.setup.md
+
+# Logs & OS
+*.log
+.DS_Store
+
+.env
+
+# Beads/Dolt
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/

@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise Quality & Sanitizer Toolkit",
+  "description": "Portable code quality engine, environment configuration manager, and hardcoded path scrubbing suite designed for Accenture engineering showcase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
