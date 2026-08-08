@@ -2,9 +2,9 @@
 You are a Staff-Level QA Architect and Orchestrator Agent operating in the `opencode` environment. Your mission is to completely eradicate "Silent Swallows" (exception swallowing, silent data dropping, and logic fallthroughs) from the BaZi deterministic math engine, enforcing extreme SQLite-grade data integrity.
 
 ## Environment Context
-* **Swallow Audit Directory:** `/home/yapilwsl/arthityap/my-repo/TEST/swallow/` (my-repo-only: not in standalone kit download)
-* **Target Application Directory:** `/home/yapilwsl/arthityap/my-repo/src2/` (Specifically the engine and core models) (my-repo-only: not in standalone kit download)
-* **Skill Dependency:** All agents MUST read `/home/yapilwsl/arthityap/my-repo/TEST/swallow/SKILL.md` before writing a single line of code. (my-repo-only: not in standalone kit download)
+* **Swallow Audit Directory:** `tests/08_static_gates/swallow/`
+* **Target Application Directory:** `src/` (Specifically the engine and core models)
+* **Skill Dependency:** All agents MUST read `tests/08_static_gates/swallow/SKILL.md` before writing a single line of code.
 
 ## Subagent Deployment Criteria
 You must deploy **3 subagents at one go** to tackle three distinct silent swallow vulnerabilities concurrently. 
@@ -17,7 +17,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 3. **Perform tasks:** 
    - Write the auditing test/script in the `TEST/swallow/` directory.
    - Run the test or script (`uv run pytest` or `uv run python`).
-   - **CRITICAL:** If the audit fails (e.g., a Pydantic model is found missing strict configs, or a silent exception is caught), the agent MUST go into `src2/` and fix the source code to patch the vulnerability until the audit passes perfectly.
+   - **CRITICAL:** If the audit fails (e.g., a Pydantic model is found missing strict configs, or a silent exception is caught), the agent MUST go into `src/` and fix the source code to patch the vulnerability until the audit passes perfectly.
 4. **Capture decisions:** Use `bd remember "Anti-Swallow implemented for [Domain]. Fixed X vulnerability..."` to capture key decisions and report status.
 5. **Close the ticket:** Mark as complete.
 
@@ -27,16 +27,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 
 ### Ticket 1: The "Pydantic Black Hole" (Strict Mode Introspection)
 **Target File:** `TEST/swallow/test_pydantic_strictness.py`
-**Target Scope:** All `BaseModel` classes in `src2/`
+**Target Scope:** All `BaseModel` classes in `src/`
 **Task Details:**
-* Write a dynamic introspection unit test that recursively crawls the `src2/` package using `importlib` and `inspect` to find every Pydantic model.
+* Write a dynamic introspection unit test that recursively crawls the `src/` package using `importlib` and `inspect` to find every Pydantic model.
 * **Properties to Assert:**
   1. Every model's `model_config` MUST have `extra = "forbid"`.
   2. Every model's `model_config` MUST have `validate_assignment = True`.
-* **Fixing Fallout:** Run `uv run pytest TEST/swallow/test_pydantic_strictness.py`. For every model that fails the assertion, you must open the respective source file in `src2/` and update its `model_config` or `ConfigDict` to enforce these strict rules. Repeat until the test passes.
+* **Fixing Fallout:** Run `uv run pytest TEST/swallow/test_pydantic_strictness.py`. For every model that fails the assertion, you must open the respective source file in `src/` and update its `model_config` or `ConfigDict` to enforce these strict rules. Repeat until the test passes.
 
 ### Ticket 2: The "Ghost Logger" (Pytest Caplog Trap)
-**Target File:** `/home/yapilwsl/arthityap/my-repo/conftest.py` (or the nearest global conftest) (my-repo-only: not in standalone kit download)
+**Target File:** `tests/conftest.py` (or the nearest global conftest)
 **Target Scope:** The entire Pytest suite (`TEST/math/`, etc.)
 **Task Details:**
 * Implement the `no_swallowed_errors` global Pytest fixture as defined in the `SKILL.md` file.
@@ -45,12 +45,12 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 
 ### Ticket 3: The "Terminal Swallow" (AST Scanner)
 **Target File:** `TEST/swallow/scan_silent_excepts.py`
-**Target Scope:** `src2/engine/`
+**Target Scope:** `src/engine/`
 **Task Details:**
-* Write a custom Python script that parses the Abstract Syntax Tree (`ast.parse`) of every `.py` file in `src2/engine/`.
+* Write a custom Python script that parses the Abstract Syntax Tree (`ast.parse`) of every `.py` file in `src/engine/`.
 * Find all `ast.Try` nodes. For every `except` handler, recursively walk the handler's AST body to ensure it terminates with either an `ast.Raise` or `ast.Return`.
 * The script should print a detailed report of violating files and line numbers, and exit with a non-zero status code (`sys.exit(1)`) if any blind swallows are found.
-* **Fixing Fallout:** Run `uv run python TEST/swallow/scan_silent_excepts.py`. For every violation reported, open the corresponding `src2/engine/` file and explicitly fix the `except` block (e.g., add `raise`, or properly handle the state with a `return`). Repeat until the scanner returns 0 violations.
+* **Fixing Fallout:** Run `uv run python TEST/swallow/scan_silent_excepts.py`. For every violation reported, open the corresponding `src/engine/` file and explicitly fix the `except` block (e.g., add `raise`, or properly handle the state with a `return`). Repeat until the scanner returns 0 violations.
 
 ---
 

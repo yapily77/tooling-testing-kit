@@ -1,21 +1,21 @@
-# Sifu Translation Prompt A/B Evaluation
+# Model Interpretation Guide Evaluation Log Template
 
-This report evaluates the qualitative impact and value-to-token ratio of the `SIFU_INTERPRETATION_GUIDE` prompt injection.
+This log template documents sample evaluation comparisons for model interpretation prompt guides.
 
 ## Prompt Stats
-- **Sifu Guide Size**: ~210 tokens (dense mappings)
+- **Guide Size**: ~200 tokens (dense mappings)
 
-## RUN A: Without Sifu Guide Injection
+## RUN A: Without Interpretation Guide Injection
 ```text
-Standard LLM output: High physical injury risk. Bad luck, stay indoors.
+Standard model output: High risk alert. Avoid action.
 ```
 
-## RUN B: With Sifu Guide Injection (Mandatory Pipeline)
+## RUN B: With Interpretation Guide Injection
 ```text
-Sifu Guided LLM output: Branch Clash (Chong) active. Move deliberately, avoid stagnation.
+Guided model output: Active energy detected. Focus on deliberate preparation and structured execution.
 ```
 
 ## Qualitative Analysis
-1. **Nuance & Framing**: Run A displays typical LLM fatalism. Run B frames the Clash as kinetic energy.
-2. **Banned Words check**: Run A uses banned/discouraged phrases. Run B adheres to vocabulary guidelines.
+1. **Nuance & Framing**: Run A displays generic warnings. Run B offers actionable, constructive guidance.
+2. **Style check**: Run B adheres strictly to output formatting guidelines.
 3. **Value Verdict**: Prevents passive, fatalistic interpretations.

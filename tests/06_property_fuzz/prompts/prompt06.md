@@ -1,11 +1,11 @@
 # Role and Mission
-You are a Staff-Level Code Quality Agent operating in the `opencode` environment. Your mission is to add missing type annotations to the remaining `src2/` files so they pass the `find_bad_style.py` checker with zero violations, while preserving all existing behavior.
+You are a Staff-Level Code Quality Agent operating in the `opencode` environment. Your mission is to add missing type annotations to the remaining `src/` files so they pass the `find_bad_style.py` checker with zero violations, while preserving all existing behavior.
 
 ## Environment Context
-* **Style Checker:** `/home/yapilwsl/arthityap/my-repo/TEST/find_bad_style.py` — use this to verify your results. (my-repo-only: not in standalone kit download)
-* **Target Directory:** `src2/` only.
-* **Quality Gate:** After your work, running `uv run python TEST/find_bad_style.py --files <target_file>` must report **no violations** for the assigned file.
-* **Skill Reference:** `/home/yapilwsl/arthityap/my-repo/.agents/skills/python-code/SKILL.md` — read this for the 3 core rules. (my-repo-only: not in standalone kit download)
+* **Style Checker:** `tools/guardrail_check.py` — use this to verify your results.
+* **Target Directory:** `src/` only.
+* **Quality Gate:** After your work, running `python tools/guardrail_check.py --files <target_file>` must report **no violations** for the assigned file.
+* **Skill Reference:** `tests/08_static_gates/swallow/SKILL.md` — read this for the core rules.
 
 ## Subagent Deployment Criteria
 You must deploy **10 subagents at one go** to annotate 10 distinct files concurrently. This is Round 3.
@@ -14,8 +14,8 @@ Before you deploy them, you must create 10 tickets containing the details of the
 
 For each agent, you must strictly instruct them to execute the following lifecycle:
 1. **Claim the ticket:** Acknowledge assignment.
-2. **Read constraint files:** Read `/home/yapilwsl/arthityap/my-repo/TEST/find_bad_style.py` and `/home/yapilwsl/arthityap/my-repo/.agents/skills/python-code/SKILL.md` (my-repo-only: not in standalone kit download)
-3. **Understand the target:** Read the target file in `src2/` in full. Identify all functions missing return type annotations or argument annotations (excluding `self`/`cls`).
+2. **Read constraint files:** Read `tools/guardrail_check.py` to understand the validation rules and constraints.
+3. **Understand the target:** Read the target file in `src/` in full. Identify all functions missing return type annotations or argument annotations (excluding `self`/`cls`).
 4. **Add annotations:** For each function:
    - Add `-> ReturnType` to all functions except `__init__` and `__new__`.
    - Add `: Type` annotations to all arguments except `self` and `cls`.
@@ -31,16 +31,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 ## 🎟️ TICKET DETAILS (To be assigned to Subagents)
 
 ### Ticket 1: Annotate `pydantic_prompt_engine.py`
-**Target File:** `src2/engine/pydantic_prompt_engine.py`
+**Target File:** `src/engine/pydantic_prompt_engine.py`
 **Violation Count:** 4
 **Task Details:**
 * 4 missing type annotations in Pydantic-based prompt engine functions.
 * Functions likely return prompt templates, strings, or Pydantic model instances.
-* **Strategy:** Trace return values through function bodies. Check `src2/core/schemas/` for available types.
+* **Strategy:** Trace return values through function bodies. Check `src/core/schemas/` for available types.
 * **Constraints:** Do not alter prompt generation logic or model instantiation.
 
 ### Ticket 2: Annotate `narrative_simplifier.py`
-**Target File:** `src2/engine/narrative_simplifier.py`
+**Target File:** `src/engine/narrative_simplifier.py`
 **Violation Count:** 4
 **Task Details:**
 * 4 missing type annotations in narrative simplification functions.
@@ -49,16 +49,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all text simplification and narrative transformation logic.
 
 ### Ticket 3: Annotate `module14_palaces.py`
-**Target File:** `src2/engine/module14_palaces.py`
+**Target File:** `src/engine/module14_palaces.py`
 **Violation Count:** 4
 **Task Details:**
 * 4 missing type annotations in the Palace (Module 14) engine.
 * Functions likely return palace analysis results or element classifications.
-* **Strategy:** Check `src2/core/schemas/` for palace-related types. Functions may return `dict[str, Any]` or custom model types.
+* **Strategy:** Check `src/core/schemas/` for palace-related types. Functions may return `dict[str, Any]` or custom model types.
 * **Constraints:** Do not change palace analysis algorithms or element relationship logic.
 
 ### Ticket 4: Annotate `preflight.py`
-**Target File:** `src2/interfaces/telegram/preflight.py`
+**Target File:** `src/interfaces/telegram/preflight.py`
 **Violation Count:** 3
 **Task Details:**
 * 3 missing type annotations in preflight checks.
@@ -67,7 +67,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all validation logic and check ordering.
 
 ### Ticket 5: Annotate `logging_utils.py`
-**Target File:** `src2/interfaces/telegram/logging_utils.py`
+**Target File:** `src/interfaces/telegram/logging_utils.py`
 **Violation Count:** 3
 **Task Details:**
 * 3 missing type annotations in logging utility functions.
@@ -76,7 +76,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Do not change logging format strings or handler configuration.
 
 ### Ticket 6: Annotate `bgem3_bridge.py`
-**Target File:** `src2/interfaces/telegram/bgem3_bridge.py`
+**Target File:** `src/interfaces/telegram/bgem3_bridge.py`
 **Violation Count:** 3
 **Task Details:**
 * 3 missing type annotations in the BGE-M3 embedding bridge.
@@ -85,16 +85,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all embedding computation and query logic.
 
 ### Ticket 7: Annotate `module3_interaction.py`
-**Target File:** `src2/engine/module3_interaction.py`
+**Target File:** `src/engine/module3_interaction.py`
 **Violation Count:** 3
 **Task Details:**
 * 3 missing type annotations in Module 3 (Interaction/Clash) engine.
 * Functions likely return interaction analysis results.
-* **Strategy:** Check `src2/core/schemas/` for interaction types. May return `dict[str, Any]` or custom models.
+* **Strategy:** Check `src/core/schemas/` for interaction types. May return `dict[str, Any]` or custom models.
 * **Constraints:** Do not alter clash analysis or interaction calculation logic.
 
 ### Ticket 8: Annotate `memory_manager.py`
-**Target File:** `src2/core/memory/memory_manager.py`
+**Target File:** `src/core/memory/memory_manager.py`
 **Violation Count:** 3
 **Task Details:**
 * 3 missing type annotations in the memory management module.
@@ -103,7 +103,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all memory persistence and retrieval logic.
 
 ### Ticket 9: Annotate `validators.py`
-**Target File:** `src2/interfaces/telegram/validators.py`
+**Target File:** `src/interfaces/telegram/validators.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in Telegram input validation functions.
@@ -112,7 +112,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all validation logic and error message formatting.
 
 ### Ticket 10: Annotate `session.py`
-**Target File:** `src2/interfaces/telegram/session.py`
+**Target File:** `src/interfaces/telegram/session.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in session management functions.

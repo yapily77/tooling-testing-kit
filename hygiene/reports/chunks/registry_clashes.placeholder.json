@@ -2,8 +2,8 @@
   "scanned_files_count": "{{scanned_files_count}}",
   "clashes": [
     {
-      "file_path": "src2/{{module}}.py",
-      "line": {{line}},
+      "file_path": "src/{{module}}.py",
+      "line": "{{line}}",
       "variable": "{{VARIABLE_NAME}}",
       "registry_class": "{{SomeClass}}",
       "expression": "{{VARIABLE_NAME}}[{{key}}]",
@@ -16,8 +16,8 @@
   "suspects": [],
   "ok": [
     {
-      "file_path": "src2/core/{{module}}.py",
-      "line": {{line}},
+      "file_path": "src/core/{{module}}.py",
+      "line": "{{line}}",
       "variable": "{{VARIABLE_NAME}}",
       "method": "__getitem__",
       "expression": "{{VARIABLE_NAME}}[{{key}}]",

@@ -1,11 +1,11 @@
 # Role and Mission
-You are a Staff-Level Code Quality Agent operating in the `opencode` environment. Your mission is to add missing type annotations to the remaining `src2/` files so they pass the `find_bad_style.py` checker with zero violations, while preserving all existing behavior.
+You are a Staff-Level Code Quality Agent operating in the `opencode` environment. Your mission is to add missing type annotations to the remaining `src/` files so they pass the `find_bad_style.py` checker with zero violations, while preserving all existing behavior.
 
 ## Environment Context
-* **Style Checker:** `/home/yapilwsl/arthityap/my-repo/TEST/find_bad_style.py` — use this to verify your results. (my-repo-only: not in standalone kit download)
-* **Target Directory:** `src2/` only.
-* **Quality Gate:** After your work, running `uv run python TEST/find_bad_style.py --files <target_file>` must report **no violations** for the assigned file.
-* **Skill Reference:** `/home/yapilwsl/arthityap/my-repo/.agents/skills/python-code/SKILL.md` — read this for the 3 core rules. (my-repo-only: not in standalone kit download)
+* **Style Checker:** `tools/guardrail_check.py` — use this to verify your results.
+* **Target Directory:** `src/` only.
+* **Quality Gate:** After your work, running `python tools/guardrail_check.py --files <target_file>` must report **no violations** for the assigned file.
+* **Skill Reference:** `tests/08_static_gates/swallow/SKILL.md` — read this for the core rules.
 
 ## Subagent Deployment Criteria
 You must deploy **10 subagents at one go** to annotate 10 distinct files concurrently. This is Round 2 — the first 10 files were completed in Round 1.
@@ -14,8 +14,8 @@ Before you deploy them, you must create 10 tickets containing the details of the
 
 For each agent, you must strictly instruct them to execute the following lifecycle:
 1. **Claim the ticket:** Acknowledge assignment.
-2. **Read constraint files:** Read `/home/yapilwsl/arthityap/my-repo/TEST/find_bad_style.py` and `/home/yapilwsl/arthityap/my-repo/.agents/skills/python-code/SKILL.md` (my-repo-only: not in standalone kit download)
-3. **Understand the target:** Read the target file in `src2/` in full. Identify all functions missing return type annotations or argument annotations (excluding `self`/`cls`).
+2. **Read constraint files:** Read `tools/guardrail_check.py` to understand the validation rules and constraints.
+3. **Understand the target:** Read the target file in `src/` in full. Identify all functions missing return type annotations or argument annotations (excluding `self`/`cls`).
 4. **Add annotations:** For each function:
    - Add `-> ReturnType` to all functions except `__init__` and `__new__`.
    - Add `: Type` annotations to all arguments except `self` and `cls`.
@@ -31,16 +31,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 ## 🎟️ TICKET DETAILS (To be assigned to Subagents)
 
 ### Ticket 1: Annotate `prompt_engine.py`
-**Target File:** `src2/engine/prompt_engine.py`
+**Target File:** `src/engine/prompt_engine.py`
 **Violation Count:** 10
 **Task Details:**
 * 10 missing type annotations in the prompt engine core functions.
 * Functions likely return prompt templates, strings, or dict configurations.
-* **Strategy:** Trace return values through function bodies. Check `src2/engine/pydantic_prompt_engine.py` for related type patterns.
+* **Strategy:** Trace return values through function bodies. Check `src/engine/pydantic_prompt_engine.py` for related type patterns.
 * **Constraints:** Do not alter prompt generation logic or template formatting.
 
 ### Ticket 2: Annotate `__init__.py`
-**Target File:** `src2/engine/__init__.py`
+**Target File:** `src/engine/__init__.py`
 **Violation Count:** 10
 **Task Details:**
 * 10 missing type annotations in the engine package init — likely factory functions and re-exports.
@@ -49,7 +49,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Do not change any import statements or re-export structure. Preserve all `__all__` definitions.
 
 ### Ticket 3: Annotate `utils.py`
-**Target File:** `src2/interfaces/telegram/utils.py`
+**Target File:** `src/interfaces/telegram/utils.py`
 **Violation Count:** 9
 **Task Details:**
 * 9 missing type annotations in Telegram utility functions.
@@ -58,16 +58,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all formatting logic and external API call formatting.
 
 ### Ticket 4: Annotate `stars.py`
-**Target File:** `src2/engine/stars.py`
+**Target File:** `src/engine/stars.py`
 **Violation Count:** 9
 **Task Details:**
 * 9 missing type annotations in the stars (astrological) engine.
 * Functions likely return star classifications or numerical scores.
-* **Strategy:** Check `src2/core/schemas/` for star-related types. Use `str` for star names, `int`/`float` for scores.
+* **Strategy:** Check `src/core/schemas/` for star-related types. Use `str` for star names, `int`/`float` for scores.
 * **Constraints:** Do not change astrological calculations or star classification rules.
 
 ### Ticket 5: Annotate `ui_components.py`
-**Target File:** `src2/interfaces/telegram/ui_components.py`
+**Target File:** `src/interfaces/telegram/ui_components.py`
 **Violation Count:** 7
 **Task Details:**
 * 7 missing type annotations in UI component builders for Telegram messages.
@@ -76,7 +76,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all UI layout logic and keyboard formatting.
 
 ### Ticket 6: Annotate `conductor.py`
-**Target File:** `src2/interfaces/telegram/conductor.py`
+**Target File:** `src/interfaces/telegram/conductor.py`
 **Violation Count:** 6
 **Task Details:**
 * 6 missing type annotations in the conductor/orchestrator layer.
@@ -85,7 +85,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Do not alter orchestration flow or state management.
 
 ### Ticket 7: Annotate `queue_worker.py`
-**Target File:** `src2/interfaces/telegram/queue_worker.py`
+**Target File:** `src/interfaces/telegram/queue_worker.py`
 **Violation Count:** 5
 **Task Details:**
 * 5 missing type annotations in background job workers.
@@ -94,7 +94,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all queue processing and job lifecycle logic.
 
 ### Ticket 8: Annotate `rotator.py`
-**Target File:** `src2/core/rotator.py`
+**Target File:** `src/core/rotator.py`
 **Violation Count:** 5
 **Task Details:**
 * 5 missing type annotations in the API key rotator.
@@ -103,7 +103,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all key selection and rotation logic.
 
 ### Ticket 9: Annotate `security.py`
-**Target File:** `src2/interfaces/telegram/security.py`
+**Target File:** `src/interfaces/telegram/security.py`
 **Violation Count:** 4
 **Task Details:**
 * 4 missing type annotations in security/authorization functions.
@@ -112,7 +112,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all security checks and access control logic.
 
 ### Ticket 10: Annotate `reliability.py`
-**Target File:** `src2/interfaces/telegram/reliability.py`
+**Target File:** `src/interfaces/telegram/reliability.py`
 **Violation Count:** 4
 **Task Details:**
 * 4 missing type annotations in reliability/metrics reporting.

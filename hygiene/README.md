@@ -1,95 +1,105 @@
-# 🧹 Codebase Hygiene Suite
+# 🧹 Codebase Hygiene Suite (`kit-hygiene`)
 
-> **Not slop. This is a production-grade technical debt scanner.**
+[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
 
-> **Related docs:** `GUIDE.md` (install & configure) · `FAQ.md` (troubleshooting & cost) · `orchestrator_hygiene.md` (CI orchestration)
+> **Hybrid Static AST + LLM Technical Debt Scanner for Python Codebases**  
+> Detects swallowed exceptions, schema hazards, circular dependencies, hardcoded secrets, and async deadlocks without noise or vendor lock-in.
 
-This is a **hybrid static-analysis + LLM-audit pipeline** that detects real bugs — swallowed exceptions, schema hazards, circular imports, hardcoded secrets, async deadlocks, and more — across any Python codebase.
+---
 
-## What problem does this solve?
+## Executive Summary
 
-Most "linters" either:
-- **False-positive everything** (pylint: 1000 warnings, 990 are junk)
-- **Miss real bugs** (you ship code with `except: pass` that silently drops user data)
+**kit-hygiene** is a two-tier static analysis and LLM-powered audit pipeline that eliminates false positives in technical debt scanning. Standard linters either generate hundreds of stylistic warnings or miss deep runtime bugs. `kit-hygiene` combines fast, local Python Abstract Syntax Tree (AST) parsing with targeted LLM semantic verification.
 
-This suite uses a **two-tier pipeline** to eliminate both problems:
+### Related Documentation
+- **[`GUIDE.md`](./GUIDE.md)** — Step-by-step installation, `.env` reference, and execution modes.
+- **[`FAQ.md`](./FAQ.md)** — Answer Engine & SEO optimized questions on costs, CI/CD, and custom models.
 
-```mermaid
-graph TD
-    A[Your Codebase] -->|1. Fast local AST/Regex| B(Tier 1: Static Pre-filter)
-    B -->|Generates candidates| C{Candidate List}
-    C -->|2. Deep semantic check| D[Tier 2: LLM Audit]
-    D -->|Verdict: real bug vs false positive| E[Final Report]
+---
+
+## Two-Tier Architecture
+
+```
+                                 ┌─────────────────────────────────┐
+                                 │       Target Python Codebase    │
+                                 └────────────────┬────────────────┘
+                                                  │
+                                                  ▼
+                                 ┌─────────────────────────────────┐
+                                 │ Tier 1: Static AST / Regex Pass │
+                                 │ (Offline, Fast, High Recall)    │
+                                 └────────────────┬────────────────┘
+                                                  │
+                                                  ▼ Candidate Findings
+                                 ┌─────────────────────────────────┐
+                                 │ Tier 2: LLM Semantic Audit      │
+                                 │ (Selective, Pydantic-AI Agent)  │
+                                 └────────────────┬────────────────┘
+                                                  │
+                                                  ▼ Verified Verdicts
+                                 ┌─────────────────────────────────┐
+                                 │  Reports: JSON + Markdown Summaries │
+                                 └─────────────────────────────────┘
 ```
 
-**Tier 1** runs in milliseconds — pure Python AST analysis, no API calls. It casts a wide net (high recall), flagging every suspicious pattern.
+1. **Tier 1 (Static AST Filter)**: Runs locally in milliseconds with zero network or API dependencies. Flags potential risks with high recall.
+2. **Tier 2 (LLM Semantic Verification)**: Sends only snippet context of flagged candidates to a model via Pydantic-AI. Filters false positives and categorizes real bugs.
 
-**Tier 2** invokes a Pydantic-AI agent **only** on the candidates. The LLM examines the actual code context (snippet only, not your whole repo) and makes a semantic call: `SILENT_KILLER` vs `FALSE_POSITIVE`, `SCHEMA_HAZARD` vs `safe_dict_use`, etc.
+---
 
-This means you pay for **3–5 API calls per scan** (not thousands), and you get **zero false positives** worth your time.
+## Scanner Capabilities Matrix
 
-## What does it find?
+| # | Scanner | Target Defect / Pattern | Tier 1 (AST) | Tier 2 (LLM) | Output Verdict |
+|---|---|---|---|---|---|
+| 1 | `find_dead_code.py` | Unreachable functions, classes, and unused exports | ✓ | ✓ | `DEAD_CODE` / `VERIFIED_LIVE` |
+| 2 | `find_silent_killers.py` | Swallowed exceptions (`except: pass`), bare handlers | ✓ | ✓ | `SILENT_KILLER` / `FALSE_POSITIVE` |
+| 3 | `find_async_hazards.py` | Blocking I/O (`requests.get`) inside `async def` | ✓ | ✓ | `ASYNC_HAZARD` / `SAFE` |
+| 4 | `find_engine_schemas.py` | Dict/list passed directly to Pydantic models | ✓ | ✓ | `SCHEMA_HAZARD` / `FALSE_POSITIVE` |
+| 5 | `find_secrets.py` | Hardcoded API keys, tokens, and committed secrets | ✓ | ✓ | `HARDCODED_SECRET` / `FALSE_POSITIVE` |
+| 6 | `find_env_drift.py` | `os.getenv()` keys missing from `.env.example` | ✓ | ✓ | `ENV_DRIFT` / `OK` |
+| 7 | `find_circular_deps.py` | Import cycles causing startup `ImportError` | ✓ | ✓ | `CIRCULAR_DEP` / `FALSE_POSITIVE` |
+| 8 | `find_duplication.py` | Duplicated code blocks exceeding threshold | ✓ | ✓ | `DUPLICATE` / `FALSE_POSITIVE` |
+| 9 | `find_type_safety.py` | Mypy / Pyright static type errors | ✓ | ✓ | `TYPE_ERROR` / `FALSE_POSITIVE` |
+| 10 | `find_registry_clashes.py` | Model dict-access methods (`.get()`, `.keys()`) | ✓ | ✓ | `SCHEMA_HAZARD` / `FALSE_POSITIVE` |
+| 11 | `find_message_drift.py` | Translation string keys vs dictionary definitions | ✓ | ✗ | `MISSING_KEY` / `OK` |
 
-| # | Scanner | Detects | Tier | LLM? |
-|---|---|---|---|---|
-| 1 | `find_dead_code.py` | Unused classes/functions unreachable via import graph | Tier 2 | ✓ |
-| 2 | `find_silent_killers.py` | `except: pass`, bare `except:`, silent fallback configs | Tier 2 | ✓ |
-| 3 | `find_async_hazards.py` | `requests.get()` inside `async def`, blocking I/O in event loop | Tier 2 | ✓ |
-| 4 | `find_engine_schemas.py` | Raw `dict`/`list` passed to Pydantic models (runtime crash risk) | Tier 2 | ✓ |
-| 5 | `find_secrets.py` | Hardcoded API keys, tokens, passwords committed to source | Tier 2 | ✓ |
-| 6 | `find_env_drift.py` | `os.getenv()` keys missing from `.env.example` | Tier 2 | ✓ |
-| 7 | `find_circular_deps.py` | Import cycles that can cause `ImportError` at startup | Tier 2 | ✓ |
-| 8 | `find_duplication.py` | Copy-pasted code blocks > N lines (maintenance debt) | Tier 2 | ✓ |
-| 9 | `find_type_safety.py` | `mypy`/pyright errors filtered by LLM for false positives | Tier 2 | ✓ |
-| 10 | `find_registry_clashes.py` | `.get()`, `.keys()`, `in` on Pydantic models (post-migration crash risk) | Tier 2 | ✓ |
-| 11 | `find_message_drift.py` | Telegram translation keys in code vs `messages.yaml` | Tier 1 | ✗ |
-
-Plus two meta-tools:
-- `find_cc_nested.py` — cyclomatic complexity analysis (run separately)
-- `kill_tries.py` — batch LLM refactoring of high-CC functions (see `GUIDE.md` for orchestration)
+---
 
 ## Directory Structure
 
 ```
 hygiene/
-├── .env.example          # All config knobs (copy to .env, never commit .env)
-├── README.md             # This file — what it is, why it exists
-├── GUIDE.md              # How to install, configure, and run on your repo
-├── FAQ.md                # Troubleshooting, cost, CI/CD, and model configuration
-├── control.py            # Runtime settings loader (reads KIT_* env vars)
-├── requirements.txt      # Python deps for full mode
-├── run-registry-scan.sh  # tmux wrapper for long-running registry scans
+├── .env.example          # Environment variable configuration template
+├── README.md             # Architecture and overview (this file)
+├── GUIDE.md              # Installation, configuration, and execution guide
+├── FAQ.md                # Answer engine FAQ and troubleshooting
+├── control.py            # Configuration loader for KIT_* variables
 ├── cleanup.py            # One-shot AST auto-fixer for simple violations
-├── scanners/
-│   ├── run_all.py        # Master runner — runs all 11 scanners in sequence
-│   ├── utils.py          # Shared helpers (file discovery, path validation)
-│   └── find_*.py         # Individual scanners (see table above)
-└── reports/              # Generated audit outputs (JSON + MD per scanner)
+├── run-registry-scan.sh  # Wrapper for long-running registry scans
+├── scanners/             # Individual scanner implementation scripts
+│   ├── run_all.py        # Master execution orchestrator
+│   ├── utils.py          # Shared AST and file parsing utilities
+│   └── find_*.py         # Scanner implementations
+└── reports/              # Audit report output directory (JSON + MD)
 ```
-
-## No vendor lock-in
-
-- **No external services required** — Tier 1 runs 100% offline
-- **Bring your own LLM** — configure `KIT_BASE_URL` / `KIT_API_KEY` / `KIT_MODEL` in `.env`
-- **Works on any Python repo** — set `TARGET_ROOT` to your codebase, point the scanners at any `src/` directory
 
 ---
 
-## Quick Start (30 seconds)
+## Quick Start
 
 ```bash
-# 1. Copy config and point at your repo
+# 1. Copy environment template
 cp hygiene/.env.example hygiene/.env
-# Edit .env: set TARGET_ROOT=/path/to/your/code
 
-# 2. Install deps (if running LLM tiers)
-pip install -r hygiene/requirements.txt
+# 2. Configure target directory in .env
+# TARGET_ROOT=/path/to/your/codebase
 
-# 3. Run -- offline static pass only (no API key needed)
+# 3. Run offline static analysis pass (no API key required)
 uv run hygiene/scanners/run_all.py --scripts
 
-# 4. Review reports in hygiene/reports/
+# 4. Review findings in reports
+cat hygiene/reports/find_silent_killers.md
 ```
 
-See **[GUIDE.md](./GUIDE.md)** for full installation, LLM configuration, and advanced usage.  
-Common questions answered in **[FAQ.md](./FAQ.md)**.
+For complete configuration and LLM setup, refer to **[`GUIDE.md`](./GUIDE.md)** and **[`FAQ.md`](./FAQ.md)**.

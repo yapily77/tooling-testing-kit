@@ -35,16 +35,16 @@ graph TD
 
 ## 1. Daily Forecast Path
 
-* **Telegram Entrypoint**: `src2/interfaces/telegram/app.py`
+* **Telegram Entrypoint**: `src/interfaces/telegram/app.py`
   - Command `/daily` maps to the inner handler executing:
     ```python
     from .chronomancer import handle_daily
     reply = await handle_daily(chat_id)
     ```
-* **Chronomancer Coordinator**: `src2/interfaces/telegram/chronomancer/coordinator.py#handle_daily`
+* **Chronomancer Coordinator**: `src/interfaces/telegram/chronomancer/coordinator.py#handle_daily`
   - Reconstructs profile from `profile.json` or monthly master JSONs using `_reconstruct_session_profile`.
-  - Calculates daily scoring via `src2/engine/activity_oracle.py#score_day`.
-  - Sends context to **Sifu Agent** (`src2/interfaces/telegram/chronomancer/agents.py`) for forecast narrative.
+  - Calculates daily scoring via `src/engine/activity_oracle.py#score_day`.
+  - Sends context to **Sifu Agent** (`src/interfaces/telegram/chronomancer/agents.py`) for forecast narrative.
   - Sends narrative to **Simplifier Agent** to strip Bazi jargon if sifu-mode is disabled.
   - Saves the generated summary in `memory_manager.add_memory`.
   - Caches forecast in Valkey/SQLite database using `db.save_chrono_cache`.
@@ -53,14 +53,14 @@ graph TD
 
 ## 2. Chronomancer Ask Path
 
-* **Telegram Entrypoint**: `src2/interfaces/telegram/app.py`
+* **Telegram Entrypoint**: `src/interfaces/telegram/app.py`
   - `/ask <question>` command or any free-text while in `CHRONOMANCER` step executes:
     ```python
     from .chronomancer import handle_ask
     reply = await handle_ask(chat_id, question)
     ```
-* **Chronomancer Coordinator**: `src2/interfaces/telegram/chronomancer/coordinator.py#handle_ask`
-  - Calls `src2/interfaces/telegram/ier_parser.py#parse_question` to determine dates, intent, and entities.
+* **Chronomancer Coordinator**: `src/interfaces/telegram/chronomancer/coordinator.py#handle_ask`
+  - Calls `src/interfaces/telegram/ier_parser.py#parse_question` to determine dates, intent, and entities.
   - Scores target dates for the user.
   - Fetches and scores stakeholder charts if questions are related to a partner or stakeholder.
   - Calls the **Sifu Agent** to answer the question with the scored date context.
@@ -70,7 +70,7 @@ graph TD
 
 ## 3. UAT E2E Simulation Flow (test.py)
 
-The UAT script [`test.py`](file:///home/yapilwsl/arthityap/my-repo/[my-repo-only: TEST/GOLD/05_chronomancer/test.py not in kit download]) walks through the following sequential conversational path using the official tester ID `999` and real RAG/LLM calls:
+The UAT script `test.py` walks through the following sequential conversational path using the official tester ID `999` and real RAG/LLM calls:
 
 * **Turn 0: Bootstrapping**:
   - Initializes session for user `999` and dynamically seeds `semantic_id` as `SGUSD0000999` at database creation.

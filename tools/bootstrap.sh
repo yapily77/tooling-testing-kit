@@ -21,9 +21,9 @@ CLEAN_TOKEN="${2:-${TARGET_CLEAN_NAME:-my-repo}}"
 echo "[2/3] Executing Path & String Scrubber ($LEGACY_TOKEN -> $CLEAN_TOKEN)..."
 python3 tools/scrub_paths.py "$LEGACY_TOKEN" "$CLEAN_TOKEN"
 
-echo "[3/3] Installing dependencies..."
-npm install
+echo "[3/3] Installing Python dependencies..."
+pip install -e .
 
 echo "----------------------------------------------------------"
-echo " Setup complete! Run 'npm test' or 'npm run dev'."
+echo " Setup complete! Run 'pytest'."
 echo "----------------------------------------------------------"

@@ -1,22 +1,22 @@
 {
   "pydantic_exceptions": [
     {
-      "file": "src2/core/database/models.py",
+      "file": "src/core/database/models.py",
       "class": "User",
       "reason": "SQLAlchemy declarative base model \u2014 must inherit Base, not BaseModel"
     },
     {
-      "file": "src2/core/database/models.py",
+      "file": "src/core/database/models.py",
       "class": "PlatformAccount",
       "reason": "SQLAlchemy declarative base model \u2014 must inherit Base, not BaseModel"
     },
     {
-      "file": "src2/core/database/models.py",
+      "file": "src/core/database/models.py",
       "class": "ConsentRecord",
       "reason": "SQLAlchemy declarative base model \u2014 must inherit Base, not BaseModel"
     },
     {
-      "file": "src2/core/database/models.py",
+      "file": "src/core/database/models.py",
       "class": "Session",
       "reason": "SQLAlchemy declarative base model \u2014 must inherit Base, not BaseModel"
     },

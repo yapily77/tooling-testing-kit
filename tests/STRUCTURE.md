@@ -22,8 +22,7 @@ tests/
 ├── examples/               # 5 self-contained, runnable stubs (the interview-critical gate)
 ├── 10_harness_suite/       # ai-factory self-tests, 8 domain bins (reference + parse-clean)
 ├── pyproject.toml          # deps (pytest, hypothesis) + [tool.mutmut]
-├── orchestrator.md         # reproducible build recipe
-└── README.md / QUICKSTART.md / STRUCTURE.md
+└── README.md / QUICKSTART.md / GUIDE.md / STRUCTURE.md
 ```
 
 ## Curation rules (applied during build)

@@ -1,51 +1,50 @@
 # kit-tools
 
-Community-facing utility scripts extracted into `ai-factory/tools/`.
-Runs inside `ai-factory`: `uv run python tools/<tool>.py "args"`.
+[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
 
-> **New:** Fully portable versions live in `codebase/` and `rag/`. See
-> [GUIDE.md](GUIDE.md) for quick-start cross-references.
+> **Portable Codebase Intelligence, AST Modification, and RAG Utilities**  
+> Extracted utility scripts for searching, analyzing, refactoring, and retrieving codebase context.
 
-## Portability
+---
 
-`tools/` is fully portable via `KIT_*` environment variables (see `.env.example`).
-Each tool declares its required env vars at the top. If a tool needs internal infra
-that isn't available locally, it raises a clear `RuntimeError` rather than failing silently.
+## Tool Categories & Capabilities
 
-| category | tools | notes |
+All tools operate portably on target repositories specified by `KIT_TARGET_ROOT`.
+
+| Category | Key Tool Scripts | Purpose & Notes |
 |---|---|---|
-| **Codebase search & analysis** | `search.py`, `investigate.py`, `grep_codebase.py`, `read_file.py`, `list_files.py`, `get_file_symbols.py`, `get_repo_structure.py`, `query_knowledge_graph.py`, `graph_health.py` | Semantic search, file discovery, code hierarchy. Requires `KIT_TARGET_ROOT`. |
-| **Code modification (AST)** | `add_function.py`, `add_class.py`, `add_constant.py`, `add_import.py`, `replace_function.py`, `replace_text.py`, `move_symbol.py`, `rename_file.py`, `delete_file.py`, `write_file.py`, `repair_imports.py` | Surgical edits via AST. Requires `KIT_TARGET_ROOT`. |
-| **Index & collection management** | `index_repository.py`, `verify_file_path.py`, `load_schema_gate.py` | One-shot indexing, path validation, schema gates. Requires `KIT_TARGET_ROOT`, `KIT_COLLECTION_NAME`. |
-| **DevOps / system** | `web.sh`, `mcp_git_guardrail.py`, `guardrail_check.py`, `smoke_test.py` | Git guardrails, smoke tests, web launcher. |
-| **Utility / self-tests** | `_codebase_common.py`, `_fix_preprocess2.py`, `_gen_utils.py`, `_test_tools.py`, `control.py` | Shared helpers, env control, cleanup scripts. |
-| **RAG demonstration** | `rag/bazirag.py`, `rag/mcp_bazirag.py`, `rag/query_cli.py`, `rag/redis_cache.py`, `rag/run_rag_pipeline.py` | Domain-specific RAG demo (see `rag/README.md`). |
+| **Codebase Search & Analysis** | `search.py`, `grep_codebase.py`, `investigate.py`, `get_file_symbols.py`, `get_repo_structure.py` | Semantic search, regex code search, symbol hierarchy extraction, and repository topology. |
+| **AST Code Modification** | `add_function.py`, `add_class.py`, `add_import.py`, `replace_function.py`, `move_symbol.py` | AST-aware code editing, import insertion, and symbol refactoring. |
+| **File Operations** | `read_file.py`, `write_file.py`, `rename_file.py`, `delete_file.py` | Safe file manipulation with path validation. |
+| **Index & Schema Management** | `index_repository.py`, `verify_file_path.py`, `load_schema_gate.py` | Vector index construction and schema verification gates. |
+| **RAG Demonstration** | `rag/bazirag.py`, `rag/query_cli.py`, `rag/mcp_bazirag.py` | Domain-specific RAG pipeline demonstrating query expansion and vector retrieval. |
 
-## Quick start (anywhere)
+---
+
+## Quick Start
 
 ```bash
-cd /path/to/kit-tools
+# 1. Navigate to tools workspace
+cd tools
+
+# 2. Copy configuration template
 cp .env.example .env
-# edit .env: set KIT_TARGET_ROOT to your target repository
-uv venv
-uv pip install python-dotenv pydantic-ai httpx qdrant-client numpy trafilatura pyyaml fastmcp
-python control.py                          # verify config
-uv run python search.py "query"            # semantic search
-uv run python investigate.py --filename src/main.py --query "issues?"
+
+# 3. Configure target repository path
+# Edit .env and set: KIT_TARGET_ROOT=/path/to/target/repository
+
+# 4. Run semantic search or codebase tools
+uv run python search.py "Where is authentication handled?"
+uv run python get_repo_structure.py
 ```
 
-## test/
+---
 
-`run_all.py` + self-tests for kit-tools. `cd kit-tools && uv run pytest test/ -q`.
+## Subfolder Navigation
 
-## rag/
-
-Domain-specific RAG demonstration (BaziRAG). See `rag/README.md`.
-
-## See also
-
-- [GUIDE.md](GUIDE.md) — unified quick-start spanning `codebase/` + `rag/`
-- [codebase/README.md](codebase/README.md) — portable codebase search/analyze tools
-- [codebase/FAQ.md](codebase/FAQ.md) — FAQ for codebase tools
-- [rag/README.md](rag/README.md) — portable BaziRAG demo
-- [rag/FAQ.md](rag/FAQ.md) — FAQ for RAG tools
+- **[`GUIDE.md`](GUIDE.md)** — Unified usage guide for codebase tools and RAG modules.
+- **[`codebase/README.md`](codebase/README.md)** — Detailed codebase search and AST refactoring tool docs.
+- **[`codebase/FAQ.md`](codebase/FAQ.md)** — Frequently asked questions for codebase analysis tools.
+- **[`rag/README.md`](rag/README.md)** — BaziRAG retrieval engine documentation.
+- **[`rag/FAQ.md`](rag/FAQ.md)** — RAG system FAQ and caching strategies.

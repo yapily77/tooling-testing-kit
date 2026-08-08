@@ -1,41 +1,61 @@
 # kit-tools Guide — Unified Usage
 
-Quick reference spanning both portable subdirectories.
+> **Step-by-step guide for codebase intelligence, AST modification, and RAG tools.**
 
-## Two toolkits
+---
 
-| toolkit | purpose | docs |
+## Tool Suites Overview
+
+`kit-tools` provides two primary toolkits:
+
+| Subdirectory | Focus | Primary Use Case |
 |---|---|---|
-| `codebase/` | Search, analyze, and modify any codebase via `KIT_TARGET_ROOT` | [README.md](codebase/README.md) |
-| `rag/` | Domain-specific RAG on classical Bazi texts | [README.md](rag/README.md) |
+| **`codebase/`** | Codebase Search & AST Code-Mod | Search, analyze, and refactor any target Python codebase specified by `KIT_TARGET_ROOT`. |
+| **`rag/`** | Domain RAG Retrieval Engine | Query-expansion and vector search demonstration for domain-specific text analysis. |
 
-## When to use what
+---
 
-- **Browse a repo, find code, fix bugs** → `codebase/` tools
-  (`grep_codebase.py`, `search.py`, `investigate.py`, `add_function.py`, ...)
-- **Query dense documents with LLM query-translation + embeddings** → `rag/` tools
-  (`bazirag.py`, `query_cli.py`)
+## Environment Configuration
 
-Both share the same env-var pattern: copy the local `.env.example`, set
-`KIT_TARGET_ROOT`, then run from inside the toolkit folder.
+Both toolkits share a standardized environment variable schema (`KIT_*`):
 
-```bash
-# Codebase tools
-cd tools/codebase
-cp .env.example .env
-python grep_codebase.py "def main" "" --extension-filter ".py"
+```env
+# Target Codebase Configuration
+KIT_TARGET_ROOT=/path/to/target/repository
 
-# RAG demo
-cd tools/rag
-cp .env.example .env
-uv run python query_cli.py "my Bazi question"
+# LLM & Embedding Settings (Optional)
+KIT_BASE_URL=http://localhost:8000/v1
+KIT_API_KEY=sk-your-api-key
+KIT_MODEL=gemma-2-27b-it
 ```
 
-## FAQ
+---
 
-| question | answer |
+## Common Workflows
+
+### 1. Codebase Search & Analysis
+```bash
+# Regex search across python files
+cd tools/codebase
+uv run python grep_codebase.py "def main" "" --extension-filter ".py"
+
+# Inspect symbol hierarchy in a file
+uv run python get_file_symbols.py --filename src/main.py
+```
+
+### 2. Domain RAG Querying
+```bash
+cd tools/rag
+cp .env.example .env
+uv run python query_cli.py "Query question"
+```
+
+---
+
+## Frequently Asked Questions
+
+| Question | Answer |
 |---|---|
-| Where do I set the target repo? | `KIT_TARGET_ROOT` in either `.env` file |
-| Do codebase and rag conflict? | No — they use separate `.env.example` files |
-| Can I use search.py without Qdrant? | Yes — install deps but set `KIT_QDRANT_URL` to nothing and the LLM path degrades gracefully |
-| Do I need Redis for RAG? | No — see [rag/FAQ.md](rag/FAQ.md#performance--caching) |
+| How do I set the target codebase? | Set `KIT_TARGET_ROOT` in your `tools/.env` or `tools/codebase/.env` file. |
+| Can search tools run without Qdrant/Vector DBs? | Yes. Text-based grep and AST analysis tools work offline without vector indexes. |
+| Do I need external credentials for AST code modifications? | No. AST modifications (`add_function.py`, `replace_function.py`) execute locally using Python's `ast` parser. |

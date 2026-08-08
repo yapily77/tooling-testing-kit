@@ -2,8 +2,7 @@
 set -euo pipefail
 
 # Run the 01_start GOLD E2E test against the live tmux infra (bazi-infra, :8445).
-# Must be run with the server already up (see [my-repo-only: TEST/GOLD/00_infra/start.sh not in kit download]).
+# Must be run with the server already up (see tests/01_gold_snapshots/00_infra/start.sh).
 cd "$(dirname "$0")/../../.."
 
-# [my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
-uv run python -c 'import sys; sys.path.insert(0,"."); import TEST.GOLD.run as R; R.SERVER_URL="http://127.0.0.1:8445"; R.HEALTH_ENDPOINT=R.SERVER_URL+"/health"; import json; print(json.dumps(R.run_test_folder("01_start"), indent=2, default=str))'
+python3 -c 'import sys; sys.path.insert(0,"."); import tests.01_gold_snapshots.run as R; R.SERVER_URL="http://127.0.0.1:8445"; R.HEALTH_ENDPOINT=R.SERVER_URL+"/health"; import json; print(json.dumps(R.run_test_folder("01_start"), indent=2, default=str))'

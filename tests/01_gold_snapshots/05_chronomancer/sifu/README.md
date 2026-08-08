@@ -11,10 +11,10 @@ Before starting, verify the local backend services are active:
 | Service / Dependency | Check Method | Expected State |
 | :--- | :--- | :--- |
 | 👤 **User Profile / Report** | Check `_prd/users/999/reports/` | A valid monthly master JSON or `profile.json` must exist. |
-| 🧠 **Memory Store (Qdrant)** | GET `http://127.0.0.1:6333/collections/user_memory` | Qdrant is online and the `user_memory` collection has a dimension of `1024`. |
-| 🔢 **Embedding Engine (BGEM3)** | POST `http://10.32.34.109:8000/embed` | local BGEM3 server is online and generating 1024-dim vectors. |
-| 🔮 **LLM Gateway (Sifu / Simplifier)** | POST `http://10.32.34.243:18000/v1/chat/completions` | `gemma-4-31b-it` is active and has quota. |
-| 🤝 **BaziRAG (for /ask)** | GET `http://10.32.34.243:9000/sse` | BaziRAG MCP server is online. |
+| 🧠 **Memory Store (Qdrant)** | GET `http://localhost:6333/collections/user_memory` | Qdrant is online and the `user_memory` collection has a dimension of `1024`. |
+| 🔢 **Embedding Engine** | POST `http://localhost:8000/embed` | Embedding server is online and generating 1024-dim vectors. |
+| 🔮 **LLM Gateway** | POST `http://localhost:18000/v1/chat/completions` | Target LLM model is active and accessible. |
+| 🤝 **Context Server** | GET `http://localhost:9000/sse` | MCP context server is online. |
 
 ---
 
