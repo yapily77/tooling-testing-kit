@@ -41,7 +41,7 @@ def run_scrub(root_dir, legacy, target):
     print(f"\nScrubbing Complete. Total files sanitized: {scrubbed_count}")
 
 if __name__ == "__main__":
-    legacy = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_LEGACY
-    target = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_TARGET
+    legacy = sys.argv[1] if len(sys.argv) > 1 else os.getenv("TARGET_LEGACY_NAME", DEFAULT_LEGACY)
+    target = sys.argv[2] if len(sys.argv) > 2 else os.getenv("TARGET_CLEAN_NAME", DEFAULT_TARGET)
     print(f"Starting Repository Sanitization: '{legacy}' -> '{target}'")
     run_scrub(".", legacy, target)

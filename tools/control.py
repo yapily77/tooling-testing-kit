@@ -2,11 +2,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 load_dotenv(dotenv_path=Path(__file__).resolve().parent / ".env")
 
-TARGET_ROOT = os.getenv("KIT_TARGET_ROOT")
-if not TARGET_ROOT:
-    raise RuntimeError("KIT_TARGET_ROOT is required — set it in kit-tools/.env to your target repository path.")
+TARGET_ROOT = os.getenv("KIT_TARGET_ROOT", str(Path(__file__).resolve().parent.parent))
 REPO_ROOT = Path(TARGET_ROOT).resolve()
 
 INFRA_ROOT = os.getenv("KIT_INFRA_ROOT")

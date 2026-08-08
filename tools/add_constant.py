@@ -9,8 +9,10 @@ from _codebase_common import _normalize_content, fail, ok, resolve_secure_path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 
-def _constant_node(constant_code: str) -> ast.stmt:
+def _constant_node(constant_code: str, constant_name: str = "") -> ast.stmt:
     stripped = constant_code.strip()
+    if "=" not in stripped and constant_name:
+        stripped = f"{constant_name} = {stripped}"
     tree = ast.parse(stripped)
     node = tree.body[0]
     if not isinstance(node, (ast.Assign, ast.AnnAssign)):
@@ -57,7 +59,7 @@ def main():
         sys.exit(1)
 
     try:
-        new_node = _constant_node(args.constant_code)
+        new_node = _constant_node(args.constant_code, args.constant_name)
         content = _normalize_content(path.read_text(encoding="utf-8"))
         tree = ast.parse(content)
 

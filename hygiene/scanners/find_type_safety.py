@@ -55,9 +55,10 @@ audit_agent = Agent(
 def run_mypy_checker() -> list[TypeSafetyCandidate]:
     candidates = []
     try:
-        # Run mypy on src2
+        # Run mypy on src
+        cmd = [sys.executable, "-m", "mypy", "src", "--ignore-missing-imports"]
         result = subprocess.run(
-            ["uv", "run", "mypy", "src2", "--ignore-missing-imports"],
+            cmd,
             capture_output=True,
             text=True,
             check=False
@@ -137,7 +138,7 @@ def audit_candidate_with_llm(candidate: TypeSafetyCandidate, file_contents: dict
 def generate_markdown_report(report: AuditReport, md_path: Path):
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Type Safety & Annotation Audit Report\n\n")
-        out.write(f"Scanned `{report.scanned_files_count}` files in `src2/`.\n\n")
+        out.write(f"Scanned `{report.scanned_files_count}` files in `src/`.\n\n")
 
         if not report.audit_results:
             out.write("🎉 *No type safety violations found! All type annotations pass checks.*\n")

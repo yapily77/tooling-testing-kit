@@ -1,108 +1,113 @@
-# Tools Test Kit (kit)
+# Tooling & Testing Kit (`tooling-testing-kit`)
 
-[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
-[![Package Manager: uv](https://img.shields.io/badge/package%20manager-uv-purple.svg)](https://docs.astral.sh/uv/)
+[![CI](https://github.com/Acivar-Digital/tooling-testing-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/Acivar-Digital/tooling-testing-kit/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
-> **Portable, runnable Python slices for technical debt analysis, test design, AST refactoring, and domain RAG.**  
-> Self-contained tools and test patterns extracted into clean, zero-dependency runnable modules.
+> **Enterprise-grade AI Engineering, Static Analysis, and Harness Testing Toolkit for Python Workflows**  
+> Portable, zero-dependency runnable modules for technical debt scanning, AST refactoring, test harness design, and codebase intelligence.
 
 ---
 
-## Overview
+## 🌟 Overview
 
-The **Tools Test Kit** (`kit`) is a production-grade Python engineering toolkit designed for developers, AI coding agents, and technical auditors. It breaks complex enterprise codebases down into portable, runnable modules that can be executed offline or paired with LLMs via standard `KIT_*` environment variables.
+The **Tooling & Testing Kit** is a production-grade Python engineering toolkit designed for developers, AI coding agents, and enterprise technical auditors. It breaks complex Python repositories down into portable, runnable modules that can be executed offline or paired with LLMs via standard `KIT_*` environment variables.
 
-### Key Capabilities & Suites
+### 📦 Toolkit Modules & Capabilities
 
-| Suite | Focus & Purpose | Execution Mode | Quick Run |
+| Module | Purpose | Execution Mode | Quick Command |
 |---|---|---|---|
-| **[`hygiene/`](./hygiene)** | Hybrid static-AST + LLM technical debt scanner (11 detection passes) | Offline static or LLM-assisted | `cd hygiene && cp .env.example .env && uv run scanners/run_all.py --scripts` |
-| **[`tests/`](./tests)** | Interview-ready test pattern stubs (golden snapshots, property/fuzz, mutation targets) | Offline stubs (`KIT_LIVE=false`) | `cd tests && uv run pytest examples -q` |
-| **[`tools/`](./tools)** | Codebase search, AST code modification, and BaziRAG domain retrieval | Portable via `KIT_TARGET_ROOT` | `cd tools && uv run python search.py "query"` |
+| **[`hygiene/`](./hygiene)** | Technical debt & security scanner (11 static + LLM analysis passes) | Static or LLM-assisted | `python hygiene/scanners/run_all.py --scripts` |
+| **[`tools/`](./tools)** | AST code refactoring, codebase search, and RAG retrieval utilities | Portable via `KIT_TARGET_ROOT` | `python tools/test/run_all.py` |
+| **[`tests/`](./tests)** | Golden snapshot, property-based fuzzing, and harness test patterns | Offline or live mode | `pytest tests/examples/` |
+| **[`examples/`](./examples)** | Worked examples, sample targets, and generated audit report samples | Quick demonstration | `python hygiene/scanners/run_all.py --scripts` |
 
 ---
 
-## Quick Start (Workspace Setup)
+## ⚡ Quick Start
 
-You can run each subfolder independently or manage the entire workspace with [`uv`](https://docs.astral.sh/uv/):
+### 1. Installation
+
+Install all toolkit modules at once with optional dependencies:
 
 ```bash
-# Clone repository
-git clone https://github.com/Acivar-Digital/tools-test-kit.git
-cd tools-test-kit
+# Clone the repository
+git clone https://github.com/Acivar-Digital/tooling-testing-kit.git
+cd tooling-testing-kit
 
-# Install all dependencies across workspace projects
-uv sync --all-projects
+# Install with all optional suites (hygiene, tools, tests)
+pip install -e ".[all]"
+```
 
-# Run test stubs
-cd tests && uv run pytest examples -q
+### 2. Run All Verification Suites
 
-# Run static hygiene scans
-cd ../hygiene && cp .env.example .env && uv run scanners/run_all.py --scripts
+```bash
+# 1. Run codebase hygiene static scanners
+python hygiene/scanners/run_all.py --scripts
+
+# 2. Run AST code-mod unit test suite
+python tools/test/run_all.py
+
+# 3. Run pytest harness suite
+pytest tests/examples/
 ```
 
 ---
 
-## Architecture & Directory Layout
+## 📂 Repository Architecture
 
-```
-tools-test-kit/
-├── hygiene/                  # Technical debt scanner suite (AST + LLM audit)
-│   ├── scanners/              # 11 static and LLM scanner scripts
-│   ├── reports/               # Output audit reports (JSON + Markdown)
-│   ├── README.md              # Hygiene architecture & overview
-│   ├── GUIDE.md               # Installation & configuration guide
-│   └── FAQ.md                 # Technical debt FAQ & cost optimization
-├── tests/                    # Production test patterns & stubs
-│   ├── examples/              # Self-contained cloner-safe stubs (START HERE)
-│   ├── 01_gold_snapshots/     # Golden snapshot test suites
-│   ├── 06_property_fuzz/      # Property-based Hypothesis fuzz tests
-│   ├── README.md              # Test suite design & layer breakdown
-│   ├── GUIDE.md               # Execution & LLM mode configuration
-│   └── QUICKSTART.md          # Fast-path user quickstart
-├── tools/                    # Codebase intelligence & AST code-mods
-│   ├── codebase/              # Search, AST refactoring, and analysis tools
-│   ├── rag/                   # Domain-specific BaziRAG demonstration
-│   ├── README.md              # Tools suite overview & portability matrix
-│   └── GUIDE.md               # Unified usage guide for codebase & RAG tools
-├── .env.example              # Central environment template
-├── AGENTS.md                 # AI agent system instructions & issue tracking rules
-└── pyproject.toml            # Root workspace project definition
+```text
+tooling-testing-kit/
+├── .github/workflows/       # GitHub Actions CI/CD workflows
+│   └── ci.yml               # Automated scanner & pytest verification pipeline
+├── hygiene/                 # Technical debt scanner suite (AST + LLM audit)
+│   ├── scanners/            # 11 static and LLM scanner scripts
+│   ├── reports/             # Generated audit reports (JSON + Markdown)
+│   ├── README.md            # Hygiene architecture & overview
+│   └── GUIDE.md             # Scanner configuration guide
+├── tools/                   # Codebase intelligence & AST code modifications
+│   ├── test/                # Unit test suite runner for codebase tools
+│   ├── rag/                 # Portable BaziRAG domain retrieval pipeline
+│   └── README.md            # Tools suite overview & AST tool list
+├── tests/                   # Production test patterns & harness stubs
+│   ├── examples/            # Self-contained test harness examples
+│   └── README.md            # Test suite layer breakdown
+├── examples/                # Worked examples & sample scanner outputs
+│   ├── sample_target.py     # Sample target module with intentional code smells
+│   └── scanner_output_example.md # Formatted audit output demonstration
+├── CONTRIBUTING.md          # Open collaboration & contribution guidelines
+├── pyproject.toml           # Unified root package configuration
+└── README.md                # Main repository guide
 ```
 
 ---
 
-## LLM Configuration Contract (`KIT_*`)
+## ⚙️ Configuration Contract (`KIT_*`)
 
-All LLM-enabled tools share a standardized, fail-closed configuration interface:
+LLM-enabled tools share a fail-closed configuration contract:
 
 ```env
 # Target codebase path
-KIT_TARGET_ROOT=/path/to/target/codebase
+KIT_TARGET_ROOT=/path/to/target/repository
 
 # LLM Endpoint Configuration
 KIT_BASE_URL=http://localhost:8000/v1
 KIT_API_KEY=sk-your-api-key
 KIT_MODEL=gemma-2-27b-it
 
-# Live test switch
+# Test mode toggle
 KIT_LIVE=false
 ```
 
-If an LLM feature is enabled without required credentials, the tools **fail closed** immediately with a clear error message rather than silently dropping checks.
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on testing, code style, and submission process.
 
 ---
 
-## Search Engine & LLM Answer Engine Index
+## 📄 License
 
-- **What is kit-hygiene?** See [`hygiene/FAQ.md`](./hygiene/FAQ.md)
-- **How to run tests without external dependencies?** See [`tests/QUICKSTART.md`](./tests/QUICKSTART.md)
-- **How to perform AST-driven code modifications?** See [`tools/README.md`](./tools/README.md)
-- **How to configure LLM models and local endpoints?** See [`hygiene/GUIDE.md`](./hygiene/GUIDE.md)
-
----
-
-## License & Contribution
-
-Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
+Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for full details.

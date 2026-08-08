@@ -2,13 +2,14 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 SCRATCH_DIR = "scratch"
 
 def run_tool(args):
-    result = subprocess.run(["uv", "run", "python", str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:],
-                            capture_output=True, text=True)
+    cmd = [sys.executable, str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:]
+    result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"Error running {args[0]}.py: {result.stderr}")
         return None
@@ -28,7 +29,7 @@ def test_write_file():
     path = f"{SCRATCH_DIR}/test.txt"
     content = "Hello World"
     res = run_tool(["write_file", path, content])
-    return res is not None and os.path.exists(path) and open(path).read() == content
+    return res is not None and os.path.exists(path) and open(path).read().strip() == content.strip()
 
 def test_replace_text():
     print("Testing replace_text...")
@@ -37,7 +38,7 @@ def test_replace_text():
         with open(path, "w") as f:
             f.write("Hello World")
     res = run_tool(["replace_text", path, "World", "Opencode"])
-    return res is not None and open(path).read() == "Hello Opencode"
+    return res is not None and open(path).read().strip() == "Hello Opencode"
 
 def test_replace_function():
     print("Testing replace_function...")

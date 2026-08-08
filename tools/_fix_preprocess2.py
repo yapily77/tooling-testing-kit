@@ -3,9 +3,7 @@
 import os
 from pathlib import Path
 
-target_root = os.getenv("KIT_TARGET_ROOT")
-if not target_root:
-    raise RuntimeError("KIT_TARGET_ROOT is required — set it in kit-tools/.env to your target repository path.")
+target_root = os.getenv("KIT_TARGET_ROOT", str(Path(__file__).resolve().parent.parent))
 f = str(Path(target_root) / os.getenv("KIT_SOURCE_ROOT", "src") / "interfaces/telegram/utils.py")
 
 with open(f, encoding="utf-8") as fh:

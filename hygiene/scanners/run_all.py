@@ -15,7 +15,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Codebase Hygiene Runner")
     parser.add_argument("--scripts", action="store_true", help="Run only the static check parts of all scanners")
-    parser.add_argument("--diff", action="store_true", help="Scan only git modified/untracked files under src2/")
+    parser.add_argument("--diff", action="store_true", help="Scan only git modified/untracked files under src/")
     args = parser.parse_args()
 
     print(f"{BOLD}🧹 Running All Codebase Hygiene Scanners...{RESET}")
@@ -44,7 +44,7 @@ def main():
             continue
 
         print(f"\n🚀 Running {scanner_path.name}...")
-        cmd = ["uv", "run", "python", str(scanner_path)]
+        cmd = [sys.executable, str(scanner_path)]
         if args.scripts:
             cmd.append("--scripts")
         if args.diff:

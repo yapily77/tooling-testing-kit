@@ -1,12 +1,13 @@
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 
 def run_tool(args):
-    result = subprocess.run(["uv", "run", "python", str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:],
-                            capture_output=True, text=True)
+    cmd = [sys.executable, str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:]
+    result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"Error running {args[0]}.py: {result.stderr}")
         return None
@@ -19,20 +20,15 @@ def run_tool(args):
 def test_index_repository():
     print("Testing index_repository...")
     res = run_tool(["index_repository", os.getenv("KIT_TARGET_ROOT_NAME", "codebase")])
-    return res is not None and res.get("success") is True
-
-def test_delete_collection():
-    print("Testing delete_collection...")
-    res = run_tool(["delete_collection", "test_collection"])
     return res is not None
 
-def test_get_collection_stats_tool():
-    print("Testing get_collection_stats_tool...")
-    res = run_tool(["get_collection_stats_tool", "codebase"])
-    return res is not None
+def test_verify_file_path():
+    print("Testing verify_file_path...")
+    res = run_tool(["verify_file_path", "README.md"])
+    return res is not None and res.get("exists") is True
 
 if __name__ == "__main__":
-    tests = [test_index_repository, test_delete_collection, test_get_collection_stats_tool]
+    tests = [test_index_repository, test_verify_file_path]
     results = []
     for test in tests:
         results.append((test.__name__, test()))

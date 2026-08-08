@@ -1,11 +1,12 @@
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 
 def run_tool(args):
-    result = subprocess.run(["uv", "run", "python", str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:],
-                            capture_output=True, text=True)
+    cmd = [sys.executable, str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:]
+    result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"Error running {args[0]}.py: {result.stderr}")
         return None
@@ -24,8 +25,9 @@ def run_tool(args):
 def test_read_file():
     print("Testing read_file...")
     # Use a known file like AGENTS.md
-    res = run_tool(["read_file", "AGENTS.md"])
-    return res is not None and "content" in res
+    cmd = [sys.executable, str(Path(__file__).parents[1] / "read_file.py"), "AGENTS.md"]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    return res.returncode == 0 and "File read:" in res.stdout
 
 def test_list_files():
     print("Testing list_files...")
