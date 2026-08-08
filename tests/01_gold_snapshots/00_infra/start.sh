@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Define variables
-SESSION_NAME="bazi-infra"
-PROD_PORT=8445
-DOCKER_COMPOSE_FILE="infrastructure/docker/docker-compose.yml"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    set -a
+    source "$PROJECT_ROOT/.env"
+    set +a
+fi
+
+SESSION_NAME="${TMUX_SESSION_INFRA:-bazi-infra}"
+PROD_PORT="${APP_PORT:-8445}"
+DOCKER_COMPOSE_FILE="${DOCKER_COMPOSE_PATH:-infrastructure/docker/docker-compose.yml}"
+
+PYTHON_EXEC="${PYTHON_CMD:-python3}"
+if command -v uv >/dev/null 2>&1; then
+    PYTHON_EXEC="uv run python"
+fi
 
 echo "=== my-repo Infra Manager ==="
 
@@ -43,7 +56,7 @@ fi
 
 # 4. Start Tmux Session (single production server; Gold E2E hits /webhook/test on same instance)
 echo "Creating tmux session: $SESSION_NAME..."
-tmux new-session -d -s "$SESSION_NAME" -n "services" "uv run start2.py --skip-preflight"
+tmux new-session -d -s "$SESSION_NAME" -n "services" "$PYTHON_EXEC start2.py --skip-preflight"
 
 # Enable mouse mode for easy scrolling
 tmux set-option -g -t "$SESSION_NAME" mouse on

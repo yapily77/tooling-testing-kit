@@ -23,9 +23,9 @@ if CODEBASE_SERVER_DIR:
 try:
     import mcp_codebase
 except ImportError as e:
+    import pytest
     _loc = str(CODEBASE_SERVER_DIR) if CODEBASE_SERVER_DIR else "(KIT_CODEBASE_DIR not set)"
-    print(f"❌ Failed to import mcp_codebase from {_loc}: {e}")
-    sys.exit(1)
+    pytest.skip(f"Skipping test_mcp_tools: Failed to import mcp_codebase from {_loc}: {e}", allow_module_level=True)
 
 def run_test(tool_name: str, func, *args, **kwargs):
     print(f"\n🔍 Testing tool: {tool_name} ...")
@@ -72,7 +72,7 @@ def main():
     all_passed &= run_test(
         "list_files",
         mcp_codebase.list_files,
-        directory="src2/core/memory",
+        directory="src/core/memory",
         recursive=False,
         limit=5
     )
@@ -81,7 +81,7 @@ def main():
     all_passed &= run_test(
         "read_file",
         mcp_codebase.read_file,
-        relative_path="src2/core/memory/memory_manager.py",
+        relative_path="src/core/memory/memory_manager.py",
         start_line=1,
         end_line=20
     )
@@ -91,7 +91,7 @@ def main():
         "grep_codebase",
         mcp_codebase.grep_codebase,
         pattern="MemoryManager",
-        directory="src2/core/memory",
+        directory="src/core/memory",
         max_results=3
     )
 

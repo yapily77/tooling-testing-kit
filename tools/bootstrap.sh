@@ -8,11 +8,17 @@ echo " Enterprise Quality & Sanitizer Toolkit - Bootstrap"
 echo " Prepared for Accenture Technical Evaluation & Open Source"
 echo "=========================================================="
 
-if [ ! -f .env ]; then
+if [ -f .env ]; then
+  echo "[1/3] Existing .env file found."
+  set -a
+  source .env
+  set +a
+else
   echo "[1/3] Creating .env from .env.example..."
   cp .env.example .env
-else
-  echo "[1/3] Existing .env file found."
+  set -a
+  source .env
+  set +a
 fi
 
 LEGACY_TOKEN="${1:-${TARGET_LEGACY_NAME:-legacy_project_name}}"

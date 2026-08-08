@@ -1,7 +1,7 @@
 # Bazi Special Structures (Vibrant / Follower) Edge Cases Verification
 
 ## 1. The Bug & Fix Context
-Previously, the core Bazi engine's element classifier in [shen_classifier.py](file:///home/yapilwsl/arthityap/my-repo/src2/engine/shen_classifier.py) grouped special structures with normal structures: (my-repo-only: not in standalone kit download)
+Previously, the core Bazi engine's element classifier in `shen_classifier.py` grouped special structures with normal structures:
 *   **Vibrant (从强)** was grouped with normal **Strong** structures, incorrectly assigning draining/controlling elements (`Output`, `Wealth`, `Officer`) as its medicine.
 *   **Follower (从弱)** was grouped with normal **Weak** structures, incorrectly assigning supporting elements (`Friend`, `Resource`) as its medicine.
 

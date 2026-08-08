@@ -12,9 +12,9 @@
 
 set -uo pipefail
 
-WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCANNER_SCRIPT="hygiene/scanners/find_registry_clashes.py"
-TMUX_SESSION="registry-scanner"
+TMUX_SESSION="${TMUX_SESSION_SCANNER:-registry-scanner}"
 
 # Parse args
 MODE="--verify"
@@ -22,21 +22,29 @@ if [ "${1:-}" = "--scripts" ]; then
   MODE="--scripts"
 fi
 
-command -v uv >/dev/null 2>&1 || { echo "ERROR: 'uv' not found on PATH" >&2; exit 1; }
+ENV_FILE="$WORKSPACE_ROOT/.env"
+if [ -f "$ENV_FILE" ]; then
+    set -a
+    source "$ENV_FILE"
+    set +a
+fi
+
+PYTHON_EXEC="${PYTHON_CMD:-python3}"
+if command -v uv >/dev/null 2>&1; then
+    PYTHON_EXEC="uv run python"
+fi
+
 command -v tmux >/dev/null 2>&1 || { echo "ERROR: 'tmux' not found on PATH" >&2; exit 1; }
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Launching registry scanner in tmux session '$TMUX_SESSION' (cwd=$WORKSPACE_ROOT)"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Detach anytime with Ctrl-B then D. Re-run this script to attach."
 
 # Build the command that runs INSIDE the tmux window.
-ENV_FILE="$WORKSPACE_ROOT/.env"
+RUN_CMD="cd '$WORKSPACE_ROOT' && export PYTHONUNBUFFERED=1; "
 if [ -f "$ENV_FILE" ]; then
-    RUN_CMD="cd '$WORKSPACE_ROOT' && export PYTHONUNBUFFERED=1; set -a; . '$ENV_FILE'; set +a; "
-else
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: .env not found at $ENV_FILE — using environment defaults. Copy .env.example first if this is unexpected." >&2
-    RUN_CMD="cd '$WORKSPACE_ROOT' && export PYTHONUNBUFFERED=1; "
+    RUN_CMD+="set -a; . '$ENV_FILE'; set +a; "
 fi
-RUN_CMD+="uv run python '$SCANNER_SCRIPT' $MODE"
+RUN_CMD+="$PYTHON_EXEC '$SCANNER_SCRIPT' $MODE"
 
 # Kill any prior session to avoid duplicate/colliding runs, then launch fresh.
 tmux kill-session -t "$TMUX_SESSION" 2>/dev/null || true

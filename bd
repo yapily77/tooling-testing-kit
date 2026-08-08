@@ -5,4 +5,15 @@ if [ -f .env ]; then
   source .env
   set +a
 fi
-exec /home/linuxbrew/.linuxbrew/bin/bd "$@"
+
+BD_BIN="${BD_BIN_PATH:-/home/linuxbrew/.linuxbrew/bin/bd}"
+
+if [ -x "$BD_BIN" ]; then
+  exec "$BD_BIN" "$@"
+elif command -v bd &> /dev/null; then
+  exec bd "$@"
+else
+  echo "Error: 'bd' binary not found at $BD_BIN or in PATH." >&2
+  echo "Please install bd or set BD_BIN_PATH in your .env file." >&2
+  exit 127
+fi

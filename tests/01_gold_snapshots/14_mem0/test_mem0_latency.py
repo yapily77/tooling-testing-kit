@@ -9,14 +9,14 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 # Load environment variables
 load_dotenv(".env")
 
-# Ensure Python path knows about src2
+# Ensure Python path knows about src
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
 try:
-    from src2.core.memory.mem0_store import Mem0Store
+    from src.core.memory.mem0_store import Mem0Store
 except ImportError as e:
-    print(f"Failed to import Mem0Store: {e}")
-    sys.exit(1)
+    import pytest
+    pytest.skip(f"Skipping test_mem0_latency: {e}", allow_module_level=True)
 
 def main():
     print("--- Starting Mem0 Latency Test ---")

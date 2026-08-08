@@ -1,7 +1,18 @@
-#!/bin/bash
-# Resolve the project root directory (two levels up from kit-tools/)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Run the Python script with PYTHONPATH set to the project root
-PYTHONPATH="$PROJECT_ROOT" uv run python "$SCRIPT_DIR/web.py" "$@"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
+
+if [ -f "$PROJECT_ROOT/.env" ]; then
+  set -a
+  source "$PROJECT_ROOT/.env"
+  set +a
+fi
+
+PYTHON_EXEC="${PYTHON_CMD:-python3}"
+if command -v uv >/dev/null 2>&1; then
+  PYTHONPATH="$PROJECT_ROOT" uv run python "$SCRIPT_DIR/web.py" "$@"
+else
+  PYTHONPATH="$PROJECT_ROOT" $PYTHON_EXEC "$SCRIPT_DIR/web.py" "$@"
+fi

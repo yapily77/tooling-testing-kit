@@ -21,7 +21,7 @@ We just completed a major codebase auditing phase and organized the codebase hyg
   ```
 
 ### 2. Hardened Score Validators
-* We modified [validators.py](file:///home/yapilwsl/arthityap/my-repo/src2/interfaces/telegram/validators.py) to implement a strict maximum score cap. (my-repo-only: not in standalone kit download)
+* We modified `validators.py` to implement a strict maximum score cap.
 * If any monthly forecast `composite_score` exceeds `81.0` (on the scale capped at 80.0), it now triggers a hard validation violation (`SCORE_OUT_OF_BOUNDS`) and blocks output. This prevents LLM out-of-bounds calculations or hallucinations.
 
 ---
@@ -31,20 +31,20 @@ We just completed a major codebase auditing phase and organized the codebase hyg
 Once the session is reloaded, these are the target tasks to continue:
 
 ### Task 1: Clean Up Legacy Backups (Noise Reduction)
-* **Target**: Delete legacy/backup files in `src2/` to clear out duplication and drift noise.
-  * `src2/engine/pydantic_prompt_engine_bbkp.py`
-  * `src2/engine/pydantic_prompt_engine_OAI.py`
-  * `src2/interfaces/telegram/intake_old.py`
+* **Target**: Delete legacy/backup files in `src/` to clear out duplication and drift noise.
+  * `src/engine/pydantic_prompt_engine_bbkp.py`
+  * `src/engine/pydantic_prompt_engine_OAI.py`
+  * `src/interfaces/telegram/intake_old.py`
 
 ### Task 2: Refactor Circular Imports in Chronomancer
-* **Target**: Resolve the circular import in `src2/interfaces/telegram/chronomancer`:
+* **Target**: Resolve the circular import in `src/interfaces/telegram/chronomancer`:
   * `coordinator.py` $\rightarrow$ `agents.py` $\rightarrow$ `cache.py` $\rightarrow$ `coordinator.py`
   * **Action**: Move eager module imports in `coordinator.py` into local scopes.
 
 ### Task 3: Resolve Engine Exception Swallowing (Silent Killers)
 * **Target**: Make engine errors fail loudly instead of proceeding with corrupt data:
-  * In `src2/engine/daily_pillar.py` (lines 147 and 228), ensure the code propagates errors instead of catching them silently.
-  * In `src2/core/memory/memory_manager.py:62`, ensure memory save exceptions are propagated.
+  * In `src/engine/daily_pillar.py` (lines 147 and 228), ensure the code propagates errors instead of catching them silently.
+  * In `src/core/memory/memory_manager.py:62`, ensure memory save exceptions are propagated.
 
 ### Task 4: Integrate Pydantic Logfire Tracing
 * **Target**: Install and hook `logfire` into the Pydantic AI pipeline to trace active Gemma model completions, schema validations, and database writes.
