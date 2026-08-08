@@ -9,7 +9,7 @@ from _bootstrap import pkg_root  # noqa: F401,E402
 from pydantic import BaseModel, Field  # noqa: E402
 from pydantic_ai import Agent  # noqa: E402
 from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 from control import CONTROL_SHEET  # noqa: E402
 
@@ -99,10 +99,10 @@ def find_cycles(graph: dict[str, list[tuple[str, int, bool]]]) -> list[CircularD
 
         for neighbor, line, is_local in graph.get(node, []):
             # Resolve relative imports/shorthands to module paths
-            # Simple shorthand matching for src2 structure
-            if not neighbor.startswith("src2."):
+            # Simple shorthand matching for src structure
+            if not neighbor.startswith("src."):
                 # Try to map relative import or shorthands
-                resolved = f"src2.{neighbor}"
+                resolved = f"src.{neighbor}"
                 if resolved not in graph:
                     # Try packages/modules matching
                     for g_key in graph.keys():
@@ -187,7 +187,7 @@ def audit_candidate_with_llm(candidate: CircularDepCandidate, file_contents: dic
 def generate_markdown_report(report: AuditReport, md_path: Path):
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Circular Dependency Audit Report\n\n")
-        out.write(f"Scanned `{report.scanned_files_count}` files in `src2/`.\n\n")
+        out.write(f"Scanned `{report.scanned_files_count}` files in `src/`.\n\n")
 
         if not report.audit_results:
             out.write("🎉 *No circular dependencies found! Clean import DAG.*\n")
@@ -209,12 +209,12 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
 
 
 def main():
-    files = get_src2_files()
+    files = get_src_files()
     graph = {}
     file_contents = {}
 
     for file_path in files:
-        # Convert path to module name, e.g. src2/engine/prompt_maker.py -> src2.engine.prompt_maker
+        # Convert path to module name, e.g. src/engine/prompt_maker.py -> src.engine.prompt_maker
         module_path = str(file_path.with_suffix("")).replace("/", ".")
         path_str = str(file_path)
         try:

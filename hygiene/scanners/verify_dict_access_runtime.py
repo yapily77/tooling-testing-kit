@@ -29,12 +29,12 @@ from pathlib import Path
 from typing import Any
 
 # Add workspace root to sys.path to allow absolute imports
-from _bootstrap import pkg_root, target_root  # noqa: F401,E402  (target_root on sys.path so src2.* resolves)
+from _bootstrap import pkg_root, target_root  # noqa: F401,E402  (target_root on sys.path so src.* resolves)
 
 from pydantic import BaseModel
 
 try:
-    from src2.core.schemas.unified import (
+    from src.core.schemas.unified import (
         ChartProfile,
         DaYunOutput,
         Pillar,
@@ -61,7 +61,7 @@ BANNED_DICT_METHODS = {
 def build_sample_profile() -> ChartProfile | None:
     """Constructs a deterministic, valid ChartProfile for best-effort execution."""
     if not _UNIFIED_AVAILABLE:
-        print("[INFO] src2.core.schemas.unified not importable on this repo — skipping runtime verification sample")
+        print("[INFO] src.core.schemas.unified not importable on this repo — skipping runtime verification sample")
         return None
     return ChartProfile(
         day_master="Jia",
@@ -105,12 +105,15 @@ def workspace_root() -> Path:
     return target_root
 
 
-def get_src2_files() -> list[Path]:
-    """Recursively find all Python files in src2/."""
-    src2_dir = workspace_root() / "src2"
-    if not src2_dir.exists():
+def get_src_files() -> list[Path]:
+    """Recursively find all Python files in src/."""
+    src_dir = workspace_root() / "src"
+    if not src_dir.exists():
         return []
-    return list(src2_dir.rglob("*.py"))
+    return list(src_dir.rglob("*.py"))
+
+
+get_src2_files = get_src_files
 
 
 def discover_models(files: list[Path]) -> dict[str, str]:
@@ -345,7 +348,7 @@ def main():
             )
         sys.exit(0)
 
-    files = get_src2_files()
+    files = get_src_files()
     model_classes = discover_models(files)
 
     results = []

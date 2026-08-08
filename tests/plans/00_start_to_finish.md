@@ -6,9 +6,9 @@
   - `tests/01_gold_snapshots/05_chronomancer/` (Chronomancer E2E Test)
   - `tests/01_gold_snapshots/02_auto/` (Auto Monthly E2E Test)
   - `tests/01_gold_snapshots/03_input/` (Input Monthly E2E Test)
-  - `src2/interfaces/telegram/intake/calendar_node.py` (Auto engine ingress seam)
-  - `src2/interfaces/telegram/bridge.py` & `src2/core/schemas/unified.py` (C5/C4 schema boundary & tailoring threading)
-  - `src2/interfaces/telegram/chronomancer/coordinator.py`, `state_writer.py`, `forecast_store.py` (Chronomancer runtime & BaziCache)
+  - `src/interfaces/telegram/intake/calendar_node.py` (Auto engine ingress seam)
+  - `src/interfaces/telegram/bridge.py` & `src/core/schemas/unified.py` (C5/C4 schema boundary & tailoring threading)
+  - `src/interfaces/telegram/chronomancer/coordinator.py`, `state_writer.py`, `forecast_store.py` (Chronomancer runtime & BaziCache)
 - **Exploration Tools:** 
   - `/investigate`: `_run_auto_engine`, `map_profile_to_k3`, `handle_ask`, `handle_daily`, `run_pydantic_engine`
   - `Codebase Indexing`: `ChartProfile`, `UserProfile`, `UserState`, `BaziCache`

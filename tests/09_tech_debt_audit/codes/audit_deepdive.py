@@ -14,7 +14,7 @@ from admin.dotenv import api_key, base_url, model_name
 
 class AuditResponse(BaseModel):
     review: str = Field(
-        description="Detailed technical reasoning of what replaced this code in src2, naming specific files/functions."
+        description="Detailed technical reasoning of what replaced this code in src, naming specific files/functions."
     )
     recommendation: str = Field(
         description="Drop (Recommended) or Restore (Recommended) with strict verification reason."
@@ -29,8 +29,8 @@ agent = Agent(
     retries=3,
     system_prompt=(
         "You are an expert Python codebase auditor specializing in migration verification. "
-        "Your task is to review a flagged dead code symbol (class or function) and determine if it is truly dead in `src2/` or if it got accidentally dropped or has callers. "
-        "Look for any alternative implementations in `src2/` that replaced it. "
+        "Your task is to review a flagged dead code symbol (class or function) and determine if it is truly dead in `src/` or if it got accidentally dropped or has callers. "
+        "Look for any alternative implementations in `src/` that replaced it. "
         "Do NOT write generic descriptions like 'Confirmed unused'. Always provide a specific technical replacement path if one exists."
     )
 )
@@ -67,18 +67,18 @@ def main():
 
     for idx, item in enumerate(truly_dead, 1):
         name = item["name"]
-        file_src2 = item["file_path_src2"]
+        file_src = item.get("file_path_src", item.get("file_path_src2", ""))
 
         # Check if already processed
-        unique_key = f"{name}::{file_src2}"
+        unique_key = f"{name}::{file_src}"
         if unique_key in results:
             print(f"[{idx}/{total_items}] Skipping already audited: {name}")
             continue
 
-        print(f"[{idx}/{total_items}] Deep-dive auditing symbol: {name} in {file_src2}...")
+        print(f"[{idx}/{total_items}] Deep-dive auditing symbol: {name} in {file_src}...")
 
         # Find file contents to pass as context
-        file_path = Path(file_src2)
+        file_path = Path(file_src)
         content = ""
         if file_path.exists():
             try:
@@ -89,7 +89,7 @@ def main():
         prompt = (
             f"Symbol Name: {name}\n"
             f"Symbol Type: {item['type']}\n"
-            f"File Path in src2: {file_src2}\n\n"
+            f"File Path in src: {file_src2}\n\n"
             f"File Content context:\n```python\n{content}\n```\n\n"
             f"Please verify if this symbol `{name}` is truly unused or if it has callers. "
             "Examine if its logic got consolidated into another function or replaced by a new pattern. "
@@ -152,7 +152,7 @@ def main():
         categorized_data[cat].append(val)
 
     md_lines = []
-    md_lines.append("# 🛑 Truly Dead Legacy Code Decision Matrix (Dead in both `src` and `src2`)\n")
+    md_lines.append("# 🛑 Truly Dead Legacy Code Decision Matrix (Dead in both `src` and `src`)\n")
     md_lines.append("> [post] timestamp=2026-06-26\n")
     md_lines.append("> Review the dead codes listed under each category. Use the **Review / Replaced By** column to identify why they became obsolete, and update the **Final Decision** column to document the action.\n\n")
 
@@ -162,7 +162,7 @@ def main():
             md_lines.append("No dead items identified in this category.\n\n")
             continue
 
-        md_lines.append("| S/No. | Symbol Name / Type | src Location | src2 Location | Reason (src2 Audit) | Review / Replaced By | Final Decision |\n")
+        md_lines.append("| S/No. | Symbol Name / Type | src Location | src Location | Reason (src Audit) | Review / Replaced By | Final Decision |\n")
         md_lines.append("|---|---|---|---|---|---|---|\n")
 
         for idx, item in enumerate(sorted(items, key=lambda x: x["name"]), 1):

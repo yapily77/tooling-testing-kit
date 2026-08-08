@@ -95,7 +95,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
 
         # Clear DB to ensure clean state
         try:
-            from src2.interfaces.telegram.db import Database
+            from src.interfaces.telegram.db import Database
             db = Database()
             db.delete_all_user_data(chat_id)
         except Exception as e:
@@ -211,7 +211,7 @@ def main():
         run_cmd("pytest tests/ -k swap_config")
         
     # 2. Run Preflight Diagnostics
-    run_cmd("python -m src2.interfaces.telegram.preflight")
+    run_cmd("python -m src.interfaces.telegram.preflight")
 
     # 3. Execute the Gold Test
     print(f"\n🏃 Running {TEST_NAME} gold test...")

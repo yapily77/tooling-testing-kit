@@ -9,7 +9,7 @@ from _bootstrap import pkg_root  # noqa: F401,E402
 from pydantic import BaseModel, Field  # noqa: E402
 from pydantic_ai import Agent  # noqa: E402
 from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 from control import CONTROL_SHEET  # noqa: E402
 
@@ -160,7 +160,7 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
 
 
 def main():
-    files = get_src2_files()
+    files = get_src_files()
     file_contents = {}
 
     for file_path in files:

@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 # Ensure repo root in sys.path
 from _bootstrap import pkg_root  # noqa: F401,E402
 
-from utils import get_src2_files
+from utils import get_src_files
 from control import ControlSheet, SystemSettings  # noqa: E402
 
 # Initialize fast-json-repair if available
@@ -109,7 +109,7 @@ class LLMScanResult(BaseModel):
 
 def build_registry_api_map() -> dict:
     """Introspect unified.py to find all registry objects and their API surfaces."""
-    from src2.core.schemas import unified
+    from src.core.schemas import unified
 
     registry_map = {}
 
@@ -371,7 +371,7 @@ def runtime_verify_pre(site, import_map) -> str:
     # 3. Fallback to unified
     if obj is None:
         try:
-            from src2.core.schemas import unified
+            from src.core.schemas import unified
             obj = getattr(unified, orig_name, None)
         except Exception:
             pass
@@ -407,7 +407,7 @@ def runtime_verify(finding: dict, registry_map: dict) -> dict:
         return finding
 
     try:
-        from src2.core.schemas import unified
+        from src.core.schemas import unified
         obj = getattr(unified, orig_name, None)
         if not obj:
             finding["verified_status"] = "UNVERIFIED"
@@ -471,8 +471,8 @@ async def main_async(do_verify: bool, limit: int | None = None, scripts_only: bo
     registry_map = build_registry_api_map()
     print(f"📚 Loaded {len(registry_map)} registry schemas from unified.py")
 
-    files = get_src2_files()
-    print(f"🔍 Scanning {len(files)} files in src2/...")
+    files = get_src_files()
+    print(f"🔍 Scanning {len(files)} files in src/...")
 
     scanned_files = load_checkpoint()
     print(f"♻️ Resuming from checkpoint: {len(scanned_files)} already scanned")

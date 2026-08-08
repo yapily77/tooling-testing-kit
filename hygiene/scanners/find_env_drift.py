@@ -9,7 +9,7 @@ from _bootstrap import pkg_root  # noqa: F401,E402
 from pydantic import BaseModel, Field  # noqa: E402
 from pydantic_ai import Agent  # noqa: E402
 from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 from control import CONTROL_SHEET  # noqa: E402
 
@@ -151,7 +151,7 @@ def audit_candidate_with_llm(candidate: EnvDriftCandidate, file_contents: dict[s
 def generate_markdown_report(report: AuditReport, md_path: Path):
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Environment Variables Drift Audit Report\n\n")
-        out.write(f"Scanned `{report.scanned_files_count}` files in `src2/`.\n\n")
+        out.write(f"Scanned `{report.scanned_files_count}` files in `src/`.\n\n")
 
         if not report.audit_results:
             out.write("🎉 *No environment drift detected! .env.example matches the codebase.*\n")
@@ -173,7 +173,7 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
 
 
 def main():
-    files = get_src2_files()
+    files = get_src_files()
     example_vars = load_env_example_vars()
     file_contents = {}
     code_vars = {}

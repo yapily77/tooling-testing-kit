@@ -17,7 +17,7 @@ from pathlib import Path
 
 from _bootstrap import pkg_root  # noqa: F401,E402
 
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 BANNED_DICT_METHODS = {
     "get",
@@ -108,7 +108,7 @@ def scan_file(path: Path) -> list[dict]:
 
 
 def main() -> None:
-    files = get_src2_files()
+    files = get_src_files()
     all_candidates: list[dict] = []
     for f in files:
         all_candidates.extend(scan_file(f))

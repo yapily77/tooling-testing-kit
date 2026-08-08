@@ -21,11 +21,11 @@ def _resolve_scan_roots() -> list[Path]:
     """Resolve SCAN_ROOTS env var into a list of Path objects.
 
     Each entry is relative to AIB_FACTORY_ROOT or absolute.
-    Falls back to ``["src2"]`` for backward compatibility when SCAN_ROOTS is unset.
+    Falls back to ``["src"]`` for backward compatibility when SCAN_ROOTS is unset.
     """
     scan_roots_env = os.environ.get("SCAN_ROOTS")
     if not scan_roots_env:
-        return [Path("src2")]
+        return [Path("src")]
 
     factory_root = os.environ.get("AIB_FACTORY_ROOT")
     roots: list[Path] = []
@@ -53,7 +53,7 @@ def _is_py_file(rel_path: str) -> bool:
     )
 
 
-def get_src2_files() -> list[Path]:
+def get_src_files() -> list[Path]:
     """Get all Python files under configured scan roots, or override via env.
 
     Honors:
@@ -62,7 +62,7 @@ def get_src2_files() -> list[Path]:
       - AIB_FACTORY_ROOT: base directory for relative SCAN_ROOTS entries.
       - ``--diff``: git-changed files only, filtered to SCAN_ROOTS.
 
-    When SCAN_ROOTS is unset, falls back to scanning ``src2`` (backward compat).
+    When SCAN_ROOTS is unset, falls back to scanning ``src`` (backward compat).
     """
     use_diff = False
     if "--diff" in sys.argv:
@@ -179,3 +179,6 @@ def is_binary_file(file_path: Path) -> bool:
             return b"\x00" in chunk
     except Exception:
         return False
+
+
+get_src2_files = get_src_files

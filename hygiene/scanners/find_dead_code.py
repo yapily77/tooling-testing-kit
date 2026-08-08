@@ -10,7 +10,7 @@ from _bootstrap import pkg_root  # noqa: F401,E402
 from pydantic import BaseModel, Field  # noqa: E402
 from pydantic_ai import Agent  # noqa: E402
 from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 from control import CONTROL_SHEET  # noqa: E402
 
@@ -286,7 +286,7 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
     """Deterministically convert the Pydantic/JSON audit report to Markdown."""
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Dead Code Audit Report\n\n")
-        out.write(f"Scanned `{report.scanned_files_count}` files in `src2/`.\n\n")
+        out.write(f"Scanned `{report.scanned_files_count}` files in `src/`.\n\n")
 
         if report.failed_audits:
             out.write(
@@ -346,7 +346,7 @@ def load_manual_whitelist() -> set[str]:
 
 
 def main():
-    files = get_src2_files()
+    files = get_src_files()
 
     # 1. Catalog all definitions and AST-based whitelists
     all_defs: dict[str, list[CodeDefinition]] = {}

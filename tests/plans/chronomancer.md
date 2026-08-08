@@ -2,7 +2,7 @@
 
 ## 1. 🔍 Context, Tooling & AST Strategy
 *Map out the codebase before writing a single line of code.*
-- **Target Files:** `tests/01_gold_snapshots/05_chronomancer/`, `src2/engine/agents.py`, `src2/interfaces/telegram/chronomancer/coordinator.py`
+- **Target Files:** `tests/01_gold_snapshots/05_chronomancer/`, `src/engine/agents.py`, `src/interfaces/telegram/chronomancer/coordinator.py`
 - **Exploration Tools:** 
   - `/investigate`: `handle_ask`, `handle_daily`, `DailyDeps`
   - `Codebase Indexing`: `infrastructure/mem0`, `UserState` Redis caching

@@ -8,12 +8,12 @@ import yaml
 from _bootstrap import pkg_root, target_root  # noqa: F401,E402
 
 from pydantic import BaseModel, Field  # noqa: E402
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 # Paths
 BASE_DIR = target_root  # scanned repo root (TARGET_ROOT env; default = repo root)
-MESSAGES_PATH = BASE_DIR / "src2" / "interfaces" / "telegram" / "messages.yaml"
-SRC_DIR = BASE_DIR / "src2"
+MESSAGES_PATH = BASE_DIR / "src" / "interfaces" / "telegram" / "messages.yaml"
+SRC_DIR = BASE_DIR / "src"
 
 
 class MessageDriftCandidate(BaseModel):
@@ -135,7 +135,7 @@ def audit_candidate_locally(candidate: MessageDriftCandidate) -> AuditResult:
 def generate_markdown_report(report: AuditReport, md_path: Path):
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Telegram Message Keys Drift Report\n\n")
-        out.write(f"Scanned `{report.scanned_files_count}` files in `src2/`.\n\n")
+        out.write(f"Scanned `{report.scanned_files_count}` files in `src/`.\n\n")
 
         if not report.audit_results:
             out.write("🎉 *No message key drift detected! messages.yaml is perfectly synchronized.*\n")
@@ -157,7 +157,7 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
 
 
 def main():
-    files = get_src2_files()
+    files = get_src_files()
     messages = load_messages()
     usage = collect_usage(files)
 
@@ -194,7 +194,7 @@ def main():
         if key not in usage:
             candidates.append(
                 MessageDriftCandidate(
-                    name=key, file_path="src2/interfaces/telegram/messages.yaml", line=1, type="unused_message"
+                    name=key, file_path="src/interfaces/telegram/messages.yaml", line=1, type="unused_message"
                 )
             )
 

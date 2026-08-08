@@ -8,7 +8,7 @@ from _bootstrap import pkg_root  # noqa: F401,E402
 from pydantic import BaseModel, Field  # noqa: E402
 from pydantic_ai import Agent  # noqa: E402
 from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src2_files  # noqa: E402
+from utils import get_src_files  # noqa: E402
 
 from control import CONTROL_SHEET  # noqa: E402
 
@@ -154,7 +154,7 @@ def audit_candidate_with_llm(candidate: DuplicationCandidate, file_contents: dic
 def generate_markdown_report(report: AuditReport, md_path: Path):
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Code Duplication & Copypasta Report\n\n")
-        out.write(f"Scanned `{report.scanned_files_count}` files in `src2/`.\n\n")
+        out.write(f"Scanned `{report.scanned_files_count}` files in `src/`.\n\n")
 
         if not report.audit_results:
             out.write("🎉 *No code duplications found! Codebase is perfectly DRY.*\n")
@@ -170,7 +170,7 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
 
 
 def main():
-    files = get_src2_files()
+    files = get_src_files()
     file_contents = {}
 
     for file_path in files:
