@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`01_gold_snapshots: Regression Snapshot Locks > matches sanitized configuration snapshot 1`] = `
+"
+    // Configuration File
+    const DB_URI = "./projects/my-repo/data/app.db";
+    const API_ENDPOINT = "https://my-repo.internal/api/v1";
+    "
+`;

@@ -5,7 +5,7 @@ set -e
 
 echo "=========================================================="
 echo " Enterprise Quality & Sanitizer Toolkit - Bootstrap"
-echo " Prepared for Accenture Technical Demonstration"
+echo " Prepared for Accenture Technical Evaluation & Open Source"
 echo "=========================================================="
 
 if [ ! -f .env ]; then
@@ -15,12 +15,15 @@ else
   echo "[1/3] Existing .env file found."
 fi
 
-echo "[2/3] Executing Path & String Scrubber..."
-python3 tools/scrub_paths.py "baziforecaster" "my-repo"
+LEGACY_TOKEN="${1:-${TARGET_LEGACY_NAME:-legacy_project_name}}"
+CLEAN_TOKEN="${2:-${TARGET_CLEAN_NAME:-my-repo}}"
 
-echo "[3/3] Checking Node.js dependencies..."
+echo "[2/3] Executing Path & String Scrubber ($LEGACY_TOKEN -> $CLEAN_TOKEN)..."
+python3 tools/scrub_paths.py "$LEGACY_TOKEN" "$CLEAN_TOKEN"
+
+echo "[3/3] Installing dependencies..."
 npm install
 
 echo "----------------------------------------------------------"
-echo " Setup complete! Run 'npm run dev' to start the workspace."
+echo " Setup complete! Run 'npm test' or 'npm run dev'."
 echo "----------------------------------------------------------"
