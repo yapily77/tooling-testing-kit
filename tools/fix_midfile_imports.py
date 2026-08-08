@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
 fix_midfile_imports.py — AST tool to fix E402 mid-file imports and remove duplicate definitions.
-Moves all mid-file imports to the top of python files in src2/.
+Moves all mid-file imports to the top of python files in src/.
 """
 
 import ast
 from pathlib import Path
 
-repo_root = Path(__file__).resolve().parents[2]
-src2_dir = repo_root / "src2"
+repo_root = Path(__file__).resolve().parents[1]
+src_dir = repo_root / "src"
 
 
 def fix_file_imports(file_path: Path) -> bool:
@@ -81,7 +81,7 @@ def fix_file_imports(file_path: Path) -> bool:
 
 def main():
     fixed_count = 0
-    for py_file in sorted(src2_dir.rglob("*.py")):
+    for py_file in sorted(src_dir.rglob("*.py")):
         if py_file.is_file():
             if fix_file_imports(py_file):
                 fixed_count += 1

@@ -10,6 +10,7 @@ build/
 .next/
 out/
 *.egg-info/
+scratch/
 
 # Environment & Config
 .env

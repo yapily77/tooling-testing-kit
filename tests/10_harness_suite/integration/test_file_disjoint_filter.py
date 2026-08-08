@@ -3,11 +3,11 @@
 The cross-group / intra-group file-disjointness HALT (added by closed
 zu9u) must NOT trip on the Intern's untrusted file_paths
 claims. The Intern is reasoning-only and routinely emits derived/staging/
-hallucinated paths (e.g. ``factory/temp/src2/.../unified_patch.py``)
+hallucinated paths (e.g. ``factory/temp/src/.../unified_patch.py``)
 into file_paths. Those are not real source files and cannot cause a
 concurrent-edit race, so they must be filtered out before the assertion.
 
-Genuine overlap of TWO REAL existing src2/ source files across concurrent
+Genuine overlap of TWO REAL existing src/ source files across concurrent
 groups MUST still HALT (true positive).
 
 No LLM keys required: intern_fn is stubbed and the plan is built in-process.
@@ -39,8 +39,8 @@ from factory.infra.context import _real_source_paths
 from factory.infra.execution import run_execute_phase
 
 
-def _make_real_src2(rel: str) -> Path:
-    """Create a real file under the repo's src2/ tree; return its Path."""
+def _make_real_src(rel: str) -> Path:
+    """Create a real file under the repo's src/ tree; return its Path."""
     fp = REPO_ROOT / rel
     fp.parent.mkdir(parents=True, exist_ok=True)
     fp.write_text("# real source\n", encoding="utf-8")
@@ -88,18 +88,18 @@ async def _stub_intern_fn(brief: str, task_id: str | None = None):
 
 
 def test_real_source_paths_filters_derived_and_missing():
-    """Derived/staging/hallucinated/missing paths are dropped; real src2 kept."""
+    """Derived/staging/hallucinated/missing paths are dropped; real src kept."""
     with tempfile.TemporaryDirectory() as d:
-        real = _make_real_src2("src2/_vw4dd_real.py")
+        real = _make_real_src("src/_vw4dd_real.py")
         try:
             got = _real_source_paths([
-                "src2/_vw4dd_real.py",  # real existing src2 file -> kept
-                str(Path(d) / "factory/temp/src2/core/schemas/unified_patch.py"),  # staging
-                "src2/does_not_exist_yet.py",  # missing
-                "factory/temp/foo.py",  # not under src2/
-                "README.md",  # real but not under src2/
+                "src/_vw4dd_real.py",  # real existing src file -> kept
+                str(Path(d) / "factory/temp/src/core/schemas/unified_patch.py"),  # staging
+                "src/does_not_exist_yet.py",  # missing
+                "factory/temp/foo.py",  # not under src/
+                "README.md",  # real but not under src/
             ])
-            assert got == ["src2/_vw4dd_real.py"]
+            assert got == ["src/_vw4dd_real.py"]
         finally:
             _rm(real)
 
@@ -114,14 +114,14 @@ def test_false_positive_plan_does_not_crash(monkeypatch):
     g1 = WorkGroup(
         id="g1",
         tasks=[ApprovedTask(id="intern01", title="t1",
-                            file_paths=["factory/temp/src2/core/schemas/unified_patch.py"],
+                            file_paths=["factory/temp/src/core/schemas/unified_patch.py"],
                             instruction="i", acceptance="a", tool_preference="CLI-wrapper")],
     )
     g2 = WorkGroup(
         id="g2",
         depends_on=["g1"],
         tasks=[ApprovedTask(id="intern02", title="t2",
-                            file_paths=["src2/does_not_exist.py"],
+                            file_paths=["src/does_not_exist.py"],
                             instruction="i", acceptance="a", tool_preference="CLI-wrapper")],
     )
     plan = _plan_with([g1, g2])
@@ -133,18 +133,18 @@ def test_false_positive_plan_does_not_crash(monkeypatch):
 
 
 def test_true_positive_real_overlap_still_halts():
-    """Two concurrent groups (no depends_on) sharing a REAL src2/ file MUST HALT."""
-    shared = _make_real_src2("src2/_vw4dd_shared.py")
+    """Two concurrent groups (no depends_on) sharing a REAL src/ file MUST HALT."""
+    shared = _make_real_src("src/_vw4dd_shared.py")
     try:
         g1 = WorkGroup(
             id="g1",
-            tasks=[ApprovedTask(id="intern01", title="t1", file_paths=["src2/_vw4dd_shared.py"],
+            tasks=[ApprovedTask(id="intern01", title="t1", file_paths=["src/_vw4dd_shared.py"],
                                 instruction="i", acceptance="a", tool_preference="CLI-wrapper")],
         )
         g2 = WorkGroup(
             id="g2",
             # No depends_on — genuinely concurrent with g1, so file overlap is unsafe
-            tasks=[ApprovedTask(id="intern02", title="t2", file_paths=["src2/_vw4dd_shared.py"],
+            tasks=[ApprovedTask(id="intern02", title="t2", file_paths=["src/_vw4dd_shared.py"],
                                 instruction="i", acceptance="a", tool_preference="CLI-wrapper")],
         )
         plan = _plan_with([g1, g2])
@@ -165,17 +165,17 @@ def test_depends_on_chain_allows_file_overlap(monkeypatch):
         "factory.infra.execution._write_harness_patches",
         lambda task_id, files, bd="": ([], 1),
     )
-    shared = _make_real_src2("src2/_vw4dd_chain_overlap.py")
+    shared = _make_real_src("src/_vw4dd_chain_overlap.py")
     try:
         g1 = WorkGroup(
             id="g1",
-            tasks=[ApprovedTask(id="intern01", title="t1", file_paths=["src2/_vw4dd_chain_overlap.py"],
+            tasks=[ApprovedTask(id="intern01", title="t1", file_paths=["src/_vw4dd_chain_overlap.py"],
                                 instruction="i", acceptance="a", tool_preference="CLI-wrapper")],
         )
         g2 = WorkGroup(
             id="g2",
             depends_on=["g1"],
-            tasks=[ApprovedTask(id="intern02", title="t2", file_paths=["src2/_vw4dd_chain_overlap.py"],
+            tasks=[ApprovedTask(id="intern02", title="t2", file_paths=["src/_vw4dd_chain_overlap.py"],
                                 instruction="i", acceptance="a", tool_preference="CLI-wrapper")],
         )
         plan = _plan_with([g1, g2])

@@ -4,16 +4,16 @@ import pkgutil
 
 from pydantic import BaseModel, RootModel
 
-import src2
+import src
 
 
 def get_all_pydantic_models() -> list[type[BaseModel]]:
     models: list[type[BaseModel]] = []
-    src2_dir = str(src2.__path__[0])
+    src_dir = str(src.__path__[0])
     seen: set[str] = set()
 
     for importer, modname, ispkg in pkgutil.walk_packages(
-        src2.__path__, src2.__name__ + "."
+        src.__path__, src.__name__ + "."
     ):
         try:
             mod = importlib.import_module(modname)
@@ -21,7 +21,7 @@ def get_all_pydantic_models() -> list[type[BaseModel]]:
             continue
 
         mod_file = getattr(mod, "__file__", None)
-        if not mod_file or not mod_file.startswith(src2_dir):
+        if not mod_file or not mod_file.startswith(src_dir):
             continue
 
         for name, obj in inspect.getmembers(mod, inspect.isclass):

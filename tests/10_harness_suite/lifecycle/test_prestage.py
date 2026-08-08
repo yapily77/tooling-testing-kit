@@ -1,7 +1,7 @@
 """Tests for Conductor-led Pre-staging.
 
 Exercises stage_workspace_from_draft to ensure:
-  1. Existing source files (src2/...) are copied to factory/temp/src2/...
+  1. Existing source files (src/...) are copied to factory/temp/src/...
   2. Proposed new deliverables (ending in .diff, .md or with temp/ in path) are touched as empty files.
 """
 from __future__ import annotations
@@ -41,21 +41,21 @@ def test_stage_workspace_from_draft(tmp_path, monkeypatch):
     monkeypatch.setattr(context_mod, "TEMP_DIR", mock_temp)
 
     # Create dummy source files
-    src2_dir = tmp_path / "src2" / "engine"
-    src2_dir.mkdir(parents=True, exist_ok=True)
-    live_file = src2_dir / "module_test.py"
+    src_dir = tmp_path / "src" / "engine"
+    src_dir.mkdir(parents=True, exist_ok=True)
+    live_file = src_dir / "module_test.py"
     live_file.write_text("print('hello')", encoding="utf-8")
 
     # Define DraftPlan with subtasks referencing existing files and new deliverables
     subtask = SubTaskBrief(
         id="intern01",
         title="Edit test module",
-        file_paths=["src2/engine/module_test.py", "factory/temp/patch_test.diff"],
+        file_paths=["src/engine/module_test.py", "factory/temp/patch_test.diff"],
         instruction="Do something",
         acceptance="done",
         tool_preference="AST-edit",
         evidence=[
-            EvidenceItem(file_path="src2/engine/module_test.py", content="print('hello')"),
+            EvidenceItem(file_path="src/engine/module_test.py", content="print('hello')"),
             EvidenceItem(file_path="factory/temp/patch_test.diff", content="")
         ]
     )
@@ -81,12 +81,12 @@ def test_stage_workspace_from_draft(tmp_path, monkeypatch):
                             ApprovedTask.model_construct(
                                 id="intern01",
                                 title="Edit test module",
-                                file_paths=["src2/engine/module_test.py", "factory/temp/patch_test.diff"],
+                                file_paths=["src/engine/module_test.py", "factory/temp/patch_test.diff"],
                                 instruction="Do something",
                                 acceptance="done",
                                 tool_preference="AST-edit",
                                 evidence=[
-                                    EvidenceItem(file_path="src2/engine/module_test.py", content="print('hello')"),
+                                    EvidenceItem(file_path="src/engine/module_test.py", content="print('hello')"),
                                     EvidenceItem(file_path="factory/temp/patch_test.diff", content="")
                                 ],
                                 approved=True,
@@ -103,8 +103,8 @@ def test_stage_workspace_from_draft(tmp_path, monkeypatch):
     stage_workspace_from_draft(draft, bd="test_bd")
 
     # Assertions
-    # 1. Existing source file is copied to temp/src2/...
-    copied_src = mock_temp / "src2" / "engine" / "module_test.py"
+    # 1. Existing source file is copied to temp/src/...
+    copied_src = mock_temp / "src" / "engine" / "module_test.py"
     assert copied_src.exists()
     assert copied_src.read_text(encoding="utf-8") == "print('hello')"
 

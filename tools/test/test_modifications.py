@@ -24,6 +24,10 @@ def setup():
         shutil.rmtree(SCRATCH_DIR)
     os.makedirs(SCRATCH_DIR)
 
+def teardown():
+    if os.path.exists(SCRATCH_DIR):
+        shutil.rmtree(SCRATCH_DIR)
+
 def test_write_file():
     print("Testing write_file...")
     path = f"{SCRATCH_DIR}/test.txt"
@@ -106,11 +110,14 @@ def test_ast_clean_imports():
 
 if __name__ == "__main__":
     setup()
-    tests = [test_write_file, test_replace_text, test_replace_function, test_add_constant,
-             test_add_import, test_delete_file, test_rename_file, test_move_symbol, test_ast_clean_imports]
-    results = []
-    for test in tests:
-        results.append((test.__name__, test()))
+    try:
+        tests = [test_write_file, test_replace_text, test_replace_function, test_add_constant,
+                 test_add_import, test_delete_file, test_rename_file, test_move_symbol, test_ast_clean_imports]
+        results = []
+        for test in tests:
+            results.append((test.__name__, test()))
 
-    for name, res in results:
-        print(f"{name}: {'PASS' if res else 'FAIL'}")
+        for name, res in results:
+            print(f"{name}: {'PASS' if res else 'FAIL'}")
+    finally:
+        teardown()

@@ -1,6 +1,6 @@
 {
-  "name": "Acivar Digital Tools Test Kit",
-  "description": "Portable Python 3.11+ Quality Engineering Toolkit — hygiene scanners, test stubs, AST code-mods, and path sanitization suite.",
+  "name": "Tooling & Testing Kit",
+  "description": "Enterprise-grade AI Engineering, Static Analysis, and Harness Testing Toolkit for Python Workflows",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
