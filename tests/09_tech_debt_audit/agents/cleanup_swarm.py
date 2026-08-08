@@ -19,7 +19,7 @@ base_url = os.getenv("LOCAL_FREE_GEMINI_URL", "http://localhost:18000/v1")
 api_key = os.getenv("LLM_API_KEY") or _kit_api_key or "localfreegemini"
 LOCAL_URL = f"{base_url.replace('/v1', '/v1beta')}/models/gemini-3.1-flash-lite:generateContent?key={api_key}"
 PROJECT_ROOT = Path(__file__).parents[3].resolve()
-# Annot: TEST/tech_debt reports are baziforecaster-only; honour KIT_PATH override.
+# Annot: TEST/tech_debt reports are my-repo-only; honour KIT_PATH override.
 _kit_root = os.getenv("KIT_PATH", "")
 VERIFIED_DEBT_PATH = Path(_kit_root) / "09_tech_debt_audit" / "reports" / "verified_tech_debt.json" if _kit_root else PROJECT_ROOT / "TEST/tech_debt/reports/verified_tech_debt.json"
 
@@ -63,14 +63,14 @@ def run_tests() -> bool:
         logger.warning("Ruff linter failed!")
         return False
     logger.info("Running project verification test suite...")
-    # Annot: TEST/test_run.py is baziforecaster-only; guarded by existence check
+    # Annot: TEST/test_run.py is my-repo-only; guarded by existence check
     test_runner = PROJECT_ROOT / "TEST/test_run.py"
     if test_runner.exists():
         if not run_cmd(["uv", "run", "python", str(test_runner)]):
             logger.warning("Test suite failed!")
             return False
     else:
-        logger.warning("TEST/test_run.py not found — skipping (baziforecaster-only).")
+        logger.warning("TEST/test_run.py not found — skipping (my-repo-only).")
     return True
 
 async def request_fix(file_path: Path, issue: dict) -> str:

@@ -2,7 +2,7 @@
 
 ## 1. 🔍 Context, Tooling & AST Strategy
 *Map out the codebase before writing a single line of code.*
-- **Target Files:** `[baziforecaster-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]`, `src2/engine/agents.py`, `src2/interfaces/telegram/chronomancer/coordinator.py`
+- **Target Files:** `[my-repo-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]`, `src2/engine/agents.py`, `src2/interfaces/telegram/chronomancer/coordinator.py`
 - **Exploration Tools:** 
   - `/investigate`: `handle_ask`, `handle_daily`, `DailyDeps`
   - `Codebase Indexing`: `infrastructure/mem0`, `UserState` Redis caching
@@ -40,7 +40,7 @@
 
 ## 5. 🔄 The OpenCode Test & Resolution Protocol
 *Strict instructions for how I will handle test failures during execution.*
-- **Initial Test Phase:** Run the E2E script via `# baziforecaster-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.`.
+- **Initial Test Phase:** Run the E2E script via `# my-repo-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.`.
 - **Failure Protocol:** If a test fails, I WILL NOT blindly fall into a `test > fix > repeat` loop.
 - **AST & Subagent Escalation:** 
   1. I will halt direct modification.

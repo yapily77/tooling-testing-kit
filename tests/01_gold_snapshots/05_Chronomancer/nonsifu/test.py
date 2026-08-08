@@ -4,7 +4,7 @@ import os
 import sys
 from pathlib import Path
 
-# Annot: baziforecaster-only (src2.* imports). Honour KIT_PATH / TARGET_REPO override.
+# Annot: my-repo-only (src2.* imports). Honour KIT_PATH / TARGET_REPO override.
 _kit_root = os.getenv("KIT_PATH", "") or os.getenv("TARGET_REPO", "")
 PROJECT_ROOT = Path(_kit_root) if _kit_root else Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(PROJECT_ROOT))

@@ -116,7 +116,7 @@ def stop_process(process: subprocess.Popen) -> None:
 def run_gold(config: WorkerConfig, tests: list[str], snapshots: list[str] | None = None) -> dict:
     cmd = [
         sys.executable,
-        "TEST/GOLD/run.py",  # [baziforecaster-only: not in kit download]
+        "TEST/GOLD/run.py",  # [my-repo-only: not in kit download]
         "--server-url",
         config.server_url,
         "--db-file",

@@ -21,9 +21,9 @@ LOCAL_URL = f"{base_url.replace('/v1', '/v1beta')}/models/gemini-3.1-flash-lite:
 MAX_CONCURRENT_AGENTS = 5
 STAGGER_DELAY_SECONDS = 8.0
 
-# Resolve PROJECT_ROOT inside the active baziforecaster directory
+# Resolve PROJECT_ROOT inside the active my-repo directory
 PROJECT_ROOT = Path(__file__).parents[3].resolve()
-# Annot: TEST/tech_debt reports are baziforecaster-only; honour KIT_PATH override.
+# Annot: TEST/tech_debt reports are my-repo-only; honour KIT_PATH override.
 _kit_root = os.getenv("KIT_PATH", "")
 REPORT_PATH = Path(_kit_root) / "09_tech_debt_audit" / "reports" / "raw_swarm_discovery.json" if _kit_root else PROJECT_ROOT / "TEST/tech_debt/reports/raw_swarm_discovery.json"
 

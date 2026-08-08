@@ -4,7 +4,7 @@ These two files exist in **three** places in the shipped kit (plus the live sour
 
 ## Matrix
 
-| file | `08_static_gates/`<br>(Phase-1, baziforecaster-sourced) | `10_harness_suite/_shared/`<br>(Phase-2, from `ai-factory/tests/`) | live source `ai-factory/tests/` |
+| file | `08_static_gates/`<br>(Phase-1, my-repo-sourced) | `10_harness_suite/_shared/`<br>(Phase-2, from `ai-factory/tests/`) | live source `ai-factory/tests/` |
 |---|---|---|---|
 | `agent_guardrail.py` | 736 lines (byte-identical) | 736 lines (byte-identical) | 736 lines (byte-identical) |
 | `agent_guardrail.json` | present | present | present |
@@ -12,7 +12,7 @@ These two files exist in **three** places in the shipped kit (plus the live sour
 
 ## How the diff arises
 
-`agent_guardrail.py` is **byte-identical** everywhere — baziforecaster and `ai-factory/tests/`
+`agent_guardrail.py` is **byte-identical** everywhere — my-repo and `ai-factory/tests/`
 share the same canonical copy. The Phase-1 `_source/` mirror therefore produced a 08 copy
 identical to the harness source.
 

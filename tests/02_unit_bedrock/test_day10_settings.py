@@ -12,7 +12,7 @@ class TestSettings:
         with patch.dict(os.environ, {"DATABASE_URL": "postgresql+asyncpg://test:test@localhost/testdb", "APP_PORT": "8443"}, clear=False):
             s = Settings()
             assert s.s3_endpoint == "http://localhost:9000"
-            assert s.s3_bucket == "baziforecaster"
+            assert s.s3_bucket == "my-repo"
             assert s.app_port == "8443"
 
     def test_settings_loads_from_env(self, monkeypatch):

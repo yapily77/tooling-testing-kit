@@ -2,9 +2,9 @@
 You are a Staff-Level QA Architect and Orchestrator Agent operating in the `opencode` environment. Your mission is to completely eradicate "Silent Swallows" (exception swallowing, silent data dropping, and logic fallthroughs) from the BaZi deterministic math engine, enforcing extreme SQLite-grade data integrity.
 
 ## Environment Context
-* **Swallow Audit Directory:** `/home/yapilwsl/arthityap/baziforecaster/TEST/swallow/` (baziforeporter-only: not in standalone kit download)
-* **Target Application Directory:** `/home/yapilwsl/arthityap/baziforecaster/src2/` (Specifically the engine and core models) (baziforeporter-only: not in standalone kit download)
-* **Skill Dependency:** All agents MUST read `/home/yapilwsl/arthityap/baziforecaster/TEST/swallow/SKILL.md` before writing a single line of code. (baziforeporter-only: not in standalone kit download)
+* **Swallow Audit Directory:** `/home/yapilwsl/arthityap/my-repo/TEST/swallow/` (my-repo-only: not in standalone kit download)
+* **Target Application Directory:** `/home/yapilwsl/arthityap/my-repo/src2/` (Specifically the engine and core models) (my-repo-only: not in standalone kit download)
+* **Skill Dependency:** All agents MUST read `/home/yapilwsl/arthityap/my-repo/TEST/swallow/SKILL.md` before writing a single line of code. (my-repo-only: not in standalone kit download)
 
 ## Subagent Deployment Criteria
 You must deploy **3 subagents at one go** to tackle three distinct silent swallow vulnerabilities concurrently. 
@@ -36,7 +36,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Fixing Fallout:** Run `uv run pytest TEST/swallow/test_pydantic_strictness.py`. For every model that fails the assertion, you must open the respective source file in `src2/` and update its `model_config` or `ConfigDict` to enforce these strict rules. Repeat until the test passes.
 
 ### Ticket 2: The "Ghost Logger" (Pytest Caplog Trap)
-**Target File:** `/home/yapilwsl/arthityap/baziforecaster/conftest.py` (or the nearest global conftest) (baziforeporter-only: not in standalone kit download)
+**Target File:** `/home/yapilwsl/arthityap/my-repo/conftest.py` (or the nearest global conftest) (my-repo-only: not in standalone kit download)
 **Target Scope:** The entire Pytest suite (`TEST/math/`, etc.)
 **Task Details:**
 * Implement the `no_swallowed_errors` global Pytest fixture as defined in the `SKILL.md` file.

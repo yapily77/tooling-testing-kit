@@ -19,7 +19,7 @@ from src.services.compliance import export_user_data, forget_user
 from src.services.memory import log_chat
 from src.services.session import save_session
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster"
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo"
 
 
 @pytest_asyncio.fixture

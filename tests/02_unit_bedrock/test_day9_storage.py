@@ -12,7 +12,7 @@ class TestStorageService:
     def test_storage_service_initializes_with_defaults(self):
         svc = StorageService()
         assert svc.endpoint == "http://localhost:9000"
-        assert svc.bucket == "baziforecaster"
+        assert svc.bucket == "my-repo"
 
     def test_storage_service_initializes_with_env_vars(self, monkeypatch):
         monkeypatch.setenv("S3_ENDPOINT", "http://custom:9000")
@@ -30,7 +30,7 @@ class TestStorageService:
         mock_boto3.client.return_value = mock_client
         svc = StorageService()
         svc.upload_file("key/path.txt", "/tmp/file.txt")
-        mock_client.upload_file.assert_called_once_with("/tmp/file.txt", "baziforecaster", "key/path.txt")
+        mock_client.upload_file.assert_called_once_with("/tmp/file.txt", "my-repo", "key/path.txt")
 
     @patch("src.services.storage.boto3")
     def test_upload_string_calls_boto3(self, mock_boto3):

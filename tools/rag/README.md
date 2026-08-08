@@ -1,6 +1,6 @@
 # BaziRAG — Classical Chinese Bazi Text RAG
 
-A decoupled, portable subset of the baziforecaster RAG stack. Searches classical
+A decoupled, portable subset of the my-repo RAG stack. Searches classical
 Bazi (eight-characters / 八字) metaphysics texts using:
 
 - **Query translation** — Pydantic AI agent converts natural-language queries into

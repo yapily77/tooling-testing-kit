@@ -1,6 +1,6 @@
 """Property-based fuzzing tests for Database persistence boundary integrity.
 
-Ticket: baziforecaster-6pnz
+Ticket: my-repo-6pnz
 Goal: throw randomized and adversarial data at the SQLite persistence layer
 (`Database` in src2/interfaces/telegram/db.py) to prove the following
 invariants hold:

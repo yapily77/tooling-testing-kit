@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Path & String Sanitizer Script
-Scubs hardcoded project names (e.g., 'baziforecaster') and absolute machine paths,
+Scubs hardcoded project names (e.g., 'my-repo') and absolute machine paths,
 replacing them with configurable tokens or environment variables.
 """
 
@@ -9,7 +9,7 @@ import os
 import sys
 import re
 
-DEFAULT_LEGACY = "baziforecaster"
+DEFAULT_LEGACY = "my-repo"
 DEFAULT_TARGET = "my-repo"
 
 EXCLUDE_DIRS = {".git", "node_modules", ".vite", "dist"}

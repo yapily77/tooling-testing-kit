@@ -6,9 +6,9 @@ from typing import Any
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
-# Annot: src2 is baziforecaster-only; honour KIT_PATH override, else kit-relative.
+# Annot: src2 is my-repo-only; honour KIT_PATH override, else kit-relative.
 _kit_path = os.getenv("KIT_PATH", "")
-TARGET_DIR = Path(_kit_path) / "src2" if _kit_path else Path(__file__).resolve().parents[3] / "baziforecaster" / "src2"
+TARGET_DIR = Path(_kit_path) / "src2" if _kit_path else Path(__file__).resolve().parents[3] / "my-repo" / "src2"
 
 # Allowed Pydantic base classes
 PYDANTIC_BASES = {"BaseModel", "RootModel", "GenericModel", "BaseSettings"}

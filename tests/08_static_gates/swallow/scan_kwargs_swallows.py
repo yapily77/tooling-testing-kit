@@ -16,9 +16,9 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# Annot: src2 is baziforecaster-only; honour KIT_PATH override, else kit-relative.
+# Annot: src2 is my-repo-only; honour KIT_PATH override, else kit-relative.
 _kit_path = os.getenv("KIT_PATH", "")
-TARGET_DIR = os.path.join(_kit_path, "src2") if _kit_path else str(Path(__file__).resolve().parents[4] / "baziforecaster" / "src2")
+TARGET_DIR = os.path.join(_kit_path, "src2") if _kit_path else str(Path(__file__).resolve().parents[4] / "my-repo" / "src2")
 
 
 @dataclass
@@ -117,7 +117,7 @@ def scan_directory(directory: str):
 def main():
     print(f"\n🔍 Scanning {TARGET_DIR}/ for **kwargs black holes...\n")
     if not os.path.exists(TARGET_DIR):
-        print(f"⚠️  Target directory '{TARGET_DIR}' does not exist — skipping (baziforecaster-only).")
+        print(f"⚠️  Target directory '{TARGET_DIR}' does not exist — skipping (my-repo-only).")
         return 0
     violations = scan_directory(TARGET_DIR)
 

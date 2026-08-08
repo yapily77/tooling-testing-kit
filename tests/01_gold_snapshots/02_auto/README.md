@@ -1,7 +1,7 @@
 # 02_auto — `/auto` Full Intake Flow
 
 > [!NOTE]
-> **Test Optimization**: Because [`04_monthly`](file:///home/yapilwsl/arthityap/baziforecaster/[baziforecaster-only: TEST/GOLD/04_monthly/README.md not in kit download]) already performs the entire auto-intake sequence as part of its setup steps, you do **not** need to run `02_auto` separately if you are running `04_monthly`. Running `04_monthly` alone covers both scopes and saves test execution time.
+> **Test Optimization**: Because [`04_monthly`](file:///home/yapilwsl/arthityap/my-repo/[my-repo-only: TEST/GOLD/04_monthly/README.md not in kit download]) already performs the entire auto-intake sequence as part of its setup steps, you do **not** need to run `02_auto` separately if you are running `04_monthly`. Running `04_monthly` alone covers both scopes and saves test execution time.
 
 ## Scenario
 

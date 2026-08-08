@@ -5,7 +5,7 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    TEST SUITE RUNNER                    │
-│                  ([baziforecaster-only: TEST/GOLD/run.py not in kit download])                      │
+│                  ([my-repo-only: TEST/GOLD/run.py not in kit download])                      │
 └────────────────────────┬────────────────────────────────┘
                          │
                          ▼
@@ -64,10 +64,10 @@ When modifying files in the repository, you MUST run the corresponding target Go
 
 | If you modified: | Run ONLY this target command: | Gold Folder impacted: |
 |---|---|---|
-| `src/bot/intake.py` or `conductor.py` | `# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 01_start --test 02_auto` | `01_start`, `02_auto` |
-| `src/bot/tailoring.py` | `# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 02_auto` | `02_auto` |
-| `src/bot/chronomancer_handler.py` | `# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 04_daily --test 05_forecast --test 06_forecast_category --test 09_chrono_ask` | `04_daily`, `05_forecast`, `06_forecast_category`, `09_chrono_ask` |
-| `src/bot/stakeholder_intake.py` | `# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 12_stakeholder` | `12_stakeholder` |
+| `src/bot/intake.py` or `conductor.py` | `# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 01_start --test 02_auto` | `01_start`, `02_auto` |
+| `src/bot/tailoring.py` | `# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 02_auto` | `02_auto` |
+| `src/bot/chronomancer_handler.py` | `# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 04_daily --test 05_forecast --test 06_forecast_category --test 09_chrono_ask` | `04_daily`, `05_forecast`, `06_forecast_category`, `09_chrono_ask` |
+| `src/bot/stakeholder_intake.py` | `# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 12_stakeholder` | `12_stakeholder` |
 
 > [!WARNING]
 > **Gold Snapshots:** If you intentionally change Bazi mathematical formulas (like the Flat Tier 1 DM strengths), the Gold Snapshots will fail. You must explicitly update the Gold snapshots (e.g., `--update-snapshots`) after receiving user approval.

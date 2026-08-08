@@ -12,7 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 # 2. Load the mock test_control module dynamically since 00_infra is not a valid Python identifier
-# [baziforecaster-only: TEST/GOLD/00_infra/test_control.py not in kit download]
+# [my-repo-only: TEST/GOLD/00_infra/test_control.py not in kit download]
 test_control = importlib.import_module("TEST.GOLD.00_infra.test_control")
 
 # 3. Inject mock into sys.modules to intercept imports of admin.controls.controls

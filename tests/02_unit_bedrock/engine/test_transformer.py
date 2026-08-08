@@ -1,6 +1,6 @@
 """
 Unit tests for transformer.py — specifically the to_user_profile() function
-and the json_type validation crash fix (baziforecaster-ep638).
+and the json_type validation crash fix (my-repo-ep638).
 
 Root cause: to_user_profile() called UserProfile.model_validate_json(raw) which
 expects a JSON string. Callers in calendar_node.py and coordinator.py passed raw

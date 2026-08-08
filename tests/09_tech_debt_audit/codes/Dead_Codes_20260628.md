@@ -9,7 +9,7 @@ This report summarizes the dead-code audit aligning the main baseline (`src/`) a
 
 * **Total Symbols Evaluated**: `237` legacy functions/classes
 * **Successfully Kept / Restored**: `151` symbols
-* **Finally Recommended to Drop**: `76` symbols (documented in [dead_code_deepdive_results_DropOnly.json](file:///home/yapilwsl/arthityap/baziforecaster/TEST/codes/20260626_SRC2/dead_code_deepdive_results_DropOnly.json)) (baziforeporter-only: not in standalone kit download)
+* **Finally Recommended to Drop**: `76` symbols (documented in [dead_code_deepdive_results_DropOnly.json](file:///home/yapilwsl/arthityap/my-repo/TEST/codes/20260626_SRC2/dead_code_deepdive_results_DropOnly.json)) (my-repo-only: not in standalone kit download)
 * **Under Serious Review (Nuance Gap / Restorations)**: `10` accidentally dropped symbols + `billing.py` and `contradiction_resolver.py` focus areas.
 
 ---
@@ -17,7 +17,7 @@ This report summarizes the dead-code audit aligning the main baseline (`src/`) a
 ## 🔍 Focus Area 1: `billing.py` (Promo Codes & Gatekeeping)
 
 ### Current Status
-* **File Location**: [billing.py](file:///home/yapilwsl/arthityap/baziforecaster/src2/core/services/billing.py) (baziforeporter-only: not in standalone kit download)
+* **File Location**: [billing.py](file:///home/yapilwsl/arthityap/my-repo/src2/core/services/billing.py) (my-repo-only: not in standalone kit download)
 * **Action**: **KIV (Keep In View)**.
 * **Core Issue**: Currently, billing and promo code services are fully defined but unused in the refactored `src2/` branch. However, they are essential for future tier management and gatekeeping.
 
@@ -34,7 +34,7 @@ This report summarizes the dead-code audit aligning the main baseline (`src/`) a
 ## 🔍 Focus Area 2: `contradiction_resolver.py` (Bazi Nuance Resolution)
 
 ### Current Status
-* **File Location**: [contradiction_resolver.py](file:///home/yapilwsl/arthityap/baziforecaster/src2/engine/contradiction_resolver.py) (baziforeporter-only: not in standalone kit download)
+* **File Location**: [contradiction_resolver.py](file:///home/yapilwsl/arthityap/my-repo/src2/engine/contradiction_resolver.py) (my-repo-only: not in standalone kit download)
 * **Action**: **Requires Serious Review & Restoration**.
 * **Core Issue**: Several critical math/metaphysical logic helpers were flagged as "dead code" (unused) in the migration because the new 7-step `resolve_contradictions` function does not call them. However, their loss represents a degradation of Bazi nuance.
 
@@ -61,13 +61,13 @@ This report summarizes the dead-code audit aligning the main baseline (`src/`) a
 
 ### 1. Workplan to Remove Confirmed Dead Codes
 * **Actions**:
-  1. Parse [dead_code_deepdive_results_DropOnly.json](file:///home/yapilwsl/arthityap/baziforecaster/TEST/codes/20260626_SRC2/dead_code_deepdive_results_DropOnly.json) to safely extract the 76 confirmed dead functions/classes. (baziforeporter-only: not in standalone kit download)
+  1. Parse [dead_code_deepdive_results_DropOnly.json](file:///home/yapilwsl/arthityap/my-repo/TEST/codes/20260626_SRC2/dead_code_deepdive_results_DropOnly.json) to safely extract the 76 confirmed dead functions/classes. (my-repo-only: not in standalone kit download)
   2. Implement the edit using the Agent Guardrail:
      * Checkpoint: `uv run python agents/agent_guardrail.py checkpoint <path>`
      * Delete the code block.
      * Validate: `uv run python agents/agent_guardrail.py validate <path>`
   3. Run Targeted Gold E2E Tests:
-     * `# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.` (ensure no narrative changes occurred due to pruning).
+     * `# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.` (ensure no narrative changes occurred due to pruning).
 
 ### 2. Deep-Dive Review of `contradiction_resolver.py`
 * **Actions**:

@@ -159,7 +159,7 @@ async def check_celery_worker_ready() -> bool:
 
 
 async def run_uat_preflight():
-    print("=== Running BaziForecaster UAT E2E Preflight Checks ===\n")
+    print("=== Running my-repo UAT E2E Preflight Checks ===\n")
     results = await asyncio.gather(
         check_env_configs(),
         check_mock_telegram_server(),

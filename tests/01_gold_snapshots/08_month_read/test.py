@@ -3,7 +3,7 @@
 Standalone monthly forecast runner.
 
 Usage:
-    # baziforecaster-only: TEST/GOLD/08_month_read/run_monthly.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. [--chat-id 12345]
+    # my-repo-only: TEST/GOLD/08_month_read/run_monthly.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. [--chat-id 12345]
 
 Creates a mock session in DB, then calls run_pipeline_direct(chat_id).
 No Telegram webhook needed — runs entirely offline.

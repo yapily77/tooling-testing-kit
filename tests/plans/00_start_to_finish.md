@@ -3,9 +3,9 @@
 ## 1. 🔍 Context, Tooling & AST Strategy
 *Map out the codebase before writing a single line of code.*
 - **Target Files:**
-  - `[baziforecaster-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` (Chronomancer E2E Test)
-  - `[baziforecaster-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]` (Auto Monthly E2E Test)
-  - `[baziforecaster-only: TEST/GOLD/03_input/agent_run/run_pipeline.py not in kit download]` (Input Monthly E2E Test)
+  - `[my-repo-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` (Chronomancer E2E Test)
+  - `[my-repo-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]` (Auto Monthly E2E Test)
+  - `[my-repo-only: TEST/GOLD/03_input/agent_run/run_pipeline.py not in kit download]` (Input Monthly E2E Test)
   - `src2/interfaces/telegram/intake/calendar_node.py` (Auto engine ingress seam)
   - `src2/interfaces/telegram/bridge.py` & `src2/core/schemas/unified.py` (C5/C4 schema boundary & tailoring threading)
   - `src2/interfaces/telegram/chronomancer/coordinator.py`, `state_writer.py`, `forecast_store.py` (Chronomancer runtime & BaziCache)
@@ -41,23 +41,23 @@
 *Atomic steps. Must include validation. Executed sequentially as agreed.*
 
 - [ ] **Phase 1: Chronomancer 6-Step Conversational Pipeline Validation (`chronomancer.md`)**
-  - **Action:** Spawn a subagent to execute `[baziforecaster-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` with an extended timeout (300s+). Prior to running, auto-flush Redis key `user_state:999998` and DB test session records. Validate all 6 conversational turns (`/daily`, *"what should I do now?"*, *"best time to get married next year?"* rejection boundary, proposal date extraction, profile summary, and follow-up memory test).
+  - **Action:** Spawn a subagent to execute `[my-repo-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` with an extended timeout (300s+). Prior to running, auto-flush Redis key `user_state:999998` and DB test session records. Validate all 6 conversational turns (`/daily`, *"what should I do now?"*, *"best time to get married next year?"* rejection boundary, proposal date extraction, profile summary, and follow-up memory test).
   - **Validation:** Confirm 0ms BaziCache hits/misses function as expected, Redis `UserState` updates asynchronously without crashes, and all 6 assertions pass cleanly.
   - 🛑 **Context Lock:** Execute `bd` to log Phase 1 completion and lock the verified conversational state into memory.
 
 - [ ] **Phase 2: Auto Monthly Report E2E Validation (`auto_monthly.md`)**
-  - **Action:** Spawn a subagent to execute `[baziforecaster-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]`. Verify that `lunar-python` derives Tester's Day Master as "Mild Strong" (accepted drift), creates a valid `UserProfile`, injects `tailoring_concerns`, maps to `ChartProfile`, and includes `tailoring_context` in the prompt built by `prompt_maker.py`.
+  - **Action:** Spawn a subagent to execute `[my-repo-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]`. Verify that `lunar-python` derives Tester's Day Master as "Mild Strong" (accepted drift), creates a valid `UserProfile`, injects `tailoring_concerns`, maps to `ChartProfile`, and includes `tailoring_context` in the prompt built by `prompt_maker.py`.
   - **Validation:** Confirm the script completes with exit code 0 and generated `.yaml` prompt artifacts confirm `tailoring_context` presence across all 12 monthly evaluations.
   - 🛑 **Context Lock:** Execute `bd` to log Phase 2 completion and note any schema or prompt adjustments made.
   
 - [ ] **Phase 3: Input Monthly Report E2E Validation (`input_monthly.md`)**
-  - **Action:** Spawn a subagent to execute `[baziforecaster-only: TEST/GOLD/03_input/agent_run/run_pipeline.py not in kit download]`. Validate that manual dictionary input ingress (Tester's Ding Si / Jia Chen / Yi Mao / Ren Wu chart) passes through `map_profile_to_k3()`, builds `PillarMap` objects without dict-access crashes, and serializes all 12 monthly outputs into JSON.
+  - **Action:** Spawn a subagent to execute `[my-repo-only: TEST/GOLD/03_input/agent_run/run_pipeline.py not in kit download]`. Validate that manual dictionary input ingress (Tester's Ding Si / Jia Chen / Yi Mao / Ren Wu chart) passes through `map_profile_to_k3()`, builds `PillarMap` objects without dict-access crashes, and serializes all 12 monthly outputs into JSON.
   - **Validation:** Assert no silent exception swallowing occurred and inspect output JSON to confirm 12 monthly evaluations with tailoring context.
   - 🛑 **Context Lock:** Execute `bd` to log Phase 3 completion and verify Zero-Dicts adherence across all 12 monthly turns.
 
 ## 5. 🔄 The OpenCode Test & Resolution Protocol
 *Strict instructions for how I will handle test failures during execution.*
-- **Initial Test Phase:** Execute each E2E suite sequentially via subagents running `# baziforecaster-only: TEST/GOLD/... not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.`.
+- **Initial Test Phase:** Execute each E2E suite sequentially via subagents running `# my-repo-only: TEST/GOLD/... not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.`.
 - **Failure Protocol:** If a test fails, I WILL NOT blindly fall into a `test > fix > repeat` loop.
 - **AST & Subagent Escalation (3x Auto-Loop Autonomy):** 
   1. I will halt direct modification in the main thread.

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# [baziforecaster-only: TEST/GOLD/_helpers.py and TEST/GOLD/run.py not in kit download]
+# [my-repo-only: TEST/GOLD/_helpers.py and TEST/GOLD/run.py not in kit download]
 from TEST.GOLD._helpers import get_last_bot_reply_record
 from TEST.GOLD.run import send_webhook
 

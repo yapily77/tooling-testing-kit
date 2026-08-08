@@ -27,7 +27,7 @@ os.environ.setdefault("MEM0_MODEL", _mem0_model)
 os.environ.setdefault("CHRONO_MODEL", _model)
 os.environ.setdefault("CHRONO_URL", _base_url)
 os.environ.setdefault("TELEGRAM_API_BASE", "https://api.telegram.org")
-os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster")
+os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo")
 
 # Redirect SQLAlchemy engine creation in test session to SQLite in-memory to prevent TCP connection hangs
 _orig_create_engine = sqlalchemy.create_engine

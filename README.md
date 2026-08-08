@@ -1,6 +1,6 @@
 # kit
 
-**Portable, runnable slices of `baziforecaster`** — extracted so anyone can clone, configure, and run real ML-agent test & analysis patterns without a monorepo checkout, Docker, or API keys.
+**Portable, runnable slices of `my-repo`** — extracted so anyone can clone, configure, and run real ML-agent test & analysis patterns without a monorepo checkout, Docker, or API keys.
 
 This kit exists to:
 
@@ -71,7 +71,7 @@ kit/
 
 ## Why this matters
 
-`baziforecaster` has a huge, deeply coupled codebase. That's a strength in CI and a liability in an interview. This kit **slices the patterns out**, makes each one self-contained, and ships the minimum runnable artifact — so a candidate can clone one folder and immediately see:
+`my-repo` has a huge, deeply coupled codebase. That's a strength in CI and a liability in an interview. This kit **slices the patterns out**, makes each one self-contained, and ships the minimum runnable artifact — so a candidate can clone one folder and immediately see:
 
 - **Golden-snapshot testing** (`examples/01_git_snapshots.py`)
 - **Property/fuzz testing** (`examples/06_property_fuzz.py`)
@@ -83,7 +83,7 @@ kit/
 
 ## License
 
-MIT — see [`LICENSE`](./LICENSE). Built on top of `baziforecaster` (also MIT).
+MIT — see [`LICENSE`](./LICENSE). Built on top of `my-repo` (also MIT).
 
 ---
 

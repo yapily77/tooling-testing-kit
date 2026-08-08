@@ -1,7 +1,7 @@
 # 04_monthly — Monthly Forecast Generation
 
 > [!NOTE]
-> **Test Optimization**: Because `04_monthly` executes the full auto-intake sequence (Steps 1–7) as a prerequisite to saving the user profile in the database, running `04_monthly` already fully validates the [`02_auto`](file:///home/yapilwsl/arthityap/baziforecaster/[baziforecaster-only: TEST/GOLD/02_auto/README.md not in kit download]) flow. If you run `04_monthly`, there is no need to run `02_auto` separately.
+> **Test Optimization**: Because `04_monthly` executes the full auto-intake sequence (Steps 1–7) as a prerequisite to saving the user profile in the database, running `04_monthly` already fully validates the [`02_auto`](file:///home/yapilwsl/arthityap/my-repo/[my-repo-only: TEST/GOLD/02_auto/README.md not in kit download]) flow. If you run `04_monthly`, there is no need to run `02_auto` separately.
 
 ## Scenario
 
@@ -54,7 +54,7 @@ The monthly report pipeline utilises the following specialized AI models configu
 
 ## 🛡️ Implemented Preflight Check Plan
 
-Before initiating the sequential monthly forecast compilation, a diagnostic verification is executed automatically at runtime inside [**`pipeline_check.py`**](file:///home/yapilwsl/arthityap/baziforecaster/src2/interfaces/telegram/pipeline_check.py). (baziforeporter-only: not in standalone kit download)
+Before initiating the sequential monthly forecast compilation, a diagnostic verification is executed automatically at runtime inside [**`pipeline_check.py`**](file:///home/yapilwsl/arthityap/my-repo/src2/interfaces/telegram/pipeline_check.py). (my-repo-only: not in standalone kit download)
 
 ### Active Diagnostic Checklist:
 * **Model Gateway Diagnostics**: Pings `gemma-4-31b-it` (or the configured `PIPELINE_MODEL`) on port `18000` to verify the proxy routing and keys are active.
@@ -73,9 +73,9 @@ To fit the monthly generation within the **16K context limit** and respect rate 
 
 ## 📊 Training Data Telemetry (Logfire Capture)
 
-All LLM inputs and outputs are captured automatically for training and analysis via a custom OpenTelemetry `SpanProcessor` registered in [**`app.py`**](file:///home/yapilwsl/arthityap/baziforecaster/src2/interfaces/telegram/app.py). (baziforeporter-only: not in standalone kit download)
+All LLM inputs and outputs are captured automatically for training and analysis via a custom OpenTelemetry `SpanProcessor` registered in [**`app.py`**](file:///home/yapilwsl/arthityap/my-repo/src2/interfaces/telegram/app.py). (my-repo-only: not in standalone kit download)
 
-* **Output Directory**: [**`logs/training_data/`**](file:///home/yapilwsl/arthityap/baziforecaster/logs/training_data/) (baziforeporter-only: not in standalone kit download)
+* **Output Directory**: [**`logs/training_data/`**](file:///home/yapilwsl/arthityap/my-repo/logs/training_data/) (my-repo-only: not in standalone kit download)
 * **Format**: Each LLM interaction is saved as a JSON file containing the timestamp, request payload (system prompt, user prompt, tools), and response payload.
 
 ---
@@ -87,7 +87,7 @@ To verify that failures are handled loudly and pinpointed correctly, we can exec
 ### Method A: Preflight Unit Test (Diagnostic Fault Injection)
 We run the preflight test which validates that checks fail loudly when downstream components are offline:
 ```bash
-# baziforecaster-only: TEST/GOLD/test_preflight.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
+# my-repo-only: TEST/GOLD/test_preflight.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
 ```
 
 ### Method B: Mid-Run Crash Simulation (E2E Webhook Test)
@@ -113,7 +113,7 @@ To resolve issue #3 (stupid/generic RAG queries), we have introduced `test_RAG.p
 ### Test Execution:
 Run the diagnostic script to observe the query returned by the Gemma specialist RAG agent and the resulting grounding passages:
 ```bash
-# baziforecaster-only: TEST/GOLD/04_monthly/test_RAG.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
+# my-repo-only: TEST/GOLD/04_monthly/test_RAG.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
 ```
 
 ### Expected Outcomes:

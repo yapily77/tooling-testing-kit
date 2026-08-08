@@ -66,7 +66,7 @@ def test_grep_codebase():
 
 
 def test_get_file_symbols():
-    result = call_tool("get_file_symbols", relative_path="baziforecaster/src/bot/app.py")
+    result = call_tool("get_file_symbols", relative_path="my-repo/src/bot/app.py")
     assert result.get("success") is True, f"get_file_symbols failed: {result.get('message')}"
     symbols = result.get("symbols", [])
     print(f"    Found {len(symbols)} symbols")
@@ -85,22 +85,22 @@ def test_get_repo_structure():
 # ── Read Lane ────────────────────────────────────────────────
 
 def test_read_file():
-    result = call_tool("read_file", relative_path="baziforecaster/src/bot/app.py", start_line=1, end_line=10)
+    result = call_tool("read_file", relative_path="my-repo/src/bot/app.py", start_line=1, end_line=10)
     assert result.get("success") is True, f"read_file failed: {result.get('message')}"
     print(f"    Read {result.get('total_lines', 0)} total lines, showed lines {result.get('start_line')}-{result.get('end_line')}")
 
 
 def test_list_files():
-    result = call_tool("list_files", directory="baziforecaster/src/bot")
+    result = call_tool("list_files", directory="my-repo/src/bot")
     assert result.get("success") is True, f"list_files failed: {result.get('message')}"
     items = result.get("items", [])
-    print(f"    Found {len(items)} items in baziforecaster/src/bot")
+    print(f"    Found {len(items)} items in my-repo/src/bot")
 
 
 # ── Edit Lane ────────────────────────────────────────────────
 
 def test_write_and_read_file():
-    test_path = "baziforecaster/_test_write_file.py"
+    test_path = "my-repo/_test_write_file.py"
     test_content = "# test file\nprint('hello from test')\n"
     result = call_tool("write_file", relative_path=test_path, content=test_content)
     assert result.get("success") is True, f"write_file failed: {result.get('message')}"
@@ -115,7 +115,7 @@ def test_write_and_read_file():
 
 
 def test_replace_in_file():
-    test_path = "baziforecaster/_test_replace_file.py"
+    test_path = "my-repo/_test_replace_file.py"
     call_tool("write_file", relative_path=test_path, content="old_value = 1\n")
 
     result = call_tool("replace_in_file", relative_path=test_path, target_text="old_value", replacement_text="new_value")
@@ -130,8 +130,8 @@ def test_replace_in_file():
 
 
 def test_rename_file():
-    test_path = "baziforecaster/_test_rename_old.py"
-    renamed_path = "baziforecaster/_test_rename_new.py"
+    test_path = "my-repo/_test_rename_old.py"
+    renamed_path = "my-repo/_test_rename_new.py"
     call_tool("write_file", relative_path=test_path, content="# rename test\n")
 
     result = call_tool("rename_file", source_relative_path=test_path, destination_relative_path=renamed_path)
@@ -151,7 +151,7 @@ def test_rename_file():
 # ── Cleanup Lane ─────────────────────────────────────────────
 
 def test_ast_clean_imports():
-    test_path = "baziforecaster/_test_imports.py"
+    test_path = "my-repo/_test_imports.py"
     call_tool("write_file", relative_path=test_path, content="import os\nimport sys\nimport json\nprint('hi')\n")
     result = call_tool("ast_clean_imports", relative_path=test_path)
     assert result.get("success") is True, f"ast_clean_imports failed: {result.get('message')}"
@@ -163,7 +163,7 @@ def test_ast_clean_imports():
 # ── Info Lane ────────────────────────────────────────────────
 
 def test_count_lines():
-    result = call_tool("count_lines", files=["baziforecaster/src/bot/app.py", "baziforecaster/src/engine/bazi_data.py"])
+    result = call_tool("count_lines", files=["my-repo/src/bot/app.py", "my-repo/src/engine/bazi_data.py"])
     assert isinstance(result, dict)
     for f, count in result.items():
         print(f"    {f}: {count} lines")

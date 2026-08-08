@@ -21,7 +21,7 @@ We just completed a major codebase auditing phase and organized the codebase hyg
   ```
 
 ### 2. Hardened Score Validators
-* We modified [validators.py](file:///home/yapilwsl/arthityap/baziforecaster/src2/interfaces/telegram/validators.py) to implement a strict maximum score cap. (baziforeporter-only: not in standalone kit download)
+* We modified [validators.py](file:///home/yapilwsl/arthityap/my-repo/src2/interfaces/telegram/validators.py) to implement a strict maximum score cap. (my-repo-only: not in standalone kit download)
 * If any monthly forecast `composite_score` exceeds `81.0` (on the scale capped at 80.0), it now triggers a hard validation violation (`SCORE_OUT_OF_BOUNDS`) and blocks output. This prevents LLM out-of-bounds calculations or hallucinations.
 
 ---

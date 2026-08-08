@@ -14,7 +14,7 @@ import tempfile
 from unittest.mock import AsyncMock, patch
 
 # Add project root to sys.path — honor KIT_PATH or falling back to cwd.
-# Annot: src.* imports are baziforecaster-only; module is a snapshot test.
+# Annot: src.* imports are my-repo-only; module is a snapshot test.
 _kit_path = os.getenv("KIT_PATH", "")
 sys.path.append(_kit_path or os.getcwd())
 

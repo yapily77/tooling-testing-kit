@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # ruff: noqa: E402
 """
-GOLD Standard E2E Test Runner for BaziForecaster
+GOLD Standard E2E Test Runner for my-repo
 
 Usage:
-    # baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.              # Run all tests
-    # baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 01_start  # Run specific test
-    # baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --list       # List all tests
-    # baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --verbose    # Verbose output
+    # my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.              # Run all tests
+    # my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --test 01_start  # Run specific test
+    # my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --list       # List all tests
+    # my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --verbose    # Verbose output
 """
 
 import argparse
@@ -110,8 +110,8 @@ def start_server():
     env["ADMIN_ID"] = "999"
     env["TELEGRAM_ADMIN_ID"] = "999"
     server_process = subprocess.Popen(
-        # [baziforecaster-only: TEST/GOLD/00_infra/test_start.py not in kit download]
-        ["uv", "run", "python", "TEST/GOLD/00_infra/test_start.py", "--reset", "--skip-preflight"],  # [baziforecaster-only: not in kit download]
+        # [my-repo-only: TEST/GOLD/00_infra/test_start.py not in kit download]
+        ["uv", "run", "python", "TEST/GOLD/00_infra/test_start.py", "--reset", "--skip-preflight"],  # [my-repo-only: not in kit download]
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         cwd=str(PROJECT_ROOT),

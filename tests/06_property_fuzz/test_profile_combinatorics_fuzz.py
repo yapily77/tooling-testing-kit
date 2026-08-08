@@ -1,6 +1,6 @@
 """Property-based fuzzing tests for Configuration / Profile Combinatorics.
 
-Ticket: baziforecaster-6oba (Ticket 3 — Contradictory Data Validation)
+Ticket: my-repo-6oba (Ticket 3 — Contradictory Data Validation)
 
 Targets:
 - src2.core.schemas.unified: UserProfile (extra="forbid", gender migration

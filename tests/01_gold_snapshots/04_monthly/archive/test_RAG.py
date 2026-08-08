@@ -19,11 +19,11 @@ async def main():
     print("=== STARTING RAG SEARCH DIAGNOSTIC FOR MONTH 1 ===")
 
     # 1. Load test profile (User 999)
-    # Annot: baziforecaster-only profile; guarded by kit-existence check.
+    # Annot: my-repo-only profile; guarded by kit-existence check.
     _kit_path = os.getenv("KIT_PATH", "")
     profile_path = Path(_kit_path) / "_prd" / "users" / "999" / "profile.json" if _kit_path else None
     if not profile_path or not profile_path.exists():
-        print(f"Skipping: User 999 profile not found (baziforecaster-only). Set KIT_PATH.")
+        print(f"Skipping: User 999 profile not found (my-repo-only). Set KIT_PATH.")
         return
     if not profile_path.exists():
         print(f"Error: Profile not found at {profile_path}")

@@ -43,4 +43,4 @@ This plan validates that the `lunar-python` based auto-calculation correctly cre
     *   Confirm the pipeline outputs `.yaml` files showing the live LLM prompt execution.
 
 ## Autonomous Execution Strategy (Subagent Delegation)
-The background subagent will execute `[baziforecaster-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]`. The script will output intermediate files demonstrating the engine's behavior. The agent will read these artifacts to confirm success.
+The background subagent will execute `[my-repo-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]`. The script will output intermediate files demonstrating the engine's behavior. The agent will read these artifacts to confirm success.

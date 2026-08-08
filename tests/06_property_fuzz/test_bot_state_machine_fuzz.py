@@ -1,6 +1,6 @@
 """Stateful sequence fuzzing for the Telegram bot state machine.
 
-Ticket: baziforecaster-fpo6
+Ticket: my-repo-fpo6
 Goal: drive the bot's conversational state machine through random sequences of
 ``send_date`` / ``click_menu`` / ``send_garbage_text`` actions and assert:
   1. Anti-Deadlock Invariant: the bot never silently no-ops on a user message

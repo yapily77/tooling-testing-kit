@@ -11,11 +11,11 @@
 
 ## What This Test Does
 
-Simulates a Telegram user sending `/start` to the BaziForecaster bot over the
+Simulates a Telegram user sending `/start` to the my-repo bot over the
 isolated `test_telegram01` test channel and verifies the bot returns the welcome
 greeting with mode-selection prompt. It covers two scenarios:
 
-1. **Existing / paying customer** (`999001001`, seeded `PAID` by `00_infra/[baziforecaster-only: seed_test_users.py not in kit download]`).
+1. **Existing / paying customer** (`999001001`, seeded `PAID` by `00_infra/[my-repo-only: seed_test_users.py not in kit download]`).
 2. **New / free customer** (`999001002`, auto-created `FREE` on first contact).
 
 ## How To Run
@@ -23,14 +23,14 @@ greeting with mode-selection prompt. It covers two scenarios:
 ```bash
 # 1. Start the infra in a tmux session we can watch together (separate terminal)
 cd kit-tests
-# baziforecaster-only: TEST/GOLD/00_infra/start.sh not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
+# my-repo-only: TEST/GOLD/00_infra/start.sh not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
 #    -> tmux session "bazi-infra", window "services", runs start2.py on :8445
 
 # 2. Seed the test user (PAID) — run once per fresh DB
-# baziforecaster-only: TEST/GOLD/00_infra/seed_test_users.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
+# my-repo-only: TEST/GOLD/00_infra/seed_test_users.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
 
 # 3. Run the test against the LIVE tmux server (no embedded server start)
-# [baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
+# [my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
 uv run python -c "import sys; sys.path.insert(0,'.'); \
 import TEST.GOLD.run as R; \
 R.SERVER_URL='http://127.0.0.1:8445'; R.HEALTH_ENDPOINT=R.SERVER_URL+'/health'; \

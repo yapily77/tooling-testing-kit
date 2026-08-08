@@ -66,7 +66,7 @@ uv run start2.py
 ### B. Concurrent Gold E2E Testing
 Run the test runner directly against the running bot instance without spawning a sub-server or modifying disk files:
 ```bash
-# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --no-start-server --server-url http://127.0.0.1:8443
+# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --no-start-server --server-url http://127.0.0.1:8443
 ```
 * `--no-start-server`: Instructs the runner to bypass local startup and directory modification.
 * `--server-url`: Tells the runner to route all tests to the active port.

@@ -13,7 +13,7 @@ from src.identity.service import create_user
 from src.services.bazi import ask_chronomancer, generate_report, get_daily_forecast
 from src.services.intake import handle_message
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster"
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo"
 
 
 @pytest_asyncio.fixture

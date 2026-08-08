@@ -6,7 +6,7 @@ SESSION_NAME="bazi-infra"
 PROD_PORT=8445
 DOCKER_COMPOSE_FILE="infrastructure/docker/docker-compose.yml"
 
-echo "=== BaziForecaster Infra Manager ==="
+echo "=== my-repo Infra Manager ==="
 
 # 1. Clean up any existing tmux session to avoid conflicts
 if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then

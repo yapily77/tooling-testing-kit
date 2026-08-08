@@ -28,7 +28,7 @@ tests/
 
 ## Curation rules (applied during build)
 1. **Read-only source of truth**: all content derives from `_source/` (a staging
-   mirror of `baziforecaster/TEST/`). `baziforecaster/` is **never modified**.
+   mirror of `my-repo/TEST/`). `my-repo/` is **never modified**.
 2. **Drop silently** from every layer: `__pycache__/`, `.pytest_cache/`, `*.pyc`,
    `*.db`, and the heavy audit blob `codes/20260626_SRC2/` (already excluded from
    `_source/`).

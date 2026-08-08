@@ -19,13 +19,13 @@
 You are a Staff-Level QA Architect and Orchestrator for the `community-test-kit` (`kit-tests/`). Your mission is to make the kit **downloadable + configurable from a single `.env`** and **purge stale throwaway clutter** so a fresh cloner can set `KIT_PATH`/creds and hit run with zero friction. You harden the config surface: one `.env.example` contract, one fail-loud `config.py` shim, one `conftest.py` bridge — and remove every stale artifact that bloats a download (`.venv/`, `.hypothesis/`, `.pytest_cache/`, `*.egg-info/`, all `__pycache__/` + `*.pyc`, stale `*.log`) via a root `.gitignore`.
 
 ## Environment Context
-- **Kit root:** `/home/yapilwsl/arthityap/ai-factory/kit-tests` (baziforeporter-only: local-laptop path, not standalone kit download)
+- **Kit root:** `/home/yapilwsl/arthityap/ai-factory/kit-tests` (my-repo-only: local-laptop path, not standalone kit download)
 - **Canonical config (NEW):** `kit-tests/.env.example`
 - **Config shim (NEW):** `kit-tests/config.py`
 - **Bridge (REWRITE):** `kit-tests/infra/conftest.py` (replace inline `os.environ.setdefault("LLM_*"...")` block with a `from config import load_config` pull-through)
 - **Ignore list (NEW):** `kit-tests/.gitignore`
 - **Runnable Final Gate:** `cd kit-tests && KIT_LIVE=false uv run pytest examples -q` (only deps: `pytest` + `hypothesis`; `examples/` never imports `src2.*` or `infra/conftest.py`).
-- **Source of truth note:** `baziforecaster/` is never modified; kit-tests is a one-way extraction (STRUCTURE.md §2.6).
+- **Source of truth note:** `my-repo/` is never modified; kit-tests is a one-way extraction (STRUCTURE.md §2.6).
 
 ## Subagent Deployment Criteria (lifecycle per agent)
 1. **Claim** — acknowledge your S-label assignment.
@@ -52,7 +52,7 @@ SENTRY_DSN=
 DISABLE_SENTRY=1
 LOGFIRE_NO_PLACEHOLDER=true
 LOGFIRE_IGNORE_MISSING_DATA_KEYS=true
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo
 ```
 The 5 `KIT_*` rows (plus `KIT_LIVE`) are the only place a user configures endpoint/api-key/model/path. `KIT_MODEL` and `KIT_MEM0_MODEL` are deliberately **separate** (granular: a user may set `KIT_MODEL=gemma-4-31b-it` and `KIT_MEM0_MODEL=KIT_MODEL`).
 
@@ -77,7 +77,7 @@ os.environ.setdefault("MEM0_MODEL", "mock-mem0-model")
 os.environ.setdefault("CHRONO_MODEL", "mock-chrono-model")
 os.environ.setdefault("CHRONO_URL", "http://localhost:8000/v1")
 os.environ.setdefault("TELEGRAM_API_BASE", "https://api.telegram.org")
-os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster")
+os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo")
 ```
 → S3 rewrites L14–L25 to a `from config import load_config` pull-through (see S3 body); the `sys.path.insert` (L12), the src2-isolation mocks (`SENTRY_*`, `LOGFIRE_*`, `TELEGRAM_API_BASE`, `DATABASE_URL`), the SQLAlchemy mock-engine block (L27–L58), and the migration patch (L60–L65) stay **VERBATIM**.
 
@@ -224,7 +224,7 @@ KIT_LIVE=false uv run pytest examples -q
 SHIP when every check prints `OK`, `compileall` is silent+exit-0, `config import ok` prints, and `pytest examples` is green. Otherwise `ESCALATE` (report the failing gate verbatim, do not patch).
 
 ## Known out-of-scope (do NOT touch this pass)
-- `infra/test_run.py` — stale baziforecaster runner referencing non-existent `TEST/` + `.venv/lib/...`; documented in STRUCTURE.md infra table, left intact (purge needs a STRUCTURE.md edit too).
+- `infra/test_run.py` — stale my-repo runner referencing non-existent `TEST/` + `.venv/lib/...`; documented in STRUCTURE.md infra table, left intact (purge needs a STRUCTURE.md edit too).
 - `09_tech_debt_audit/agents/{base_agent,cleanup_swarm,massive_discovery_swarm}.py` read `LLM_API_KEY`/`os.getenv("LLM_API_KEY", "localfreegemini")` directly (bypass conftest bridge); they self-fallback and are audit scripts, not the runnable gate. Normalization to `KIT_*` deferred.
 - `01_gold_snapshots/04_monthly/archive/swap.sample.py` — **KEPT**: it is the live `model_a`/`model_b` control-sheet demo your granularity decision references (`.sample`-excluded from the credential gate).
 - `02_unit_bedrock/bot/test_replicate_openai_credentials_crash.py` — possible curation duplicate of `04_bug_repros/test_replicate_openai_credentials_crash.py`; review separately.

@@ -17,7 +17,7 @@ from src.identity.service import (
     link_platform_account,
 )
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster"
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo"
 
 
 @pytest_asyncio.fixture

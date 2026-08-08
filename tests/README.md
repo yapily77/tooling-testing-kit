@@ -1,6 +1,6 @@
 # Community Test-Kit
 
-Curated, **runnable slices** of the `baziforecaster` test suite — extracted so
+Curated, **runnable slices** of the `my-repo` test suite — extracted so
 an engineer can drop a real, production-grade test in front of a candidate or a
 community member and say: *"here — clone, run, go."*
 
@@ -10,7 +10,7 @@ community member and say: *"here — clone, run, go."*
 
 ## The problem (90-second story)
 
-`baziforecaster` has a huge, deeply coupled test suite. That is a strength in CI
+`my-repo` has a huge, deeply coupled test suite. That is a strength in CI
 and a liability in an interview: the candidate stares at `src2/` and an
 `ImportError` instead of practicing **test design**. The suite, though, contains
 exactly the thing you want students to see — frozen-clock tests, golden
@@ -55,10 +55,10 @@ KIT_LIVE=false uv run pytest examples -q        # runs the 7 cloner-safe online 
 ```
 
 > `uv run pytest -q` runs the **same** thing: `pyproject.toml` pins `testpaths = ["examples"]`,
-> so an unqualified `uv run pytest -q` collects `examples/` only (the 10 baziforecaster-only
+> so an unqualified `uv run pytest -q` collects `examples/` only (the 10 my-repo-only
 > dirs are excluded — see the callout below).
 
-### What is NOT cloner-runnable (baziforecaster-only, ignored by default)
+### What is NOT cloner-runnable (my-repo-only, ignored by default)
 
 The `01_gold_snapshots` through `10_harness_suite` dirs are **NOT in the download's
 run surface**. They hardcode `TEST`/`GOLD` or import `src2.*`, and are excluded by:
@@ -68,11 +68,11 @@ run surface**. They hardcode `TEST`/`GOLD` or import `src2.*`, and are excluded 
 - `tests/conftest.py` — `collect_ignore` lists every `0N_*` dir (defense-in-depth).
 
 `math_chapters/` and `param_flows/` are also optional in-kit slices that import
-`src2.*` and need baziforecaster's source tree (plus `sqlalchemy`) installed — they
+`src2.*` and need my-repo's source tree (plus `sqlalchemy`) installed — they
 are outside the download run surface and never collected by default.
 
 ```bash
-# or, full included suite (baziforecaster-only slices are auto-ignored):
+# or, full included suite (my-repo-only slices are auto-ignored):
 KIT_LIVE=false uv run pytest -q
 ```
 
@@ -121,7 +121,7 @@ Drop a new slice → `ruff` it → `pytest --collect-only` → add a layer.
 ## Note on source
 
 This kit is a **one-way extraction**. It reads from staging mirrors and never
-writes back upstream. The `baziforecaster` repository is not modified by building this kit.
+writes back upstream. The `my-repo` repository is not modified by building this kit.
 
 ### `10_harness_suite/` — ai-factory self-tests (Phase 2)
 

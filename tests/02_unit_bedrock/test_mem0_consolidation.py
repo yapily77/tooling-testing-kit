@@ -1,6 +1,6 @@
-"""Tests for Mem0-on-Qdrant consolidation — baziForecaster memory module.
+"""Tests for Mem0-on-Qdrant consolidation — my-repo memory module.
 
-Annot: baziforecaster-only — run from target repo: cd $TARGET_REPO && uv run pytest TEST/unit/test_mem0_consolidation.py -v
+Annot: my-repo-only — run from target repo: cd $TARGET_REPO && uv run pytest TEST/unit/test_mem0_consolidation.py -v
 """
 
 

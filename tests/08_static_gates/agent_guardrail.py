@@ -46,7 +46,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 CHECKPOINT_DIR = PROJECT_ROOT / ".checkpoints"
 SANITIZER = SCRIPT_DIR / "agent_sanitizer.py"
-HARNESS_DIR = PROJECT_ROOT / "admin" / "orchestrator"  # Annot: baziforecaster-only; guarded by _index_harness_dir
+HARNESS_DIR = PROJECT_ROOT / "admin" / "orchestrator"  # Annot: my-repo-only; guarded by _index_harness_dir
 _HARNESS_SCAN_DIRS = ("infra", "common")
 
 CC_THRESHOLD = 6

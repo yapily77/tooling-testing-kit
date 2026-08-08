@@ -16,7 +16,7 @@ The format is based on [Semantic Versioning](https://semver.org/):
   `RuntimeError` naming the variable).
 - Root `conftest.py` — single source of truth owning the canonical `KIT_*` → legacy-env
   bridge (`KIT_MODEL`→`CHRONO_MODEL`, `KIT_MEM0_MODEL`→`MEM0_MODEL`) and the
-  `collect_ignore` list for the 10 baziforecaster-only `0N_*` slices.
+  `collect_ignore` list for the 10 my-repo-only `0N_*` slices.
 - `.env.example` — canonical env-var contract (`KIT_LIVE`, `KIT_PATH`, `KIT_BASE_URL`,
   `KIT_API_KEY`, `KIT_MODEL`, `KIT_MEM0_MODEL`).
 - `.gitkeep` — ensures the `kit-tests/` directory survives fresh checkout/extraction.
@@ -28,7 +28,7 @@ The format is based on [Semantic Versioning](https://semver.org/):
   `.env`. When `KIT_LIVE=true`, missing any of `{KIT_PATH, KIT_BASE_URL, KIT_MODEL,
   KIT_API_KEY}` → `RuntimeError`.
 - README.md / QUICKSTART.md — corrected run-surface honesty: `testpaths=["examples"]`
-  lives in `pyproject.toml` (not `infra/pytest.ini`); the 10 baziforecaster-only dirs
+  lives in `pyproject.toml` (not `infra/pytest.ini`); the 10 my-repo-only dirs
   are documented as auto-ignored; async-only `infra/pytest.ini` clarified (asyncio_mode
   + markers only; not the cloner entry point).
 
@@ -63,9 +63,9 @@ The format is based on [Semantic Versioning](https://semver.org/):
   `*.egg-info`) ensured absent from committed state via `.gitignore`.
 
 ### Notes
-- **Not all tests pass** at this cut: the baziforecaster-only slices
+- **Not all tests pass** at this cut: the my-repo-only slices
   (`01_gold_snapshots/`, `02_unit_bedrock/`, `04_bug_repros/`, `05_integration_e2e/`,
-  `10_harness_suite/`, `math_chapters/`) require the baziforecaster `src2.*` source
+  `10_harness_suite/`, `math_chapters/`) require the my-repo `src2.*` source
   tree + `sqlalchemy` and are **out of scope for the cloner download**. They are
   excluded from default collection by root `conftest.py` `collect_ignore`.
 - Validated cloner surface remains green: `uv run pytest examples -q` (14/14) with
@@ -73,5 +73,5 @@ The format is based on [Semantic Versioning](https://semver.org/):
   names the missing variable.
 
 ## [0.1.0] — 2026-08-08
-Initial extraction of the `kit-tests/` community test kit from the baziforecaster
+Initial extraction of the `kit-tests/` community test kit from the my-repo
 monorepo, configurable via canonical `KIT_*` env vars (single `.env`, offline-safe).

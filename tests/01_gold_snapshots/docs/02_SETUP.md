@@ -76,7 +76,7 @@ differently — that branching is future logic, but the **data is now available*
 ## 3. How a Test Request Flows
 
 ```
-[baziforecaster-only: TEST/GOLD/01_start/01_start.py not in kit download]
+[my-repo-only: TEST/GOLD/01_start/01_start.py not in kit download]
   └─ POST http://127.0.0.1:8445/webhook/test
         headers:
           X-Telegram-Bot-Api-Secret-Token: <same secret>
@@ -110,7 +110,7 @@ process_webhook_logic(data, platform="test_telegram01")
 
 ## 4. Reply Capture — REPLACES fake Telegram polling
 
-`[baziforecaster-only: TEST/GOLD/01_start/01_start.py not in kit download]` currently polls `http://127.0.0.1:9999/intercepted`
+`[my-repo-only: TEST/GOLD/01_start/01_start.py not in kit download]` currently polls `http://127.0.0.1:9999/intercepted`
 (a fake Telegram server). Under the real-Telegram test channel, `999` chat_ids are
 **mocked** in `send_telegram_message` (reply is logged, never delivered to any intercept
 server). So the test must capture the reply from the **database** instead:
@@ -163,7 +163,7 @@ Add `platform="telegram"` (default, zero regression) to:
 - `handle_intake(chat_id, text, platform="telegram")` → thread `platform` into
   `get_session` / `save_session`; read `is_new` + `User.tier` for branching.
 
-### E. `[baziforecaster-only: TEST/GOLD/01_start/01_start.py not in kit download]` (the test)
+### E. `[my-repo-only: TEST/GOLD/01_start/01_start.py not in kit download]` (the test)
 1. `SERVER_URL` → `http://127.0.0.1:8445`.
 2. `send_webhook(...)` → POST to `f"{SERVER_URL}/webhook/test"` (same secret header).
 3. Replace `FAKE_TELEGRAM_URL` polling with `get_last_bot_reply(chat_id, "test_telegram01")`
@@ -175,11 +175,11 @@ Add `platform="telegram"` (default, zero regression) to:
    - First run → `is_new == True`; second `/start` (or re-run) → `is_new == False` (old).
    - Welcome message contains expected text.
 
-### F. `[baziforecaster-only: TEST/GOLD/run.py not in kit download]`
+### F. `[my-repo-only: TEST/GOLD/run.py not in kit download]`
 1. `send_webhook` → POST to `/webhook/test`.
 2. `get_session_step(chat_id)` → query `platform="test_telegram01"` (not `"telegram"`).
 
-### G. `[baziforecaster-only: TEST/GOLD/00_infra/start.sh not in kit download]`
+### G. `[my-repo-only: TEST/GOLD/00_infra/start.sh not in kit download]`
 Launch **one** production server only:
 ```
 tmux new-session -d -s bazi-infra "uv run start2.py --skip-preflight"
@@ -197,9 +197,9 @@ tmux new-session -d -s bazi-infra "uv run start2.py --skip-preflight"
 ---
 
 ## 7. Verification (when you say GO)
-1. Start: `uv run start2.py` (or `./[baziforecaster-only: TEST/GOLD/00_infra/start.sh not in kit download]`).
+1. Start: `uv run start2.py` (or `./[my-repo-only: TEST/GOLD/00_infra/start.sh not in kit download]`).
 2. You message the bot on Telegram → replies arrive in your Telegram app (real).
-3. Terminal: `# baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --no-start-server --server-url http://127.0.0.1:8445`
+3. Terminal: `# my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'. --no-start-server --server-url http://127.0.0.1:8445`
    → drives `/webhook/test` concurrently.
 4. `01_start` verifies: registered `test_telegram01` account, `tier=FREE`, old/new flag,
    welcome text captured from `chat_logs`.

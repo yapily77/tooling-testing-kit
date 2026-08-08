@@ -12,10 +12,10 @@ KIT_LIVE=false uv run pytest examples -q        # runs the 7 cloner-safe stubs �
 ```
 
 > `uv run pytest -q` runs the **same** thing: `pyproject.toml` pins `testpaths = ["examples"]`,
-> so an unqualified `uv run pytest -q` collects `examples/` only (the 10 baziforecaster-only
+> so an unqualified `uv run pytest -q` collects `examples/` only (the 10 my-repo-only
 > dirs are excluded — see callout below).
 
-## What is NOT cloner-runnable (baziforecaster-only, ignored by default)
+## What is NOT cloner-runnable (my-repo-only, ignored by default)
 
 The `01_gold_snapshots` through `10_harness_suite` dirs are **NOT in the download's
 run surface**. They hardcode `TEST`/`GOLD` or import `src2.*`, and are excluded by:
@@ -25,11 +25,11 @@ run surface**. They hardcode `TEST`/`GOLD` or import `src2.*`, and are excluded 
 - `tests/conftest.py` — `collect_ignore` lists every `0N_*` dir (defense-in-depth).
 
 `math_chapters/` and `param_flows/` are also optional in-kit slices that import
-`src2.*` and need baziforecaster's source tree (plus `sqlalchemy`) installed —
+`src2.*` and need my-repo's source tree (plus `sqlalchemy`) installed —
 they are outside the download run surface and never collected by default.
 
 ```bash
-uv run pytest math_chapters param_flows -q   # optional slices (need baziforecaster src2 + sqlalchemy)
+uv run pytest math_chapters param_flows -q   # optional slices (need my-repo src2 + sqlalchemy)
 ```
 
 ## The KIT_LIVE=true journey (proven by a cloner-safe smoke test)

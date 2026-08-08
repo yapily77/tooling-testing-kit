@@ -1,4 +1,4 @@
-### baziforeporter-only: generated audit log content, not in standalone kit download. Paths like /home/yapilwsl/baziforecaster/TEST/... are test-run-only artifacts.
+### my-repo-only: generated audit log content, not in standalone kit download. Paths like /home/yapilwsl/my-repo/TEST/... are test-run-only artifacts.
 Run started: 2026-06-02T04:27:13Z
 ====================================================
    BAZI FORECASTING SYSTEM - FULL QUALITY AUDIT     
@@ -14,7 +14,7 @@ Run started: 2026-06-02T04:27:13Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T04:28:08Z
 ====================================================
@@ -31,7 +31,7 @@ Run started: 2026-06-02T04:28:08Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T04:28:38Z
 ====================================================
@@ -48,7 +48,7 @@ Run started: 2026-06-02T04:28:38Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T04:45:50Z
 ====================================================
@@ -65,7 +65,7 @@ Run started: 2026-06-02T04:45:50Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T05:21:24Z
 ====================================================
@@ -82,7 +82,7 @@ Run started: 2026-06-02T05:21:24Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T05:22:41Z
 ====================================================
@@ -99,7 +99,7 @@ Run started: 2026-06-02T05:22:41Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T05:32:13Z
 ====================================================
@@ -116,7 +116,7 @@ Run started: 2026-06-02T05:32:13Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T06:38:21Z
 ====================================================
@@ -133,7 +133,7 @@ Run started: 2026-06-02T06:38:21Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T06:47:48Z
 ====================================================
@@ -150,7 +150,7 @@ Run started: 2026-06-02T06:47:48Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T06:56:30Z
 ====================================================
@@ -167,7 +167,7 @@ Run started: 2026-06-02T06:56:30Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T07:11:07Z
 ====================================================
@@ -184,7 +184,7 @@ Run started: 2026-06-02T07:11:07Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T07:14:58Z
 ====================================================
@@ -201,7 +201,7 @@ Run started: 2026-06-02T07:14:58Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T07:36:24Z
 ====================================================
@@ -218,7 +218,7 @@ Run started: 2026-06-02T07:36:24Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T07:37:04Z
 ====================================================
@@ -235,7 +235,7 @@ Run started: 2026-06-02T07:37:04Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T07:49:34Z
 ====================================================
@@ -252,7 +252,7 @@ Run started: 2026-06-02T07:49:34Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T07:57:47Z
 ====================================================
@@ -269,7 +269,7 @@ Run started: 2026-06-02T07:57:47Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T08:04:52Z
 ====================================================
@@ -286,7 +286,7 @@ Run started: 2026-06-02T08:04:52Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T08:09:33Z
 ====================================================
@@ -303,7 +303,7 @@ Run started: 2026-06-02T08:09:33Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T08:14:54Z
 ====================================================
@@ -320,7 +320,7 @@ Run started: 2026-06-02T08:14:54Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T08:24:52Z
 ====================================================
@@ -337,7 +337,7 @@ Run started: 2026-06-02T08:24:52Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T08:39:28Z
 Run started: 2026-06-02T08:40:49Z
@@ -355,7 +355,7 @@ Run started: 2026-06-02T08:40:49Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T09:42:52Z
 ====================================================
@@ -372,7 +372,7 @@ Run started: 2026-06-02T09:42:52Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T09:46:37Z
 ====================================================
@@ -389,7 +389,7 @@ Run started: 2026-06-02T09:46:37Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T12:24:10Z
 ====================================================
@@ -406,7 +406,7 @@ Run started: 2026-06-02T12:24:10Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T12:56:53Z
 ====================================================
@@ -423,7 +423,7 @@ Run started: 2026-06-02T12:56:53Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:00:05Z
 ====================================================
@@ -440,7 +440,7 @@ Run started: 2026-06-02T14:00:05Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:09:35Z
 ====================================================
@@ -457,7 +457,7 @@ Run started: 2026-06-02T14:09:35Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:10:50Z
 ====================================================
@@ -474,7 +474,7 @@ Run started: 2026-06-02T14:10:50Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:11:07Z
 ====================================================
@@ -491,7 +491,7 @@ Run started: 2026-06-02T14:11:07Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:11:22Z
 ====================================================
@@ -508,7 +508,7 @@ Run started: 2026-06-02T14:11:22Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:11:56Z
 ====================================================
@@ -525,7 +525,7 @@ Run started: 2026-06-02T14:11:56Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:16:35Z
 ====================================================
@@ -542,7 +542,7 @@ Run started: 2026-06-02T14:16:35Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:17:01Z
 ====================================================
@@ -559,7 +559,7 @@ Run started: 2026-06-02T14:17:01Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:18:25Z
 ====================================================
@@ -576,7 +576,7 @@ Run started: 2026-06-02T14:18:25Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:21:52Z
 ====================================================
@@ -593,7 +593,7 @@ Run started: 2026-06-02T14:21:52Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:24:52Z
 ====================================================
@@ -610,7 +610,7 @@ Run started: 2026-06-02T14:24:52Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T14:27:00Z
 ====================================================
@@ -627,7 +627,7 @@ Run started: 2026-06-02T14:27:00Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T15:10:15Z
 ====================================================
@@ -644,7 +644,7 @@ Run started: 2026-06-02T15:10:15Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-02T15:14:41Z
 ====================================================
@@ -661,7 +661,7 @@ Run started: 2026-06-02T15:14:41Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T02:57:08Z
 ====================================================
@@ -678,7 +678,7 @@ Run started: 2026-06-03T02:57:08Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T03:53:55Z
 ====================================================
@@ -695,7 +695,7 @@ Run started: 2026-06-03T03:53:55Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T04:44:22Z
 ====================================================
@@ -712,7 +712,7 @@ Run started: 2026-06-03T04:44:22Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T05:14:22Z
 ====================================================
@@ -729,7 +729,7 @@ Run started: 2026-06-03T05:14:22Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T06:09:49Z
 ====================================================
@@ -746,7 +746,7 @@ Run started: 2026-06-03T06:09:49Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T06:12:32Z
 ====================================================
@@ -763,7 +763,7 @@ Run started: 2026-06-03T06:12:32Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T09:35:10Z
 ====================================================
@@ -780,7 +780,7 @@ Run started: 2026-06-03T09:35:10Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-03T10:00:44Z
 ====================================================
@@ -797,7 +797,7 @@ Run started: 2026-06-03T10:00:44Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-04T12:22:25Z
 ====================================================
@@ -817,7 +817,7 @@ Run started: 2026-06-04T12:22:25Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-04T13:55:14Z
 ====================================================
@@ -837,7 +837,7 @@ Run started: 2026-06-04T13:55:14Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-04T14:09:57Z
 ====================================================
@@ -857,7 +857,7 @@ Run started: 2026-06-04T14:09:57Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-04T14:21:00Z
 ====================================================
@@ -877,7 +877,7 @@ Run started: 2026-06-04T14:21:00Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.
 Run started: 2026-06-04T14:25:31Z
 ====================================================
@@ -897,5 +897,5 @@ Run started: 2026-06-04T14:25:31Z
 [>] Running Telegram Intake Workflow...
 [>] Running E2E Pipeline Stress...
 
-[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/baziforecaster/TEST/reports/test_results.md (baziforeporter-only: not in standalone kit download)
+[*] Audit Complete. Results saved to: /home/yapilwsl/arthityap/my-repo/TEST/reports/test_results.md (my-repo-only: not in standalone kit download)
 [*] Please review the markdown for details on any failures.

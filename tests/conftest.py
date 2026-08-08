@@ -1,7 +1,7 @@
 """Root conftest for the standalone community-test-kit.
 
 Responsibilities (cloner-safe, no src2.* import, no SQL mocks):
-  1. collect_ignore — the 10 baziforecaster-only slices that hardcode TEST/GOLD
+  1. collect_ignore — the 10 my-repo-only slices that hardcode TEST/GOLD
      or import src2.*; they are excluded from default collection so a fresh
      download runs `uv run pytest -q` (== `examples`) with zero friction.
   2. The canonical KIT_* -> legacy-env bridge (CHRONO_MODEL / MEM0_MODEL /

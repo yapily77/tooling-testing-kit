@@ -70,7 +70,7 @@ graph TD
 
 ## 3. UAT E2E Simulation Flow (test.py)
 
-The UAT script [`test.py`](file:///home/yapilwsl/arthityap/baziforecaster/[baziforecaster-only: TEST/GOLD/05_Chronomancer/test.py not in kit download]) walks through the following sequential conversational path using the official tester ID `999` and real RAG/LLM calls:
+The UAT script [`test.py`](file:///home/yapilwsl/arthityap/my-repo/[my-repo-only: TEST/GOLD/05_Chronomancer/test.py not in kit download]) walks through the following sequential conversational path using the official tester ID `999` and real RAG/LLM calls:
 
 * **Turn 0: Bootstrapping**:
   - Initializes session for user `999` and dynamically seeds `semantic_id` as `SGUSD0000999` at database creation.

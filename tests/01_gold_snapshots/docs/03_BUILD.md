@@ -7,19 +7,19 @@
 
 ## A. BUILD (new files)
 
-### 1. `[baziforecaster-only: TEST/GOLD/00_infra/seed_test_users.py not in kit download]`  **[NEW]**
+### 1. `[my-repo-only: TEST/GOLD/00_infra/seed_test_users.py not in kit download]`  **[NEW]**
 Idempotent seeder that pre-loads the existing customer into the `test_telegram01` platform:
 - Inserts `User(tier="PAID")` (paying returning customer).
 - Links `PlatformAccount(platform="test_telegram01", platform_user_id="999001001")`.
 - Optionally seeds a completed `Session` for that user.
 - Safe to re-run (skips if the account already exists).
 - Called by `run.py` (or `start.sh`) **before** the `01_start` test, or as a standalone
-  `# baziforecaster-only: TEST/GOLD/00_infra/seed_test_users.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.`.
+  `# my-repo-only: TEST/GOLD/00_infra/seed_test_users.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.`.
 
-### 2. `get_last_bot_reply()` helper  **[NEW — lives in `[baziforecaster-only: TEST/GOLD/run.py not in kit download]` or a shared `[baziforecaster-only: TEST/GOLD/_helpers.py not in kit download]`]**
+### 2. `get_last_bot_reply()` helper  **[NEW — lives in `[my-repo-only: TEST/GOLD/run.py not in kit download]` or a shared `[my-repo-only: TEST/GOLD/_helpers.py not in kit download]`]**
 Queries `chat_logs` for the latest `role='bot'` message of a given
 `(platform, platform_user_id)` user. Replaces fake-Telegram intercept polling.
-Recommended: extract to `[baziforecaster-only: TEST/GOLD/_helpers.py not in kit download]` so `01_start.py` and `run.py` share it.
+Recommended: extract to `[my-repo-only: TEST/GOLD/_helpers.py not in kit download]` so `01_start.py` and `run.py` share it.
 
 ---
 
@@ -57,7 +57,7 @@ Recommended: extract to `[baziforecaster-only: TEST/GOLD/_helpers.py not in kit 
   `get_session` / `save_session`; read `is_new` + `User.tier` for branching the welcome /
   flow (new vs returning, free vs paying).
 
-### 5. `[baziforecaster-only: TEST/GOLD/01_start/01_start.py not in kit download]`
+### 5. `[my-repo-only: TEST/GOLD/01_start/01_start.py not in kit download]`
 - `SERVER_URL` → `http://127.0.0.1:8445`.
 - `send_webhook(...)` → POST to `f"{SERVER_URL}/webhook/test"` with header
   `X-Test-Channel: test_telegram01` (same secret header).
@@ -68,12 +68,12 @@ Recommended: extract to `[baziforecaster-only: TEST/GOLD/_helpers.py not in kit 
 - Assert `PlatformAccount` exists with `platform="test_telegram01"`,
   `platform_user_id=<chat_id>`; assert welcome text captured from `chat_logs`.
 
-### 6. `[baziforecaster-only: TEST/GOLD/run.py not in kit download]`
+### 6. `[my-repo-only: TEST/GOLD/run.py not in kit download]`
 - `send_webhook(...)` → POST to `/webhook/test` + `X-Test-Channel` header.
 - `get_session_step(chat_id)` → query `platform="test_telegram01"` (not `"telegram"`).
-- Call `[baziforecaster-only: seed_test_users.py not in kit download]` before running `01_start` (or document that `start.sh` does).
+- Call `[my-repo-only: seed_test_users.py not in kit download]` before running `01_start` (or document that `start.sh` does).
 
-### 7. `[baziforecaster-only: TEST/GOLD/00_infra/start.sh not in kit download]`
+### 7. `[my-repo-only: TEST/GOLD/00_infra/start.sh not in kit download]`
 - Launch **one** production server only:
   `tmux new-session -d -s bazi-infra "uv run start2.py --skip-preflight"`.
 - Remove the UAT (`test_start.py`) pane.
@@ -84,10 +84,10 @@ Recommended: extract to `[baziforecaster-only: TEST/GOLD/_helpers.py not in kit 
 
 | File | Action | Why |
 |---|---|---|
-| `[baziforecaster-only: TEST/GOLD/00_infra/test_start.py not in kit download]` | **RETIRE** (keep on disk) | UAT mock server no longer launched; replaced by single production server. |
-| `[baziforecaster-only: TEST/GOLD/00_infra/test_control.py not in kit download]` | **RETIRE** (keep on disk) | Model-swap mock no longer used; production `controls.py` is used as-is. |
-| `[baziforecaster-only: TEST/GOLD/00_infra/fake_telegram.py not in kit download]` | **RETIRE** (keep on disk) | Reply capture moves to `chat_logs`; no fake Telegram intercept server needed. |
-| `[baziforecaster-only: TEST/GOLD/00_infra/start.sh not in kit download]` UAT pane | **REMOVE from script** | Only the production pane remains. |
+| `[my-repo-only: TEST/GOLD/00_infra/test_start.py not in kit download]` | **RETIRE** (keep on disk) | UAT mock server no longer launched; replaced by single production server. |
+| `[my-repo-only: TEST/GOLD/00_infra/test_control.py not in kit download]` | **RETIRE** (keep on disk) | Model-swap mock no longer used; production `controls.py` is used as-is. |
+| `[my-repo-only: TEST/GOLD/00_infra/fake_telegram.py not in kit download]` | **RETIRE** (keep on disk) | Reply capture moves to `chat_logs`; no fake Telegram intercept server needed. |
+| `[my-repo-only: TEST/GOLD/00_infra/start.sh not in kit download]` UAT pane | **REMOVE from script** | Only the production pane remains. |
 
 ---
 
@@ -104,7 +104,7 @@ Recommended: extract to `[baziforecaster-only: TEST/GOLD/_helpers.py not in kit 
 2. `session.py` (thread `platform`; surface `is_new`/`tier`).
 3. `intake/intake.py` (thread `platform`; read `is_new`/`tier`).
 4. `app.py` (`/webhook/test` route + header → `platform`).
-5. `[baziforecaster-only: seed_test_users.py not in kit download]` (new).
+5. `[my-repo-only: seed_test_users.py not in kit download]` (new).
 6. `run.py` + `_helpers.py` (`get_last_bot_reply`, `/webhook/test`, `platform` query).
 7. `01_start/01_start.py` (both-customer test).
 8. `start.sh` (single server).

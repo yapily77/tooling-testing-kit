@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Utility script to clear cached/expected bot responses and timestamps
-inside the snapshot JSON files under the TEST/GOLD/ directory [baziforecaster-only: not in kit download]
+inside the snapshot JSON files under the TEST/GOLD/ directory [my-repo-only: not in kit download]
 """
 
 import json

@@ -5,7 +5,7 @@ build-backend = "uv.build"
 [project]
 name = "community-test-kit"
 version = "0.1.0"
-description = "Curated, runnable slices of the baziforecaster test suite for interviews and the community."
+description = "Curated, runnable slices of the my-repo test suite for interviews and the community."
 requires-python = ">=3.11"
 dependencies = [
   "pytest>=8",

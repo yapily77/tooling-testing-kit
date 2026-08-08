@@ -13,7 +13,7 @@ from src.identity.service import create_user
 from src.services.memory import delete_memory, get_memory_context, log_chat
 from src.services.session import delete_session, get_session, save_session
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/baziforecaster"
+DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/my-repo"
 
 
 @pytest_asyncio.fixture

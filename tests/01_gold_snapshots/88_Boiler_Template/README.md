@@ -1,15 +1,15 @@
 # 🗺️ Gold Test Boilerplate Architecture
 
-This directory serves as the architectural blueprint for all Gold E2E tests in the BaziForecaster project. Any new Gold Test (e.g., `13_relationship`, `14_transit`) should follow this exact pattern to ensure clean separation of concerns, automated preflighting, and seamless Git-backed visual diffing.
+This directory serves as the architectural blueprint for all Gold E2E tests in the my-repo project. Any new Gold Test (e.g., `13_relationship`, `14_transit`) should follow this exact pattern to ensure clean separation of concerns, automated preflighting, and seamless Git-backed visual diffing.
 
 ---
 
 ## 📂 Standard Gold Test Directory Structure
 
-Every gold test suite must reside in a dedicated folder under `[baziforecaster-only: TEST/GOLD/ not in kit download]` named `[index]_[test_name]/` and contain these five files:
+Every gold test suite must reside in a dedicated folder under `[my-repo-only: TEST/GOLD/ not in kit download]` named `[index]_[test_name]/` and contain these five files:
 
 ```text
-[baziforecaster-only: TEST/GOLD/ not in kit download][index]_[test_name]/
+[my-repo-only: TEST/GOLD/ not in kit download][index]_[test_name]/
 ├── path.md             # 1. Path Spec (Conceptual success/failure flows & behaviors)
 ├── snapshot.json       # 2. Input Spec (Declarative inputs and expected outcomes)
 ├── [test_name].py       # 3. Test Logic (Sends webhooks, polls fake TG, writes UI.md)
@@ -181,8 +181,8 @@ from pathlib import Path
 
 # Extract the test name from folder naming: e.g. "04_monthly"
 TEST_NAME = Path(__file__).resolve().parent.name.split("_", 1)[1]
-# [baziforecaster-only: TEST/GOLD/ directory not in kit download]
-UI_MD_PATH = f"TEST/GOLD/{Path(__file__).resolve().parent.name}/UI.md"  # [baziforecaster-only: not in kit download]
+# [my-repo-only: TEST/GOLD/ directory not in kit download]
+UI_MD_PATH = f"TEST/GOLD/{Path(__file__).resolve().parent.name}/UI.md"  # [my-repo-only: not in kit download]
 
 def run_cmd(cmd: str, exit_on_fail: bool = True) -> tuple[int, str]:
     print(f"Executing: {cmd}")
@@ -207,19 +207,19 @@ def main():
     print(f"=== 🚀 Starting Automated Gold Test Orchestrator ({TEST_NAME}) ===")
     
     # 1. Swap config to UAT/Gold mode
-    # [baziforecaster-only: TEST/GOLD/swap_config.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
-    code, _ = run_cmd("uv run python TEST/GOLD/swap_config.py --mode gold", exit_on_fail=False)  # [baziforecaster-only: not in kit download]
+    # [my-repo-only: TEST/GOLD/swap_config.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
+    code, _ = run_cmd("uv run python TEST/GOLD/swap_config.py --mode gold", exit_on_fail=False)  # [my-repo-only: not in kit download]
     if code != 0:
-        # [baziforecaster-only: TEST/GOLD/swap_config.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
-        run_cmd("uv run python TEST/GOLD/swap_config.py")  # [baziforecaster-only: not in kit download]
+        # [my-repo-only: TEST/GOLD/swap_config.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
+        run_cmd("uv run python TEST/GOLD/swap_config.py")  # [my-repo-only: not in kit download]
         
     # 2. Run Preflight Diagnostics
     run_cmd("uv run python -m src2.interfaces.telegram.preflight")
 
     # 3. Execute the Gold Test
     print(f"\n🏃 Running {TEST_NAME} gold test...")
-    # [baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
-    test_code, _ = run_cmd(f"uv run python TEST/GOLD/run.py --test {TEST_NAME}", exit_on_fail=False)  # [baziforecaster-only: not in kit download]
+    # [my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
+    test_code, _ = run_cmd(f"uv run python TEST/GOLD/run.py --test {TEST_NAME}", exit_on_fail=False)  # [my-repo-only: not in kit download]
     
     if test_code != 0:
         print(f"\n❌ Gold test {TEST_NAME} FAILED (Exit Code: {test_code}).")
@@ -258,7 +258,7 @@ if __name__ == "__main__":
       },
       "expected": {
         "http_status": 200,
-        "bot_message_contains": "Welcome to BaziForecaster"
+        "bot_message_contains": "Welcome to my-repo"
       }
     }
   ]

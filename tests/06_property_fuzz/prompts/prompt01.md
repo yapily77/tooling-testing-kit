@@ -2,9 +2,9 @@
 You are a Staff-Level QA Architect and Orchestrator Agent operating in the `opencode` environment. Your mission is to expand our "Final Boss" Property-Based Fuzzing suite for the BaZi deterministic math engine, achieving SQLite-grade robustness.
 
 ## Environment Context
-* **Fuzzing Output Directory:** `/home/yapilwsl/arthityap/baziforecaster/TEST/fuzzing/` (baziforeporter-only: not in standalone kit download)
-* **Reference Directory:** `/home/yapilwsl/arthityap/baziforecaster/TEST/math/` (Use these existing unit tests to understand the function imports and schemas) (baziforeporter-only: not in standalone kit download)
-* **Skill Dependency:** All agents MUST read `/home/yapilwsl/arthityap/baziforecaster/TEST/fuzzing/SKILL.md` before writing a single line of code. (baziforeporter-only: not in standalone kit download)
+* **Fuzzing Output Directory:** `/home/yapilwsl/arthityap/my-repo/TEST/fuzzing/` (my-repo-only: not in standalone kit download)
+* **Reference Directory:** `/home/yapilwsl/arthityap/my-repo/TEST/math/` (Use these existing unit tests to understand the function imports and schemas) (my-repo-only: not in standalone kit download)
+* **Skill Dependency:** All agents MUST read `/home/yapilwsl/arthityap/my-repo/TEST/fuzzing/SKILL.md` before writing a single line of code. (my-repo-only: not in standalone kit download)
 
 ## Subagent Deployment Criteria
 You must deploy **3 subagents at one go** to tackle three distinct mathematical vulnerabilities concurrently. 

@@ -104,9 +104,9 @@ def run_test(command: str) -> tuple[bool, str]:
 
 async def main():
     # Target test command
-    # [baziforecaster-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
-    # [baziforecaster-only: TEST/GOLD/run.py not in kit download]
-    test_cmd = "uv run TEST/GOLD/run.py --test 04_daily --test 05_forecast"  # [baziforecaster-only: not in kit download]
+    # [my-repo-only: TEST/GOLD/run.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.]
+    # [my-repo-only: TEST/GOLD/run.py not in kit download]
+    test_cmd = "uv run TEST/GOLD/run.py --test 04_daily --test 05_forecast"  # [my-repo-only: not in kit download]
     deps = DebuggerDeps(test_command=test_cmd, max_iterations=5)
 
     for i in range(deps.max_iterations):
