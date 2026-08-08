@@ -98,9 +98,9 @@ We inject a mock error midway through report generation during an E2E run:
 
 ---
 
-## 🔍 RAG Query Validation Test Plan (`test_RAG.py`)
+## 🔍 RAG Query Validation Test Plan (`test_rag.py`)
 
-To resolve issue #3 (stupid/generic RAG queries), we have introduced `test_RAG.py` to run diagnostic tests on the RAG pipeline for Month 1.
+To resolve issue #3 (stupid/generic RAG queries), we have introduced `test_rag.py` to run diagnostic tests on the RAG pipeline for Month 1.
 
 ### Setup and Requirements:
 - **Profile Details**: Test Profile (User 999), Day Master `Yi Mao`, Day Master Strength `Strong`.
@@ -113,7 +113,7 @@ To resolve issue #3 (stupid/generic RAG queries), we have introduced `test_RAG.p
 ### Test Execution:
 Run the diagnostic script to observe the query returned by the Gemma specialist RAG agent and the resulting grounding passages:
 ```bash
-# my-repo-only: TEST/GOLD/04_monthly/test_RAG.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
+# my-repo-only: TEST/GOLD/04_monthly/test_rag.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.
 ```
 
 ### Expected Outcomes:

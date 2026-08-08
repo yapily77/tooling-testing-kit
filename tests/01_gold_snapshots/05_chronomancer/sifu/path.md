@@ -70,36 +70,32 @@ graph TD
 
 ## 3. UAT E2E Simulation Flow (test.py)
 
-The UAT script [`test.py`](file:///home/yapilwsl/arthityap/my-repo/[my-repo-only: TEST/GOLD/05_Chronomancer/test.py not in kit download]) walks through the following sequential conversational path using the official tester ID `999` and real RAG/LLM calls:
+The UAT script [`test.py`](file:///home/yapilwsl/arthityap/my-repo/[my-repo-only: TEST/GOLD/05_chronomancer/test.py not in kit download]) walks through the following sequential conversational path using the official tester ID `999` and real RAG/LLM calls:
 
 * **Turn 0: Bootstrapping**:
   - Initializes session for user `999` and dynamically seeds `semantic_id` as `SGUSD0000999` at database creation.
   - Deletes any old database data and clears vector memories in Qdrant.
   - Saves Test Profile's Bazi profile to disk and session storage.
 
-* **Turn 1: Language Preference Selection (`/lang`)**:
-  - Simulates the `/lang` command where the user selects Indonesian (`ID`).
-  - Sets the preferred language in the database preferences to `"Indonesian"` and disables Sifu Mode (`sifu_mode=0`).
+* **Turn 1: Daily Forecast Ingestion (`/daily`)**:
+  - Calls `handle_daily(user_id)` to compute transits and generate the initial daily narrative using real LLM/RAG.
+  - Verifies that the computed narrative is saved in the database cache.
 
-* **Turn 2: Daily Forecast Ingestion (`/daily`)**:
-  - Calls `handle_daily(user_id)` to compute transits and generate the initial daily narrative in Indonesian.
-  - Verifies that the computed Indonesian narrative is saved in the database cache.
+* **Turn 1b: Cache Extraction Validation**:
+  - Calls `handle_daily(user_id)` again and asserts that the returned narrative is fetched instantly from the database cache and matches Turn 1 exactly.
 
-* **Turn 2b: Cache Extraction Validation**:
-  - Calls `handle_daily(user_id)` again and asserts that the returned Indonesian narrative is fetched instantly from the database cache and matches Turn 2 exactly.
-
-* **Turn 3: Follow-up QA**:
+* **Turn 2: Follow-up QA**:
   - User asks `"Is today a good day to meet my partner?"`.
-  - The system parses the question intent, checks compatibility, and responds in Indonesian.
+  - The system parses the question intent and responds using computed daily compatibility scoring.
 
-* **Turn 4: Fact Ingestion**:
+* **Turn 3: Fact Ingestion**:
   - User shares `"I recently started a new job as a Senior Engineer, and I am planning to buy a house next month in Singapore."`.
-  - The system extracts and ingests these facts in Indonesian.
+  - The system extracts and ingests these facts, embedding them to Qdrant under folder `SGUSD0000999`.
 
-* **Turn 5: Context Recall QA**:
+* **Turn 4: Context Recall QA**:
   - User asks `"Based on my Singapore plans, what should I look out for?"`.
-  - The system queries Qdrant under `SGUSD0000999`, retrieves the career/housing memory, and synthesizes a response in Indonesian.
+  - The system queries Qdrant under `SGUSD0000999`, retrieves the career/housing memory, and synthesizes a response using this factual recall context.
 
-* **Turn 6: Final Cache Verification**:
+* **Turn 5: Final Cache Verification**:
   - Calls `handle_daily(user_id)` at the end of the conversation.
-  - Verifies that the Indonesian daily forecast is retrieved instantly from the database cache, matching Turn 2 exactly.
+  - Verifies that the daily forecast is retrieved instantly from the database cache, matching Turn 1 exactly.

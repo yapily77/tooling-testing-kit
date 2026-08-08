@@ -44,4 +44,4 @@ tests/
    via `cp -a` into `_harness_source/`; the live `tests/` is **never modified**
    (Final Gate #3 asserts the `tests/` working tree equals its Phase-1 baseline).
    Gate = critical-only (`E9,F63,F7,F82`) + per-bin `F401,I` **informational** (v1 faithful
-   copy; normalization + F401 cleanup deferred to v2, roadmap in `NOTES_normalization.md`).
+   copy; normalization + F401 cleanup deferred to v2, roadmap in `notes_normalization.md`).

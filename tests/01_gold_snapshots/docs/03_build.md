@@ -1,6 +1,6 @@
 # Gold E2E — Build / Refactor / Delete List
 
-> Companion to `02_SETUP.md`. Implementation task list for the `test_telegram01`
+> Companion to `02_setup.md`. Implementation task list for the `test_telegram01`
 > concurrency channel. **Nothing is deleted yet** — delete/retire items are flagged.
 
 ---

@@ -85,7 +85,7 @@ after rename so import sorting stays clean.
 | `_shared/test_gates.py` | `guardrails/test_guard_silent_continue.py`, `guardrails/test_harness_gates.py` (`from tests.test_gates import _plan`) |
 
 ## No-rename infra (keep originals)
-- `_shared/conftest.py`, `run_all.py`, `status.md`, `README.md`, `agent_guardrail.py`, `agent_guardrail.json`, `find_hallucinations.py` — shared tooling mirroring `08_static_gates/` provenance; keep in lockstep (see `NOTES_de_dup.md`).
+- `_shared/conftest.py`, `run_all.py`, `status.md`, `README.md`, `agent_guardrail.py`, `agent_guardrail.json`, `find_hallucinations.py` — shared tooling mirroring `08_static_gates/` provenance; keep in lockstep (see `notes_de_dup.md`).
 - `_tooling/test_ast_verifier.py`, `test_tool_read_file.py`, `test_tool_replace_text.py`, `test_tool_replace_function.py`, `test_tool_investigate.py`, `test_tool_exceptions.py` — already descriptive; no rename needed.
 
 ## Counts

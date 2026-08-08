@@ -142,4 +142,4 @@ writes back upstream. The `my-repo` repository is not modified by building this 
 It is **reference + parse-clean** (gate: `E9,F63,F7,F82` → green), **not** laptop-runnable:
 it imports `factory.*` and the live `tests/conftest.py`. The original `ai-factory/tests/`
 is **never modified**. v1 ships original filenames in domain bins; the v2 rename roadmap
-is in `10_harness_suite/NOTES_normalization.md` (deferred — see `orchestrator_01.md`). See [`orchestrator_01.md`](orchestrator_01.md)."]
+is in `10_harness_suite/notes_normalization.md` (deferred — see `orchestrator_01.md`). See [`orchestrator_01.md`](orchestrator_01.md)."]

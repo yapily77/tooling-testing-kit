@@ -44,7 +44,7 @@
   - **Validation:** Run unit tests for `oracle_rewriter.py` and verify intent parsing.
 
 - [ ] **Phase 2: Implement Multi-Turn Conversational Oracle Script (`run_oracle_pipeline.py`)**
-  - **Action:** Create `[my-repo-only: TEST/GOLD/06_Oracle/agent_run/run_oracle_pipeline.py not in kit download]` to execute the following sequence for test user `999998` (`sifu_mode=1`):
+  - **Action:** Create `[my-repo-only: TEST/GOLD/06_oracle/agent_run/run_oracle_pipeline.py not in kit download]` to execute the following sequence for test user `999998` (`sifu_mode=1`):
     1. **Pre-flight Setup:** Flush Redis `user_state:999998`, set `active_mode = "ORACLE"` in DB, and seed partner `"Alex"` into `Stakeholder` DB table.
     2. **Turn 1 (Range > 1 Year):** *"When is the best time for me to launch a major business venture between 2027 and 2029?"*
        - *Assert:* Output presents annual resolution for 2027, 2028, and 2029 and asks user to narrow down.
@@ -66,7 +66,7 @@
 
 ## 5. 🔄 The OpenCode Test & Resolution Protocol
 *Strict instructions for how I will handle test failures during execution.*
-- **Initial Test Phase:** Run the E2E script via `# my-repo-only: TEST/GOLD/06_Oracle/agent_run/run_oracle_pipeline.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.` and `uv run pytest tests/test_telegram_unicode.py`.
+- **Initial Test Phase:** Run the E2E script via `# my-repo-only: TEST/GOLD/06_oracle/agent_run/run_oracle_pipeline.py not in kit download. See KIT_PATH-based run via 'uv run pytest examples'.` and `uv run pytest tests/test_telegram_unicode.py`.
 - **Failure Protocol:** If a test fails, I WILL NOT blindly fall into a `test > fix > repeat` loop.
 - **AST & Subagent Escalation:** 
   1. Halt direct modification.

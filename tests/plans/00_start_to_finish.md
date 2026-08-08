@@ -3,7 +3,7 @@
 ## 1. 🔍 Context, Tooling & AST Strategy
 *Map out the codebase before writing a single line of code.*
 - **Target Files:**
-  - `[my-repo-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` (Chronomancer E2E Test)
+  - `[my-repo-only: TEST/GOLD/05_chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` (Chronomancer E2E Test)
   - `[my-repo-only: TEST/GOLD/02_auto/agent_run/run_auto_pipeline.py not in kit download]` (Auto Monthly E2E Test)
   - `[my-repo-only: TEST/GOLD/03_input/agent_run/run_pipeline.py not in kit download]` (Input Monthly E2E Test)
   - `src2/interfaces/telegram/intake/calendar_node.py` (Auto engine ingress seam)
@@ -41,7 +41,7 @@
 *Atomic steps. Must include validation. Executed sequentially as agreed.*
 
 - [ ] **Phase 1: Chronomancer 6-Step Conversational Pipeline Validation (`chronomancer.md`)**
-  - **Action:** Spawn a subagent to execute `[my-repo-only: TEST/GOLD/05_Chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` with an extended timeout (300s+). Prior to running, auto-flush Redis key `user_state:999998` and DB test session records. Validate all 6 conversational turns (`/daily`, *"what should I do now?"*, *"best time to get married next year?"* rejection boundary, proposal date extraction, profile summary, and follow-up memory test).
+  - **Action:** Spawn a subagent to execute `[my-repo-only: TEST/GOLD/05_chronomancer/agent_run/run_chronomancer_pipeline.py not in kit download]` with an extended timeout (300s+). Prior to running, auto-flush Redis key `user_state:999998` and DB test session records. Validate all 6 conversational turns (`/daily`, *"what should I do now?"*, *"best time to get married next year?"* rejection boundary, proposal date extraction, profile summary, and follow-up memory test).
   - **Validation:** Confirm 0ms BaziCache hits/misses function as expected, Redis `UserState` updates asynchronously without crashes, and all 6 assertions pass cleanly.
   - 🛑 **Context Lock:** Execute `bd` to log Phase 1 completion and lock the verified conversational state into memory.
 

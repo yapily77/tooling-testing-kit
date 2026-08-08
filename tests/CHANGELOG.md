@@ -50,7 +50,7 @@ The format is based on [Semantic Versioning](https://semver.org/):
   - `01_gold_snapshots/03_input/agent_run/final_report.json` (170 KB)
   - `01_gold_snapshots/02_auto/agent_run/final_report.json` (176 KB)
   - `01_gold_snapshots/02_auto/agent_run/final_report_month_{01..12}.yaml` (12 files)
-  - `01_gold_snapshots/05_Chronomancer/agent_run/final_report.json`
+  - `01_gold_snapshots/05_chronomancer/agent_run/final_report.json`
 - **Anonymized 44 Tier-2 files**: `Francis Yap`→`Test Profile`, `FYCL`→`TEST`,
   `187049734`→`999000001`, `1977-05-05`→`1990-01-01`, bare `Francis`→`Tester`.
 - **Sanitized 9 credential literals** to obviously-fake placeholders
