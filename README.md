@@ -1,114 +1,96 @@
-# Enterprise Quality Engineering & Sanitizer Toolkit
+# kit
 
-> **Prepared for Accenture Technical Demonstration & Open-Source Community Reuse**
+**Portable, runnable slices of `baziforecaster`** — extracted so anyone can clone, configure, and run real ML-agent test & analysis patterns without a monorepo checkout, Docker, or API keys.
 
-An enterprise-grade, portable Quality Engineering framework designed to demonstrate **clean code architecture, test automation, static hygiene gates, path scrubbing, and dynamic environment configuration (`.env`)**.
+This kit exists to:
 
----
-
-## 🎯 Purpose & Key Capabilities
-
-1. **Zero Hardcoded Paths**:
-   - Automatically scrubs machine-specific local paths (`/Users/...`, `/home/...`, `C:\Users\...`) and legacy repository identifiers into configurable environment variables and relative path resolvers (`path.resolve()`).
-2. **Dynamic Environment Engine (`.env`)**:
-   - Centralized configuration module (`src/config/index.ts`) providing environment fallbacks, path resolution, and zero-leak credential management.
-3. **Multi-Tier Quality Architecture (`tests/`)**:
-   - **01_gold_snapshots**: Output regression locks preventing unwanted drift.
-   - **02_unit_bedrock**: Isolated unit tests for path resolvers and config parsing.
-   - **03_regression_locks**: Critical path invariant protection.
-   - **05_integration_e2e**: End-to-end integration workflows.
-   - **08_static_gates**: Static linting and security quality gates.
-   - **09_tech_debt_audit**: Automated code complexity and coverage density audit.
-   - **10_harness_suite**: Test execution lifecycle management.
-4. **Automated Hygiene Scanners (`hygiene/`)**:
-   - Static analysis scanners (`hygiene/scanners/path_scrub_check.ts`) that enforce zero unscrubbed strings before commit or build.
-5. **Community Tooling Suite (`tools/`)**:
-   - `tools/codebase/analyzer.ts`: Code metrics & debt rating generator.
-   - `tools/scrub_paths.py`: Portable Python sanitizer CLI.
-   - `tools/bootstrap.sh`: 1-command open-source setup script.
+1. **Demonstrate engineering depth** — not just "vibe coding", but reproducible test design, AST-driven refactoring, static-analysis pipelines, and LLM-audit architecture.
+2. **Give back to the community** — every tool is configurable via `KIT_*` environment variables. Copy a folder, set two env vars, and go.
 
 ---
 
-## 🚀 Quick Start Guide (For Community & Evaluators)
+## What's inside
 
-### 1. Clone & Bootstrap Environment
+| Folder | Purpose | Requires API key? | Quick run |
+|--------|---------|-------------------|-----------|
+| [`hygiene/`](./hygiene) | Technical-debt scanner — 11 static + LLM audit passes (silent exceptions, circular imports, hardcoded secrets, async hazards, schema drift, ...) | Offline by default; set `KIT_API_KEY` for LLM tiers | `cd hygiene && cp .env.example .env && uv run scanners/run_all.py --scripts` |
+| [`tests/`](./tests) | Interview-ready test-pattern stubs — golden snapshots, property/fuzz, mutation testing, guardrail gates | Offline (`KIT_LIVE=false` is the default) | `cd tests && uv run pytest examples -q` |
+| [`tools/`](./tools) | Codebase search, AST code-mod, RAG demo, dev/audit utilities. Fully portable via `KIT_TARGET_ROOT` | Offline; LLM tiers need `KIT_BASE_URL` / `KIT_API_KEY` | `cd tools && uv run python search.py "your query"` |
+
+> Each subfolder has its own `pyproject.toml` / `requirements.txt` and `.env.example`. See the `GUIDE.md` in each folder for detailed setup.
+
+---
+
+## Quick start (any subfolder)
+
 ```bash
-git clone https://github.com/your-username/my-repo.git
-cd my-repo
+# 1. Pick a subfolder
+cd kit/hygiene        # or tests/ or tools/
 
-# Run 1-click bootstrapper
-bash tools/bootstrap.sh
+# 2. Copy the config template
+cp .env.example .env
+# Edit .env — set your target path or API key
+
+# 3. Run
+uv run ./scanners/run_all.py   # hygiene: offline static scan
+uv run pytest examples -q      # tests: 7 cloner-safe stubs, no .env needed
+uv run python search.py "?"    # tools: semantic search (set KIT_TARGET_ROOT)
 ```
 
-### 2. Execute Quality Test Suite
+Or run everything with one `uv` workspace:
+
 ```bash
-# Run all unit, integration, and snapshot tests
-npm test
-
-# Run daily hygiene & static path checks
-npm run scrub-check
-npm run hygiene
-
-# Run codebase metric analysis
-npm run analyze
-```
-
-### 3. Launch Interactive Web Dashboard
-```bash
-npm run dev
+uv sync --all-projects
 ```
 
 ---
 
-## 📂 Repository Structural Layout
+## Architecture
 
 ```
-├── .env.example                       # Configurable environment template
-├── src/
-│   ├── config/index.ts                # Centralized portable config engine
-│   └── utils/scrubber.ts              # Core path & token sanitizer utility
-├── tools/
-│   ├── codebase/analyzer.ts           # Code metrics & complexity analyzer
-│   ├── rag/doc_search.ts              # Local architectural search helper
-│   ├── test/runner.ts                 # Test harness orchestrator
-│   ├── scrub_paths.py                 # Python bulk path sanitizer CLI
-│   └── bootstrap.sh                   # 1-click open source onboarding script
-├── hygiene/
-│   ├── daily/preflight.ts             # Pre-flight environment & structure check
-│   └── scanners/path_scrub_check.ts   # Static path & secret leakage scanner
-├── tests/
-│   ├── 01_gold_snapshots/             # Snapshot regression test locks
-│   ├── 02_unit_bedrock/               # Core engine unit tests
-│   ├── 03_regression_locks/           # Invariant regression checks
-│   ├── 05_integration_e2e/            # End-to-end workflow tests
-│   ├── 08_static_gates/               # Security & quality static gates
-│   ├── 09_tech_debt_audit/            # Quality scorecard & coverage audit
-│   └── 10_harness_suite/              # Lifecycle test harness
-└── README.md                          # Master project documentation
+kit/
+├── hygiene/       # Codebase hygiene scanner (static AST + LLM audit)
+│   ├── scanners/   # 11 individual scanners (run_all.py master runner)
+│   ├── reports/    # Generated audit outputs
+│   └── cleanup.py  # One-shot AST auto-fixer
+├── tests/         # Runnable test-pattern stubs (interview-ready)
+│   ├── examples/   # 5 self-contained, cloner-safe stubs ← START HERE
+│   ├── 01_gold_snapshots/ ... 10_harness_suite/   # Curated slices
+│   └── math_chapters/                            # Engine math tests
+├── tools/         # Portable dev utilities
+│   ├── codebase/   # Search / AST code-mod tools
+│   ├── rag/        # BaziRAG domain-specific demo
+│   └── test/       # Self-tests for kit-tools
+├── bd             # Beads issue-tracking wrapper
+├── .beads/        # Beads Dolt config (shared Dolt server: 127.0.0.1:15432)
+├── AGENTS.md      # AI agent workflow pointer (run `bd prime` for full context)
+└── pyproject.toml # uv workspace — manages all three subfolders
 ```
 
 ---
 
-## ⚙️ Environment Configuration (.env)
+## Why this matters
 
-All system directories and legacy replacement tokens are driven via `.env`:
+`baziforecaster` has a huge, deeply coupled codebase. That's a strength in CI and a liability in an interview. This kit **slices the patterns out**, makes each one self-contained, and ships the minimum runnable artifact — so a candidate can clone one folder and immediately see:
 
-```env
-APP_NAME=my-repo
-APP_ENV=development
-APP_PORT=3000
-
-# Portable Relative Workspace Paths
-REPO_ROOT=.
-DATA_DIR=./src/data
-OUTPUT_DIR=./dist
-LOG_DIR=./tests/reports/logs
-
-# Sanitizer Replacement Target
-TARGET_LEGACY_NAME=legacy_project_name
-TARGET_CLEAN_NAME=my-repo
-```
+- **Golden-snapshot testing** (`examples/01_git_snapshots.py`)
+- **Property/fuzz testing** (`examples/06_property_fuzz.py`)
+- **Silent-exception detection** (`hygiene/scanners/find_silent_killers.py`)
+- **AST-driven refactoring** (`tools/replace_function.py`, `tools/add_import.py`)
+- **RAG with vector search** (`tools/rag/bazirag.py`)
 
 ---
 
-*Built with precision, test-driven rigor, and clean engineering standards.*
+## License
+
+MIT — see [`LICENSE`](./LICENSE). Built on top of `baziforecaster` (also MIT).
+
+---
+
+## Contributing
+
+All content is **read-only** — this kit extracts from staging mirrors and never writes back upstream. To extend:
+
+1. `./bd ready` — find unblocked work
+2. `./bd create "Title" --type task --priority 2` — create an issue
+3. Make changes → run `./bd doctor` → `./bd dolt push` → commit & push
