@@ -23,7 +23,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import asyncio
 
+from factory.infra.context import _real_source_paths
 from factory.infra.control import REPO_ROOT
+from factory.infra.execution import run_execute_phase
 from factory.infra.models import (
     ApprovedTask,
     Epic,
@@ -35,8 +37,6 @@ from factory.infra.models import (
     UserStory,
     WorkGroup,
 )
-from factory.infra.context import _real_source_paths
-from factory.infra.execution import run_execute_phase
 
 
 def _make_real_src(rel: str) -> Path:

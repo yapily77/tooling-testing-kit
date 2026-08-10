@@ -3,10 +3,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from factory.infra import _loopguard as lg
 from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
-
-from factory.infra import _loopguard as lg
 
 
 def test_replay_frozen_history_runs_once(orch_runtime, monkeypatch):

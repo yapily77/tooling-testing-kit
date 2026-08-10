@@ -2,7 +2,6 @@
 Unit tests for _get_monthly_context in chronomancer_handler.
 Verifies correct parsing of V31 modular keys, legacy keys, and loud ValueError propagation on missing data.
 """
-# ruff: noqa: E402
 
 import json
 import os

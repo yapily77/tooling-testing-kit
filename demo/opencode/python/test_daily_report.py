@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from generate_report import (
     _safe_float,
     _safe_str,

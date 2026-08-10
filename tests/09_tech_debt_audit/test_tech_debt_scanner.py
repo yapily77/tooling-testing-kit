@@ -78,8 +78,7 @@ class TechDebtScanner:
 
             # Indentation depth
             depth = self._get_indent_depth(line)
-            if depth > file_debt["max_indent"]:
-                file_debt["max_indent"] = depth
+            file_debt["max_indent"] = max(file_debt["max_indent"], depth)
 
         if file_debt["oversized"]:
             self.results["summary"]["oversized_files"] += 1
@@ -119,8 +118,7 @@ class TechDebtScanner:
                     f.write(f"- ⚠️ Deep nesting detected (Max: {file['max_indent']})\n")
                 if file["markers"]:
                     f.write("- Markers:\n")
-                    for m in file["markers"][:10]:
-                        f.write(f"  - L{m['line']} [{m['type']}]: {m['content'][:120]}\n")
+                    f.writelines(f"  - L{m['line']} [{m['type']}]: {m['content'][:120]}\n" for m in file["markers"][:10])
                 f.write("\n")
 
         return report_path

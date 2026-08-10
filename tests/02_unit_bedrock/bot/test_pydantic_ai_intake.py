@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic_ai.models.test import TestModel
-
 from src.interfaces.telegram.conductor import _parse_manual_template, run_conductor
 from src.interfaces.telegram.session import Session, SessionMetadata
 

@@ -2,7 +2,6 @@ import time
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from src.bot.intake import handle_intake
 from src.bot.session import delete_session, get_session
 

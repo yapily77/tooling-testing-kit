@@ -6,8 +6,8 @@
 // checks, and strict type-checking (tsc via subprocess).
 //
 // Usage:
-//   clean_ts validate <file>      — validate a .ts or .tsx file
-//   clean_ts --help               — show help
+//   clean_ts validate <file>      -- validate a .ts or .tsx file
+//   clean_ts --help               -- show help
 //
 // Output: JSON { "valid": boolean, "errors": string[] } on stdout.
 // Exit code 0 on success, 1 on validation failure, 2 on infrastructure error.

@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(_kit_root) if _kit_root else Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # Load environment
-from dotenv import load_dotenv  # noqa: E402
+from dotenv import load_dotenv
 
 load_dotenv(PROJECT_ROOT / ".env", override=True)
 
@@ -46,7 +46,10 @@ async def run_test(verbose=False, chat_id_override=None):
     from src.core.schemas import UserProfile
     from src.core.schemas import ValidatedPillar as Pillar
     from src.interfaces.telegram.chronomancer import coordinator
-    from src.interfaces.telegram.chronomancer.coordinator import handle_ask, handle_daily
+    from src.interfaces.telegram.chronomancer.coordinator import (
+        handle_ask,
+        handle_daily,
+    )
     from src.interfaces.telegram.db import Database
     from src.interfaces.telegram.session import get_session, save_session
 

@@ -1,7 +1,6 @@
-from pydantic import BaseModel
-
 from factory.infra import output_sanitizer as osan
 from factory.infra.jsonl_compiler import compile_jsonl_to_draft_plan_dict
+from pydantic import BaseModel
 
 
 class DummyEvidence(BaseModel):

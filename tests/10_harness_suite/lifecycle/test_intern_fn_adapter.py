@@ -13,13 +13,10 @@ import json
 from typing import Any
 
 import pytest
-from pydantic_ai.messages import ModelRequest, UserPromptPart
-
-from factory.infra import agent
-from factory.infra import _runtime
-from factory.infra.pipeline import record_intern
+from factory.infra import _runtime, agent
 from factory.infra.exchange import ExchangeTurn
-
+from factory.infra.pipeline import record_intern
+from pydantic_ai.messages import ModelRequest, UserPromptPart
 
 # ── helpers ────────────────────────────────────────────────────────────────
 

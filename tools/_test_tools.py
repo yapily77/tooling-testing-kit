@@ -7,8 +7,7 @@ from pathlib import Path
 WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(WORKSPACE_ROOT))
 
-# noqa: E402
-from mcp_git_guardrail import mcp  # noqa: E402
+from mcp_git_guardrail import mcp
 
 # ANSI colors for output
 GREEN = "\033[92m"

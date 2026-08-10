@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 # Ensure no environment key is masking the bug
@@ -6,7 +7,7 @@ os.environ.pop("OPENAI_API_KEY", None)
 
 from src.interfaces.telegram.conductor import run_conductor
 from src.interfaces.telegram.session import Session, SessionMetadata
-import openai
+
 
 @pytest.mark.asyncio
 async def test_replicate_conductor_openai_credentials_crash():

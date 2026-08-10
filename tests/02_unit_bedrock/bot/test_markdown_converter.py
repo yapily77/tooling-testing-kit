@@ -5,7 +5,6 @@ Unit tests for the markdown_to_tg_html converter in utils.py.
 import pytest
 import respx
 from httpx import Response
-
 from src.bot.utils import edit_telegram_message, markdown_to_tg_html
 
 

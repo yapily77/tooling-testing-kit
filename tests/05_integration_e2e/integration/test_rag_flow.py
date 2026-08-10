@@ -1,7 +1,6 @@
 import asyncio
 
 from dotenv import load_dotenv
-
 from src.engine.rag_client import query_classical_text_async
 
 

@@ -7,7 +7,7 @@ from pathlib import Path
 # Ensure we can import base_agent from the same directory
 sys.path.append(str(Path(__file__).parent))
 
-from base_agent import apply_diff, call_gemini  # noqa: E402
+from base_agent import apply_diff, call_gemini
 
 # Annot: TEST/unit/ paths are my-repo-only; honour KIT_PATH / TARGET_REPO override.
 _kit_root = os.getenv("KIT_PATH", "") or os.getenv("TARGET_REPO", "")

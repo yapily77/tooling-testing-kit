@@ -69,9 +69,8 @@ async def check_mock_telegram_server() -> bool:
 
 
 async def check_model_gateway_ready() -> bool:
-    from pydantic_ai import Agent
-
     from admin.controls.controls import CONTROL_SHEET
+    from pydantic_ai import Agent
 
     print_status("3. Test Model Gateway Readiness", True, "Auditing all Control Sheet roles...")
 

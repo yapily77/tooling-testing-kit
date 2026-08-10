@@ -8,13 +8,12 @@ from pathlib import Path
 # Add workspace root to sys.path to resolve admin imports when run directly
 sys.path.append(str(Path(__file__).parent.parent))
 
-from pydantic import BaseModel, Field  # noqa: E402
-from pydantic_ai import Agent  # noqa: E402
-from pydantic_ai.models.openai import OpenAIChatModel  # noqa: E402
-from pydantic_ai.providers.openai import OpenAIProvider  # noqa: E402
-from pydantic_ai.settings import ModelSettings  # noqa: E402
-
-from admin.dotenv import api_key, base_url, model_name  # noqa: E402
+from admin.dotenv import api_key, base_url, model_name
+from pydantic import BaseModel, Field
+from pydantic_ai import Agent
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.settings import ModelSettings
 
 
 class CodeDefinition(BaseModel):

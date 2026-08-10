@@ -3,7 +3,6 @@ Unit tests for Module 10: Event Classification (module10_classification.py) - V2
 """
 
 import pytest
-
 from src.engine.module10_classification import classify_events
 
 # ─────────────────────────────────────────────

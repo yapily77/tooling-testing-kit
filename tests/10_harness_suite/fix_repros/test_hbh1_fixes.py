@@ -1,5 +1,3 @@
-from factory.infra.validation import check_plan_invariants
-from factory.infra.tools import ROLE_TOOL_BUDGET
 from factory.infra.models import (
     ApprovedTask,
     Epic,
@@ -9,6 +7,9 @@ from factory.infra.models import (
     Strategy,
     WorkGroup,
 )
+from factory.infra.tools import ROLE_TOOL_BUDGET
+from factory.infra.validation import check_plan_invariants
+
 
 def test_intern_budget():
     assert ROLE_TOOL_BUDGET.get("intern") == 75

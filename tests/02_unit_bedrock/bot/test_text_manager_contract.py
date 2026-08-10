@@ -6,7 +6,6 @@ and fail-safe runtime error handling for invalid keys and formatting exceptions.
 """
 
 from pydantic import BaseModel
-
 from src.interfaces.telegram.text_manager import (
     TextManager,
     text,

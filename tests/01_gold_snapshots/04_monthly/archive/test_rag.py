@@ -8,11 +8,10 @@ from dotenv import load_dotenv
 # Load env variables BEFORE importing src modules
 load_dotenv()
 
-from src.engine.openrouter import call_openrouter_async  # noqa: E402
-
-from src.engine.orchestrator import run_full_engine  # noqa: E402
-from src.engine.rag_client import query_classical_text_async  # noqa: E402
-from src.interfaces.telegram.chronomancer.rag import RAG_INSTRUCTIONS  # noqa: E402
+from src.engine.openrouter import call_openrouter_async
+from src.engine.orchestrator import run_full_engine
+from src.engine.rag_client import query_classical_text_async
+from src.interfaces.telegram.chronomancer.rag import RAG_INSTRUCTIONS
 
 
 async def main():
@@ -23,7 +22,7 @@ async def main():
     _kit_path = os.getenv("KIT_PATH", "")
     profile_path = Path(_kit_path) / "_prd" / "users" / "999" / "profile.json" if _kit_path else None
     if not profile_path or not profile_path.exists():
-        print(f"Skipping: User 999 profile not found (my-repo-only). Set KIT_PATH.")
+        print("Skipping: User 999 profile not found (my-repo-only). Set KIT_PATH.")
         return
     if not profile_path.exists():
         print(f"Error: Profile not found at {profile_path}")

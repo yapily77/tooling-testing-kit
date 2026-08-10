@@ -13,8 +13,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from factory.tools import guardrail_check as gc
 from factory.infra import exchange
+from factory.tools import guardrail_check as gc
 
 
 # ---------------------------------------------------------------------------

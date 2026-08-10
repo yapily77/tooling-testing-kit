@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -20,10 +19,10 @@ os.environ["K3_DISPATCH_INTERVAL"] = "30.0" # Ultra stable 30s gap
 os.environ["PYTHONIOENCODING"] = "utf-8"
 
 # Import system components
-from src.bot.bridge import map_profile_to_k3  # noqa: E402
-from src.bot.session import UserProfile  # noqa: E402
-from src.engine import openrouter  # noqa: E402
-from src.engine.rag_client import query_classical_text_async  # noqa: E402
+from src.bot.bridge import map_profile_to_k3
+from src.bot.session import UserProfile
+from src.engine import openrouter
+from src.engine.rag_client import query_classical_text_async
 
 # Monkeypatch to force preset-specific routing and handle serial dispatching
 _orig_call_openrouter_async = openrouter.call_openrouter_async
@@ -44,7 +43,7 @@ async def forced_local_call_serial(prompt, system_prompt=None, model=None, tempe
 openrouter.call_openrouter_async = forced_local_call_serial
 
 # We also need to monkeypatch the pipeline to avoid asyncio.gather
-import alt_src.K3.k3_pipeline as k3p  # noqa: E402
+import alt_src.K3.k3_pipeline as k3p
 
 
 async def sequential_phase_a(month_idx, profile, engine_res, cache_dir, phase_a_config, tailoring_context=""):
@@ -108,8 +107,8 @@ async def sequential_phase_a(month_idx, profile, engine_res, cache_dir, phase_a_
 # Monkeypatch Phase A to be sequential
 k3p.run_phase_a_month = sequential_phase_a
 
-from alt_src.K3.k3_consolidator import stitch_and_convert  # noqa: E402
-from alt_src.K3.k3_summarizer import run_summarizer  # noqa: E402
+from alt_src.K3.k3_consolidator import stitch_and_convert
+from alt_src.K3.k3_summarizer import run_summarizer
 
 
 async def progress_logger(msg: str):

@@ -195,9 +195,9 @@ def test_intern_budget_dynamic_scales_and_clamps() -> None:
 
 
 async def test_path_normalization_deduplication() -> None:
-    from factory.infra.tools import normalize_read_path
     # test normalize_read_path directly
     from factory.infra.control import REPO_ROOT
+    from factory.infra.tools import normalize_read_path
     assert normalize_read_path(f"{REPO_ROOT}/src/core/schemas/unified.py") == "src/core/schemas/unified.py"
     assert normalize_read_path("factory/temp/src/core/schemas/unified.py") == "src/core/schemas/unified.py"
     assert normalize_read_path("src/core/schemas/unified.py") == "src/core/schemas/unified.py"

@@ -1,7 +1,8 @@
-import os
-import tempfile
-import subprocess
 import json
+import os
+import subprocess
+import tempfile
+
 
 def test_replace_text_ignore_whitespace():
     with tempfile.NamedTemporaryFile("w+", encoding="utf-8", dir=".", suffix=".txt", delete=False) as f:

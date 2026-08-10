@@ -21,8 +21,16 @@ import asyncio
 import json
 
 import pytest
-
+from factory.infra.context import (
+    _build_tier_b_map,
+    _stage_copies,
+    estimate_task_tokens,
+    stage_path,
+    stage_paths,
+    task_context_tier,
+)
 from factory.infra.control import TEMP_DIR
+from factory.infra.execution import run_execute_phase
 from factory.infra.models import (
     ApprovedTask,
     Epic,
@@ -34,15 +42,6 @@ from factory.infra.models import (
     UserStory,
     WorkGroup,
 )
-from factory.infra.context import (
-    _build_tier_b_map,
-    _stage_copies,
-    estimate_task_tokens,
-    stage_path,
-    stage_paths,
-    task_context_tier,
-)
-from factory.infra.execution import run_execute_phase
 
 
 def _plan_with(tasks) -> ExecutablePlan:

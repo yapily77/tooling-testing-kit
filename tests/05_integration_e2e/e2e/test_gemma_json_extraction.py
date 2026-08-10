@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.bot.conductor import _parse_conductor_response  # noqa: E402
+from src.bot.conductor import _parse_conductor_response
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -6,8 +6,8 @@ replacing them with configurable tokens or environment variables.
 """
 
 import os
-import sys
 import re
+import sys
 
 DEFAULT_LEGACY = "my-repo"
 DEFAULT_TARGET = "my-repo"

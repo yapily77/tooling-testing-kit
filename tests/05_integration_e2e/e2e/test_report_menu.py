@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -10,7 +9,6 @@ from pathlib import Path
 
 import pytest
 from alt_src.K3.k3_pipeline import generate_annual_summary
-
 from src.bot.bridge import map_profile_to_k3
 from src.bot.db import Database
 from src.bot.report_utils import get_month_narrative, get_report_menu_text

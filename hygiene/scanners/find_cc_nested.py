@@ -2,9 +2,8 @@ import os
 import sys
 from pathlib import Path
 
-from _bootstrap import pkg_root  # noqa: F401,E402
-
-from radon.complexity import cc_visit  # noqa: E402
+from _bootstrap import pkg_root  # noqa: F401
+from radon.complexity import cc_visit
 
 
 def get_all_python_files(root: Path) -> list[Path]:
@@ -67,7 +66,7 @@ def main():
 
     print(f"\n{'=' * 70}")
     print(f"  Top {len(top)} Files in {args.target_dir}/ with Functions CC >= {args.min_cc}")
-    print(f"  (Aligned with kill_tries.py: CC > 5 per function)")
+    print("  (Aligned with kill_tries.py: CC > 5 per function)")
     print(f"{'=' * 70}\n")
     print(f"  {'Rank':<5} {'Worst':<7} {'Violators':<10} {'File'}")
     print(f"  {'-' * 5} {'-' * 6} {'-' * 10} {'-' * 50}")

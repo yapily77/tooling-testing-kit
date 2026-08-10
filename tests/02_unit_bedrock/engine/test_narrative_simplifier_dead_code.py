@@ -15,9 +15,9 @@ os.environ.setdefault("BGEM3_URL", "http://mock")
 os.environ.setdefault("BGEM3_TOKEN", "mock")
 os.environ.setdefault("QDRANT_URL", "http://mock")
 
-import inspect  # noqa: E402
+import inspect
 
-from src.engine import narrative_simplifier  # noqa: E402
+from src.engine import narrative_simplifier
 
 
 def test_get_month_simplifier_agent_removed():

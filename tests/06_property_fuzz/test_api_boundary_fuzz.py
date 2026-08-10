@@ -17,7 +17,6 @@ from datetime import date
 from hypothesis import given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
-
 from src.core.schemas import (
     ChartProfile,
     CongGeValidationResult,

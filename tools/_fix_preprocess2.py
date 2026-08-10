@@ -40,4 +40,4 @@ else:
     idx = content.find("def _preprocess_telegram_text")
     section = content[idx:idx + 300]
     for i, line in enumerate(section.split(chr(10)), 1):
-        print(f"{i}: {repr(line)}")
+        print(f"{i}: {line!r}")

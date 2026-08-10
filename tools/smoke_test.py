@@ -163,8 +163,7 @@ def _module_dotted(path: Path) -> str | None:
         idx = s.find(marker)
         if idx != -1:
             rel = s[idx + 1 :]
-            if rel.endswith(".py"):
-                rel = rel[:-3]
+            rel = rel.removesuffix(".py")
             return rel.replace("/", ".")
     return None
 

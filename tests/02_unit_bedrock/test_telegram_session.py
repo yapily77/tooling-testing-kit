@@ -1,5 +1,4 @@
 import pytest
-
 from src.interfaces.telegram.session import ChatMessage, Session, SessionMetadata
 
 

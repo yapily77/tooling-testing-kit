@@ -7,7 +7,7 @@ and transactional rollback stack without mutating live files on disk.
 
 import ast
 import copy
-from typing import Callable
+from collections.abc import Callable
 
 __all__ = [
     "FunctionReplacer",

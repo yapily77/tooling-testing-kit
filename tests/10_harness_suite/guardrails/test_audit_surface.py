@@ -5,11 +5,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 import re
 
 import pytest
-from pydantic import ValidationError
-from pydantic_ai.usage import UsageLimits
-
 from factory.infra import _loopguard as lg
 from factory.infra import models, runner, tools
+from pydantic import ValidationError
+from pydantic_ai.usage import UsageLimits
 
 
 # ── SA1 Security (ACL) ───────────────────────────────────────────────────────

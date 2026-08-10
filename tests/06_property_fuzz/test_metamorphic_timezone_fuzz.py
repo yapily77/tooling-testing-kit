@@ -21,7 +21,6 @@ from datetime import UTC, datetime, timedelta, timezone
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
 from src.engine.daily_pillar import (
     BRANCH_ORDER,
     STEM_ORDER,

@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from admin.controls.controls import CONTROL_SHEET, ControlSheetSchema
+from pydantic import BaseModel
 
 
 def test_control_sheet_is_pydantic_model():

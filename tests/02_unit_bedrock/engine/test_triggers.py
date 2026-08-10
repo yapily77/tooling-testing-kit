@@ -3,7 +3,6 @@ Unit tests for Module 9: Trigger Detection (module9_triggers.py) - V31 Pydantic 
 """
 
 import pytest
-
 from src.core.schemas.unified import (
     ChartProfile,
     KVList,

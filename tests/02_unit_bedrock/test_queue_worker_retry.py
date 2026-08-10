@@ -1,7 +1,6 @@
 import sqlite3
-import sys
-from uuid import UUID
 from unittest.mock import AsyncMock, MagicMock, patch
+from uuid import UUID
 
 # Redirect bot.db to :memory: to keep workspace clean
 original_connect = sqlite3.connect
@@ -11,12 +10,12 @@ def mock_connect(database, *args, **kwargs):
     return original_connect(database, *args, **kwargs)
 sqlite3.connect = mock_connect
 
-import unittest  # noqa: E402
+import unittest
 
-from src.bot.db import Database  # noqa: E402
-from src.bot.queue_worker import QueueManager  # noqa: E402
-from src.bot.reliability import PipelineAbortError  # noqa: E402
-from src.database.models import JobQueue  # noqa: E402
+from src.bot.db import Database
+from src.bot.queue_worker import QueueManager
+from src.bot.reliability import PipelineAbortError
+from src.database.models import JobQueue
 
 
 class TestQueueWorkerRetry(unittest.IsolatedAsyncioTestCase):

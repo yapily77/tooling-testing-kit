@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -12,7 +11,6 @@ from alt_src.K3.k3_consolidator import stitch_and_convert
 from alt_src.K3.k3_pipeline import generate_annual_summary
 from alt_src.K3.k3_report_formatter import format_k3_markdown
 from alt_src.K3.k3_summarizer import format_markdown_summary
-
 from src.bot.bridge import map_profile_to_k3
 from src.bot.session import UserProfile
 

@@ -13,9 +13,8 @@ Guards (root cause of RuntimeError: [HALT] EXECUTE phase incomplete: intern03, i
 
 from __future__ import annotations
 
-from pydantic import ValidationError
-
 from factory.infra import models as models_mod
+from pydantic import ValidationError
 
 
 def _make(status: str) -> models_mod.TaskResult:

@@ -12,12 +12,10 @@
 
 import ast
 import json
-import sys
 from pathlib import Path
 
-from _bootstrap import pkg_root  # noqa: F401,E402
-
-from utils import get_src_files  # noqa: E402
+from _bootstrap import pkg_root  # noqa: F401
+from utils import get_src_files
 
 BANNED_DICT_METHODS = {
     "get",

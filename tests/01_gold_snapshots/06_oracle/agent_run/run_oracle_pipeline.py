@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 import sys
-from pathlib import Path
 
 # IMPORTANT: Load dotenv so Mem0, Qdrant, and DB have credentials
 from dotenv import load_dotenv

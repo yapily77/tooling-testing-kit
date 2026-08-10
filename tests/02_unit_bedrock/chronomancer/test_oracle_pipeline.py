@@ -1,7 +1,6 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from src.core.schemas.unified import ChartProfile, OracleDeps, OracleQueryIntent
 from src.interfaces.telegram.chronomancer.oracle_coordinator import handle_oracle
 from src.interfaces.telegram.chronomancer.oracle_gatherer import gather_oracle_deps

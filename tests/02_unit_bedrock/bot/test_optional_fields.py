@@ -1,6 +1,5 @@
 import pytest
 from pydantic import ValidationError
-
 from src.bot.bridge import validate_profile
 from src.bot.session import UserProfile
 

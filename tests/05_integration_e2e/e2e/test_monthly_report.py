@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -8,7 +7,6 @@ import asyncio
 import json
 
 from alt_src.K3.k3_pipeline import generate_annual_summary
-
 from src.bot.bridge import map_profile_to_k3
 from src.bot.session import UserProfile
 from src.engine.orchestrator import run_full_engine

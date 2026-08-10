@@ -18,11 +18,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
-from factory.infra.exchange import update_status_board
-import factory.infra.exchange as exchange_mod
 import factory.infra._runtime as runtime
+import factory.infra.exchange as exchange_mod
+import pytest
+from factory.infra.exchange import update_status_board
 
 
 @pytest.fixture

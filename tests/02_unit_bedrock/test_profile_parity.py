@@ -18,7 +18,6 @@
 #   Neutral    : 金       (Metal)
 
 import pytest
-
 from src.core.tools.bazi_engine import (
     get_current_da_yun,
     get_day_master_strength,

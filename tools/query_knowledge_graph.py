@@ -2,7 +2,6 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
 
 sys.path.insert(0, os.getenv("KIT_INFRA_ROOT", ""))
 

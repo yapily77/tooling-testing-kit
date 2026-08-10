@@ -11,7 +11,6 @@ Tests cover:
 """
 
 import pytest
-
 from src.core.schemas import ChartProfile, Pillar
 from src.engine.module12_compatibility import analyze_compatibility
 

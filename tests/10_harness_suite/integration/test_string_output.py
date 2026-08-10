@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-import pytest
 from types import SimpleNamespace
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
@@ -35,7 +36,7 @@ class MockResult:
 @pytest.mark.asyncio
 async def test_load_skill_string_output(monkeypatch) -> None:
     """Verify load_skill handles non-Pydantic string outputs and serializes cleanly."""
-    from factory.infra import agent, _runtime
+    from factory.infra import _runtime, agent
     monkeypatch.setattr("factory.infra.agent.build_role_agent", lambda role: (None, None))
     monkeypatch.setattr("factory.infra.agent.build_md_bridge", lambda role, agent_id=None: None)
     monkeypatch.setattr("factory.infra.agent.log_response_raw", lambda **kw: None)

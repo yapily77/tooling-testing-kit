@@ -1,6 +1,8 @@
 import re
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from factory.tools.investigate import extract_pattern_context, main
+
 
 def test_extract_pattern_context_overlap():
     lines = [f"line {i}" for i in range(100)]

@@ -3,8 +3,6 @@ Sample Target Python File for Tooling & Testing Kit Demonstrations.
 Contains intentional code patterns audited by kit-hygiene scanners.
 """
 
-import os
-import sys
 
 # Unused legacy constant (audited by find_dead_code.py)
 UNUSED_LEGACY_CONFIG = {"debug": True, "timeout": 30}

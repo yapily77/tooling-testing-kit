@@ -6,7 +6,6 @@ Tests promo code validation, tier management, and rate limiting.
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
 from src.database.models import Base, PromoCode, User
 from src.identity.service import create_user
 from src.services.billing import (

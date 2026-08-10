@@ -2,7 +2,6 @@ import os
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from src.bot.app import process_webhook_logic
 from src.bot.session import delete_session, get_session, save_session
 

@@ -4,14 +4,12 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from _bootstrap import pkg_root  # noqa: F401,E402
-
-from pydantic import BaseModel, Field  # noqa: E402
-from pydantic_ai import Agent  # noqa: E402
-from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src_files  # noqa: E402
-
-from control import CONTROL_SHEET  # noqa: E402
+from _bootstrap import pkg_root
+from control import CONTROL_SHEET
+from pydantic import BaseModel, Field
+from pydantic_ai import Agent
+from pydantic_ai.settings import ModelSettings
+from utils import get_src_files
 
 
 class CircularDepCandidate(BaseModel):
@@ -105,7 +103,7 @@ def find_cycles(graph: dict[str, list[tuple[str, int, bool]]]) -> list[CircularD
                 resolved = f"src.{neighbor}"
                 if resolved not in graph:
                     # Try packages/modules matching
-                    for g_key in graph.keys():
+                    for g_key in graph:
                         if g_key.endswith(f".{neighbor}") or g_key == neighbor:
                             resolved = g_key
                             break
@@ -128,7 +126,7 @@ def find_cycles(graph: dict[str, list[tuple[str, int, bool]]]) -> list[CircularD
         path.pop()
         visited[node] = 2  # fully visited
 
-    for node in graph.keys():
+    for node in graph:
         if visited.get(node, 0) == 0:
             dfs(node)
 

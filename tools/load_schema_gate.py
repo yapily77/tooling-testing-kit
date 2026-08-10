@@ -4,9 +4,8 @@ import os
 import sys
 from pathlib import Path
 
-from pydantic import BaseModel
-
 from control import REPO_ROOT
+from pydantic import BaseModel
 
 
 def main():

@@ -12,9 +12,8 @@ import types
 from pathlib import Path
 
 import pytest
-from pydantic_ai.messages import ModelRequest, UserPromptPart
-
 from factory.common.md_bridge import build_md_bridge
+from pydantic_ai.messages import ModelRequest, UserPromptPart
 
 
 def _write_md(art_dir: Path, role_folder: str, stem: str, text: str) -> None:

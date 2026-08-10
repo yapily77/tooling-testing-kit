@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 
+from factory.infra.context import stage_workspace_from_draft
 from factory.infra.models import (
     ApprovedTask,
     DraftPlan,
@@ -25,7 +26,6 @@ from factory.infra.models import (
     UserStory,
     WorkGroup,
 )
-from factory.infra.context import stage_workspace_from_draft
 
 
 def test_stage_workspace_from_draft(tmp_path, monkeypatch):

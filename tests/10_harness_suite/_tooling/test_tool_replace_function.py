@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 
+
 def test_replace_function_preserves_formatting():
     # Use a relative path inside the workspace
     source_rel = "tests/test_tmp_replace.py"

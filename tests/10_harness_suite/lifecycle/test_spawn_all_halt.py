@@ -20,11 +20,10 @@ from __future__ import annotations
 import asyncio
 import json
 
-import pytest
-
 import factory.infra.execution as exec_mod
-
+import pytest
 from factory.infra.control import TEMP_DIR
+from factory.infra.execution import run_execute_phase
 from factory.infra.models import (
     ApprovedTask,
     Epic,
@@ -36,7 +35,6 @@ from factory.infra.models import (
     UserStory,
     WorkGroup,
 )
-from factory.infra.execution import run_execute_phase
 
 
 @pytest.fixture(autouse=True)

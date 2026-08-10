@@ -14,13 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import json
 
-
 from factory.infra.models import (
     ApprovedTask,
     AuditResult,
     Epic,
-    ExecutablePlan,
     EvaluationItem,
+    ExecutablePlan,
     ParallelisableWorkplan,
     RubricCell,
     RubricCube,

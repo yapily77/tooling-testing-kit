@@ -18,7 +18,6 @@ Scenario B — Stale job after /start:
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from src.bot.bridge import validate_profile
 from src.bot.db import Database
 from src.bot.reliability import PipelineAbortError

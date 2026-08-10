@@ -5,13 +5,15 @@ import ast
 import json
 import os
 import time
-import pytest
 
+import pytest
 from factory.infra.ast_analyzer import (
     scan_file_for_anti_patterns,
 )
 from factory.infra.ast_verifier import (
     ComplexityVisitor as VerifierComplexityVisitor,
+)
+from factory.infra.ast_verifier import (
     SymbolScopeVisitor,
     ensure_pydantic_imports,
     extract_header_symbol_contract,
@@ -19,7 +21,6 @@ from factory.infra.ast_verifier import (
     verify_refactored_ast,
 )
 from factory.infra.virtual_ast_buffer import VirtualASTBuffer
-
 
 # ── ast_analyzer tests ──────────────────────────────────────────────────────
 

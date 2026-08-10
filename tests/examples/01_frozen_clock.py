@@ -11,7 +11,6 @@ from __future__ import annotations
 import datetime as dt
 import sys
 
-
 ZERO = dt.datetime(2024, 1, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
 
 

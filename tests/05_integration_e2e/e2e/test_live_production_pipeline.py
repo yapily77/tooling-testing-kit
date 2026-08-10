@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -9,22 +8,21 @@ from dotenv import load_dotenv
 # Load API keys BEFORE any local imports
 load_dotenv()
 
-import asyncio  # noqa: E402
-import json  # noqa: E402
-import os  # noqa: E402
-import sys  # noqa: E402
-import traceback  # noqa: E402
-from pathlib import Path  # noqa: E402
+import asyncio
+import json
+import os
+import sys
+import traceback
+from pathlib import Path
 
 os.environ["K3_DISPATCH_INTERVAL"] = "5.0"
 
 # --- MONKEYPATCHING FOR LIVE RUN ---
-from alt_src.K3.k3_consolidator import stitch_and_convert  # noqa: E402
-from alt_src.K3.k3_pipeline import run_k3_pipeline  # noqa: E402
-from alt_src.K3.k3_summarizer import run_summarizer  # noqa: E402
-
-from src.bot.bridge import map_profile_to_k3  # noqa: E402
-from src.bot.session import UserProfile  # noqa: E402
+from alt_src.K3.k3_consolidator import stitch_and_convert
+from alt_src.K3.k3_pipeline import run_k3_pipeline
+from alt_src.K3.k3_summarizer import run_summarizer
+from src.bot.bridge import map_profile_to_k3
+from src.bot.session import UserProfile
 
 # Import engine components
 

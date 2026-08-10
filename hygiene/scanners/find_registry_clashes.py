@@ -7,7 +7,6 @@ from __future__ import annotations
 # Validates whether the call will crash based on the actual model API surface.
 #
 # Emits kit-hygiene/reports/registry_clashes.json
-
 import ast
 import asyncio
 import json
@@ -15,20 +14,18 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import instructor
-    import openai
 
 import tenacity
-from pydantic import BaseModel, Field
 
 # Ensure repo root in sys.path
-from _bootstrap import pkg_root  # noqa: F401,E402
-
+from _bootstrap import pkg_root
+from control import ControlSheet, SystemSettings
+from pydantic import BaseModel, Field
 from utils import get_src_files
-from control import ControlSheet, SystemSettings  # noqa: E402
 
 # Initialize fast-json-repair if available
 try:
@@ -325,11 +322,11 @@ async def evaluate_call_site(client: instructor.AsyncInstructor, site: CallSite,
             }
         except Exception as e:
             if attempt < max_retries - 1:
-                print(f"[93m⚠️  LLM timeout/error on {site.file_path}:{site.line} -> {e}. Retrying ({attempt+1}/{max_retries})...[0m")
+                print(f"\x1b[93m⚠️  LLM timeout/error on {site.file_path}:{site.line} -> {e}. Retrying ({attempt+1}/{max_retries})...\x1b[0m")
                 import asyncio
                 await asyncio.sleep(2 ** attempt)  # exponential backoff
             else:
-                print(f"[91m🚨 FATAL LLM ERROR on {site.file_path}:{site.line} after {max_retries} attempts: {e}[0m")
+                print(f"\x1b[91m🚨 FATAL LLM ERROR on {site.file_path}:{site.line} after {max_retries} attempts: {e}\x1b[0m")
                 return {
                     "file_path": site.file_path,
                     "line": site.line,
@@ -337,7 +334,7 @@ async def evaluate_call_site(client: instructor.AsyncInstructor, site: CallSite,
                     "method": site.method,
                     "expression": site.expression,
                     "status": "ERROR",
-                    "reason": f"LLM error: {str(e)}",
+                    "reason": f"LLM error: {e!s}",
                     "registry_class": reg_info.get("class_name", "unknown"),
                     "suggested_fix": ""
                 }
@@ -432,7 +429,7 @@ def runtime_verify(finding: dict, registry_map: dict) -> dict:
                 finding["verified_status"] = "CONFIRMED_CRASH"
 
     except Exception as e:
-        finding["verified_status"] = f"IMPORT_ERROR: {str(e)}"
+        finding["verified_status"] = f"IMPORT_ERROR: {e!s}"
 
     return finding
 
@@ -482,8 +479,8 @@ async def main_async(do_verify: bool, limit: int | None = None, scripts_only: bo
     # or build a direct openai async client using the exact controls.
     if os.getenv("KIT_ENABLE_REGISTRY_CLASHES", "false").lower() == "true":
         try:
-            import openai
             import instructor
+            import openai
 
             s = SystemSettings()
             if not s.api_key or not s.api_key.strip():

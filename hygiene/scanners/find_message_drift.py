@@ -4,11 +4,9 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-
-from _bootstrap import pkg_root, target_root  # noqa: F401,E402
-
-from pydantic import BaseModel, Field  # noqa: E402
-from utils import get_src_files  # noqa: E402
+from _bootstrap import pkg_root, target_root
+from pydantic import BaseModel, Field
+from utils import get_src_files
 
 # Paths
 BASE_DIR = target_root  # scanned repo root (TARGET_ROOT env; default = repo root)

@@ -11,7 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from src.engine.module3_interaction import calculate_interactions  # noqa: E402
+from src.engine.module3_interaction import calculate_interactions
 
 # Setup logging (Mission Style)
 logging.basicConfig(

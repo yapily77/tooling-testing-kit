@@ -36,9 +36,8 @@ import pytest
 # subprocess. The runner calls `subprocess.run(["./bd", ...])` for CQRS
 # claim/update/close; we must NOT let it block (no TTY / no real beads run).
 # (This is globally handled in tests/conftest.py)
-
-from factory.infra import runner as _runner  # noqa: E402
-from factory.infra.control import TEMP_DIR  # noqa: E402
+from factory.infra import runner as _runner
+from factory.infra.control import TEMP_DIR
 
 # Stub the harness patch writer. The synthetic intern returns no `files_changed`,
 # which would trip the real B3 "fake-done -> blocked" guard. For this regression
@@ -46,11 +45,12 @@ from factory.infra.control import TEMP_DIR  # noqa: E402
 # and let it through. SPAWN-ALL / strict / rerun logic is untouched.
 _runner._write_harness_patches = lambda task_id, files_changed, bd: (list(files_changed), 1)
 
-from factory.infra.models import (  # noqa: E402
+from factory.infra.execution import run_execute_phase
+from factory.infra.models import (
     ApprovedTask,
     Epic,
-    ExecutablePlan,
     EvaluationItem,
+    ExecutablePlan,
     ParallelisableWorkplan,
     ReviewResult,
     RubricCell,
@@ -58,7 +58,6 @@ from factory.infra.models import (  # noqa: E402
     Strategy,
     WorkGroup,
 )
-from factory.infra.execution import run_execute_phase  # noqa: E402
 
 
 def _plan(single: bool = True) -> ExecutablePlan:

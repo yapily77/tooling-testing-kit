@@ -18,12 +18,11 @@ import asyncio
 
 import pydantic
 import pytest
+from factory.infra import _loopguard as lg
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import ModelRetry
 from pydantic_ai.models.function import FunctionModel
 from pydantic_core import ValidationError
-
-from factory.infra import _loopguard as lg
 from tests._probe import HarnessProbe
 
 # ── Confirmed FunctionModel user_func signature (pydantic_ai 2.3.0) ──────────

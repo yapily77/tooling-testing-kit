@@ -2,7 +2,6 @@ import os
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from src.interfaces.telegram.utils import send_developer_message
 
 

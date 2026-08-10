@@ -4,7 +4,6 @@ Chronomancer interaction test — uses a clean temporary SQLite DB.
 Mid-file imports are required for module-level db patching.
 Run with: uv run python 02_unit_bedrock/chronomancer/test_chronomancer_output.py
 """
-# ruff: noqa: E402, I001
 
 import asyncio
 import logging

@@ -1,7 +1,6 @@
 import json
 
 import httpx
-
 from factory.infra.http_client import _fix_openrouter_error_finish_reason
 
 

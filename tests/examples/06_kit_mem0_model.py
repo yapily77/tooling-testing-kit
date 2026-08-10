@@ -12,8 +12,6 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in os.sys.path:
     os.sys.path.insert(0, str(ROOT))
@@ -50,7 +48,7 @@ def test_kit_models_are_granular_and_independent() -> None:
 
 
 def test_config_exposes_both_knobs() -> None:
-    from config import load_config  # noqa: E402  # kit root on sys.path
+    from config import load_config  # kit root on sys.path
 
     _, _, _, model, mem0_model = load_config()
     assert model == os.getenv("CHRONO_MODEL", "mock-chrono-model")

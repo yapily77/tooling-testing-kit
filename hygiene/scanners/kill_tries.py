@@ -20,7 +20,6 @@ import logging
 import os
 import re
 import subprocess
-import sys
 import time
 import uuid
 from datetime import datetime
@@ -29,6 +28,9 @@ from typing import Any
 
 import logfire
 import yaml
+
+# Ensure repo root in sys.path
+from _bootstrap import pkg_root
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -41,17 +43,14 @@ from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import ModelRetry
 from pydantic_ai.messages import ModelRequest, UserPromptPart
 
-# Ensure repo root in sys.path
-from _bootstrap import pkg_root  # noqa: F401,E402
-
 REQUEST_TIMEOUT = 300  # seconds — max subprocess/LLM request timeout
 MAX_RETRIES = 10  # max retries for LLM refactoring attempts
 
-from virtual_ast_buffer import (  # noqa: E402
+from control import CONTROL_SHEET
+from virtual_ast_buffer import (
     VirtualASTBuffer,
     ensure_pydantic_imports,
 )
-from control import CONTROL_SHEET  # noqa: E402
 
 _KNOWN_TEMPLATE_KEYS = re.compile(
     r"\{("
@@ -353,8 +352,7 @@ class RefactoringVerdict(BaseModel):
                 s = s[9:]
             elif s.startswith("```"):
                 s = s[3:]
-            if s.endswith("```"):
-                s = s[:-3]
+            s = s.removesuffix("```")
             return s.strip()
 
         if isinstance(v, str):
@@ -1568,10 +1566,7 @@ def verify_refactored_ast(
                     for target in top_node.targets:
                         if isinstance(target, ast.Name):
                             orig_namespace.add(target.id)
-                elif isinstance(top_node, ast.Import):
-                    for alias in top_node.names:
-                        orig_namespace.add(alias.asname or alias.name)
-                elif isinstance(top_node, ast.ImportFrom):
+                elif isinstance(top_node, ast.Import) or isinstance(top_node, ast.ImportFrom):
                     for alias in top_node.names:
                         orig_namespace.add(alias.asname or alias.name)
         except SyntaxError as e:
@@ -1658,13 +1653,8 @@ def verify_refactored_ast(
                 "insert",
                 "extend",
                 "clear",
-                "update",
                 "setdefault",
-                "get",
                 "copy",
-                "items",
-                "keys",
-                "values",
                 "query",
                 "fetchone",
                 "fetchall",
@@ -1700,7 +1690,6 @@ def verify_refactored_ast(
                 "date",
                 "days",
                 "strftime",
-                "isoformat",
                 "value",
                 "result",
                 "message_history",

@@ -157,6 +157,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
         # Try to read the generated K3 profile from disk and append to UI.md as Markdown table
         try:
             from src.core.memory.memory_manager import memory_manager
+
             # [my-repo-only: TEST/GOLD/utils.py not in kit download]
             from TEST.GOLD.utils import format_engine_profile_markdown
             profile_path = memory_manager.get_profile_path(chat_id)

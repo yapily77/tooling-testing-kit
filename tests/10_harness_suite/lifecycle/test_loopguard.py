@@ -17,6 +17,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 from types import SimpleNamespace
 
 import pytest
+from factory.infra import _loopguard as lg
+from factory.infra.control import CONTROL_SHEET
 from pydantic_ai.messages import (
     ModelRequest,
     ModelResponse,
@@ -27,9 +29,6 @@ from pydantic_ai.messages import (
     UserPromptPart,
 )
 from pydantic_ai.models.test import TestModel
-
-from factory.infra import _loopguard as lg
-from factory.infra.control import CONTROL_SHEET
 
 
 def _req(text: str) -> ModelRequest:
@@ -290,6 +289,7 @@ def test_build_role_agent_clones_intern_model():
 async def test_concurrent_loopguard_monkeypatching_isolation(monkeypatch, tmp_path):
     import copy
     import types
+
     from pydantic_ai.models.test import TestModel
 
     monkeypatch.chdir(tmp_path)

@@ -8,9 +8,8 @@ from typing import Annotated, Any
 WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(WORKSPACE_ROOT))
 
-from fastmcp import FastMCP  # noqa: E402
-
-from guardrail_check import checkpoint, validate  # noqa: E402
+from fastmcp import FastMCP
+from guardrail_check import checkpoint, validate
 
 mcp = FastMCP(os.getenv("KIT_MCP_NAME", "kit-tools"))
 

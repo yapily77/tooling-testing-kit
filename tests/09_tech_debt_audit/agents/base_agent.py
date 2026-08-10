@@ -55,7 +55,7 @@ async def call_gemini(prompt: str, system_prompt: str = "You are a senior Bazi e
             content = data["candidates"][0]["content"]["parts"][0]["text"]
             return clean_llm_response(content)
     except Exception as e:
-        return f"ERROR: {str(e)}"
+        return f"ERROR: {e!s}"
 
 def apply_diff(file_path: str, new_content: str):
     """Applies the update to the file."""

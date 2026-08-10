@@ -10,14 +10,12 @@ import ast
 import json
 import logging
 import os
-import sys
 import tempfile
 from collections import defaultdict
 from pathlib import Path
 
-from _bootstrap import pkg_root  # noqa: F401,E402
-
-from virtual_ast_buffer import (  # noqa: E402
+from _bootstrap import pkg_root
+from virtual_ast_buffer import (
     VirtualASTBuffer,
     ensure_pydantic_imports,
     verify_class_structure_intact,
@@ -55,10 +53,7 @@ def _cleanup_local_imports(source: str) -> str:
         return source
     module_imports: set[str] = set()
     for node in tree.body:
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                module_imports.add(alias.asname or alias.name)
-        elif isinstance(node, ast.ImportFrom) and node.module:
+        if isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom) and node.module:
             for alias in node.names:
                 module_imports.add(alias.asname or alias.name)
     if not module_imports:

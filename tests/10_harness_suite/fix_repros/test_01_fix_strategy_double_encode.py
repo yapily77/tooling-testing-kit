@@ -10,8 +10,6 @@ about nested string values) BEFORE repair; Fix B hardens the model validators.
 
 import json
 
-from pydantic import BaseModel as _BaseModel
-
 from factory.infra import output_sanitizer as osan
 from factory.infra.models import (
     ApprovedTask,
@@ -27,6 +25,7 @@ from factory.infra.models import (
     ToolPreferenceItem,
     WorkGroup,
 )
+from pydantic import BaseModel as _BaseModel
 
 
 def _build_strategy() -> Strategy:

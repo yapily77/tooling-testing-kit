@@ -9,7 +9,6 @@ import math
 from typing import Any
 
 import pytest
-
 from src.core.schemas.unified import BRANCHES, ZHI_HIDDEN
 from src.engine.contradiction_resolver import (
     _count_element_hidden,

@@ -4,7 +4,6 @@ import tempfile
 from unittest.mock import patch
 
 import pytest
-
 from src.bot.db import Database
 from src.bot.queue_worker import QueueManager
 

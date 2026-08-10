@@ -10,7 +10,6 @@ import math
 
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
 from src.core.schemas.unified import QiInteraction
 from src.engine.contradiction_resolver import (
     apply_san_hui_nullification,

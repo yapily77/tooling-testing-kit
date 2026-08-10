@@ -14,9 +14,13 @@ import json
 import subprocess
 
 import pytest
-
 from factory.infra._loopguard import AGENT_RUN_TIMEOUT
 from factory.infra.control import TEMP_DIR
+from factory.infra.execution import (
+    DAG_DEADLOCK_TIMEOUT,
+    INTERN_VALIDATION_PASSES,
+    run_execute_phase,
+)
 from factory.infra.models import (
     ApprovedTask,
     Epic,
@@ -27,11 +31,6 @@ from factory.infra.models import (
     Strategy,
     UserStory,
     WorkGroup,
-)
-from factory.infra.execution import (
-    INTERN_VALIDATION_PASSES,
-    DAG_DEADLOCK_TIMEOUT,
-    run_execute_phase,
 )
 
 

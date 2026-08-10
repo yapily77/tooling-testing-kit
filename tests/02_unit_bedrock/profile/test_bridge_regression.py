@@ -1,5 +1,4 @@
 import pytest
-
 from src.tools.user_profile_input import (
     OVERRIDABLE_FIELDS,
     apply_override,

@@ -2,8 +2,10 @@ from datetime import date, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
-from src.interfaces.telegram.chronomancer.coordinator import _handle_ask_is_date_outside, handle_ask
+from src.interfaces.telegram.chronomancer.coordinator import (
+    _handle_ask_is_date_outside,
+    handle_ask,
+)
 from src.interfaces.telegram.utils import ChronomancerReply
 
 

@@ -54,7 +54,6 @@ from unittest.mock import patch
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
 from src.core.schemas import SessionStep
 from src.interfaces.telegram import db as db_mod
 from src.interfaces.telegram.db import Database

@@ -26,14 +26,14 @@ async def mock_call(*args, **kwargs):
 src.engine.openrouter.call_openrouter_async = mock_call
 chronomancer_handler.call_openrouter_async = mock_call
 
-from src.bot.chronomancer_handler import (  # noqa: E402
+from src.bot.chronomancer_handler import (
     handle_daily,
     handle_forecast,
     handle_forecast_category,
     handle_forecast_menu,
 )
-from src.bot.db import Database  # noqa: E402
-from src.bot.session import Session, UserProfile, save_session  # noqa: E402
+from src.bot.db import Database
+from src.bot.session import Session, UserProfile, save_session
 
 
 async def generate_examples():

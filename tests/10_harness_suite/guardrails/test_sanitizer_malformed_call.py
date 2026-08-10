@@ -18,10 +18,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
+from factory.infra import output_sanitizer as osan
 from pydantic import BaseModel
 from pydantic_ai.exceptions import UnexpectedModelBehavior
-
-from factory.infra import output_sanitizer as osan
 
 
 class _Doc(BaseModel):

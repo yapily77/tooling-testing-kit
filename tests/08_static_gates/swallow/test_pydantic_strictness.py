@@ -2,9 +2,8 @@ import importlib
 import inspect
 import pkgutil
 
-from pydantic import BaseModel, RootModel
-
 import src
+from pydantic import BaseModel, RootModel
 
 
 def get_all_pydantic_models() -> list[type[BaseModel]]:

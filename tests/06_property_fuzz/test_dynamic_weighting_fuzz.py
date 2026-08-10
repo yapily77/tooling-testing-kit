@@ -12,13 +12,12 @@ import math
 
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
+from src.core.schemas.unified import TenGod, TenGodEntry
 from src.engine.module6_ten_gods import (
     calculate_ten_god_dominance,
     get_seasonal_ten_god_weight,
     get_ten_god_magnitude_multiplier,
 )
-from src.core.schemas.unified import TenGodEntry, TenGod
 
 STEM_ORDER = [
     "Jia", "Yi", "Bing", "Ding", "Wu",

@@ -3,7 +3,6 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
-
 from src.engine.openrouter import call_openrouter_async
 
 

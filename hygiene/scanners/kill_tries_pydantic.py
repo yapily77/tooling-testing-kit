@@ -18,9 +18,7 @@ import json
 import logging
 import os
 import subprocess
-import sys
 import tempfile
-import textwrap
 import time
 import uuid
 from datetime import datetime
@@ -29,6 +27,10 @@ from typing import Any
 
 import logfire
 import yaml
+
+# Ensure repo root in sys.path
+from _bootstrap import pkg_root
+from control import CONTROL_SHEET
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -39,13 +41,7 @@ from pydantic import (
 )
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.exceptions import ModelRetry
-from pydantic_ai.messages import ModelRequest, ModelResponse, TextPart, UserPromptPart
-
-# Ensure repo root in sys.path
-from _bootstrap import pkg_root  # noqa: F401,E402
-
-from virtual_ast_buffer import VirtualASTBuffer  # noqa: E402
-from control import CONTROL_SHEET  # noqa: E402
+from virtual_ast_buffer import VirtualASTBuffer
 
 # Initialize Logfire instrumentation once globally
 try:
@@ -154,8 +150,7 @@ class RefactoringVerdict(BaseModel):
                 s = s[9:]
             elif s.startswith("```"):
                 s = s[3:]
-            if s.endswith("```"):
-                s = s[:-3]
+            s = s.removesuffix("```")
             return s.strip()
 
         if isinstance(v, str):

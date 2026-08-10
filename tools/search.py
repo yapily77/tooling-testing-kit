@@ -8,11 +8,10 @@ from pathlib import Path
 from typing import Any
 
 import httpx
+from control import ControlSheet
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from qdrant_client import AsyncQdrantClient
-
-from control import ControlSheet  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 INFRA_ROOT = Path(os.getenv("KIT_INFRA_ROOT", str(PROJECT_ROOT.parent)))
@@ -78,7 +77,7 @@ def _resolve_secure_path(relative_path: str) -> Path:
             raise ValueError(f"Path escape detected: {relative_path}")
         return target
     except Exception as e:
-        raise ValueError(f"Invalid path: {relative_path} ({str(e)})")
+        raise ValueError(f"Invalid path: {relative_path} ({e!s})")
 
 def _get_scope_expanded_snippet(rel_path: str, match_text: str) -> str:
     import ast

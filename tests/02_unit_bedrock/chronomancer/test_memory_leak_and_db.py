@@ -1,7 +1,12 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from src.interfaces.telegram.chronomancer.state_writer import _last_exchange, update_user_state_background
-from src.core.memory.memory_manager import memory_manager, _db
+from src.core.memory.memory_manager import _db, memory_manager
+from src.interfaces.telegram.chronomancer.state_writer import (
+    _last_exchange,
+    update_user_state_background,
+)
+
 
 @pytest.mark.asyncio
 async def test_last_exchange_memory_leak_fix():

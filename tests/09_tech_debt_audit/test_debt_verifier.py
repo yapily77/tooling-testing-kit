@@ -66,8 +66,7 @@ class DebtVerifier:
             for line in lines:
                 if line.strip():
                     nesting = self.get_indentation_level(line)
-                    if nesting > max_nesting:
-                        max_nesting = nesting
+                    max_nesting = max(max_nesting, nesting)
 
             # Verify Oversized
             if "⚠️ File is oversized" in details:

@@ -10,7 +10,7 @@ from pathlib import Path
 MCP_CODEBASE_DIR = Path(__file__).resolve().parent.parent.parent / "infra" / "codebase"
 sys.path.insert(0, str(MCP_CODEBASE_DIR))
 
-import mcp_codebase as m  # noqa: E402
+import mcp_codebase as m
 
 
 def call_tool(tool_name, **kwargs):

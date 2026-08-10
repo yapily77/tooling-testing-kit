@@ -6,15 +6,15 @@ real repo. See infra/testing_framework.md §GOLD TEST SUITE.
 """
 from __future__ import annotations
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import pytest  # noqa: E402
+import pytest
 
 _real_subprocess_run = subprocess.run
 
@@ -46,10 +46,10 @@ def _stub_bd_run(args, **kwargs):
 
 subprocess.run = _stub_bd_run
 
-from factory.infra import _loopguard as loopguard_mod  # noqa: E402
-from factory.infra import control as ctrl  # noqa: E402
-from factory.infra import runner as runner_mod  # noqa: E402
-from factory.infra import tools as tools_mod  # noqa: E402
+from factory.infra import _loopguard as loopguard_mod
+from factory.infra import control as ctrl
+from factory.infra import runner as runner_mod
+from factory.infra import tools as tools_mod
 
 
 @pytest.fixture

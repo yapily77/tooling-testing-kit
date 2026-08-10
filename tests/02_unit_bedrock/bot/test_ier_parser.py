@@ -2,7 +2,6 @@ from datetime import date, timedelta
 
 import pytest
 from pydantic_ai.models.test import TestModel
-
 from src.interfaces.telegram.ier_parser import (
     generate_reference_calendar,
     ier_agent,

@@ -11,7 +11,6 @@ from datetime import date
 
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
 from src.core.schemas.unified import QiInteraction
 from src.engine.bazi_math import calculate_gated_score
 from src.engine.daily_pillar import BRANCH_ORDER, STEM_ORDER, get_pillar_for_date

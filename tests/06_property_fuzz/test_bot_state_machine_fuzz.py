@@ -32,24 +32,23 @@ os.environ.setdefault("TELEGRAM_ADMIN_ID", "999999999")
 os.environ.setdefault("BOT_DB_PATH", _DB_PATH)
 os.environ.setdefault("TELEGRAM_WEBHOOK_SECRET", "")
 
-# ruff: noqa: E402  (env vars must be set before importing src modules)
-from typing import get_args as _get_args
 
-from hypothesis import HealthCheck, given, settings
-from hypothesis import strategies as st
+from typing import get_args as _get_args
 
 import src.interfaces.telegram.app as app_mod
 import src.interfaces.telegram.chronomancer.coordinator as coordinator_mod
 import src.interfaces.telegram.conductor as conductor_mod
 import src.interfaces.telegram.intake.intake as intake_mod
 import src.interfaces.telegram.pipeline as pipeline_mod
-import src.interfaces.telegram.report_utils as report_utils
 import src.interfaces.telegram.security as security_mod
 import src.interfaces.telegram.session as session_mod
 import src.interfaces.telegram.stakeholder_intake as stakeholder_intake_mod
 import src.interfaces.telegram.ui_components as ui_components_mod
 import src.interfaces.telegram.utils as utils_mod
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 from src.core.schemas import Pillar, SessionStep, UserProfile
+from src.interfaces.telegram import report_utils
 from src.interfaces.telegram.app import _route_callback_query, _route_message_data
 from src.interfaces.telegram.db import Database
 from src.interfaces.telegram.session import delete_session, get_session

@@ -16,7 +16,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from factory.infra.ledger import inject_repo_map
 from factory.infra.pipeline import read_prompt
 

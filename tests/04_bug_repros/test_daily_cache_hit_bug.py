@@ -8,7 +8,6 @@ output and not raw technical Sifu-ON output.
 from datetime import date
 
 import pytest
-
 from src.core.schemas.unified import ActivityDayResult, DailyActivities, Pillar
 from src.interfaces.telegram.chronomancer.agents import DailyDeps
 from src.interfaces.telegram.chronomancer.forecast_store import (
@@ -101,7 +100,9 @@ def test_daily_orchestrator_has_zero_tools():
 
 def test_extract_trigger_labels_from_events():
     """_extract_trigger_labels should extract unique trigger labels from scored events."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _extract_trigger_labels
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _extract_trigger_labels,
+    )
 
     scored = {
         "events": [
@@ -119,7 +120,9 @@ def test_extract_trigger_labels_from_events():
 
 def test_extract_trigger_labels_empty():
     """_extract_trigger_labels should return empty list when no events or triggers."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _extract_trigger_labels
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _extract_trigger_labels,
+    )
 
     assert _extract_trigger_labels({"events": []}) == []
     assert _extract_trigger_labels({}) == []
@@ -137,7 +140,9 @@ def test_trigger_keyword_map():
 
 def test_get_trigger_rag_keywords():
     """_get_trigger_rag_keywords should map trigger labels to Chinese keywords, capped at 5."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _get_trigger_rag_keywords,
+    )
 
     keywords = _get_trigger_rag_keywords(["yang_ren", "lu_clash", "tian_de"])
     assert len(keywords) == 3
@@ -148,7 +153,9 @@ def test_get_trigger_rag_keywords():
 
 def test_get_trigger_rag_keywords_capped():
     """_get_trigger_rag_keywords should cap at 5 keywords."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _get_trigger_rag_keywords,
+    )
 
     labels = ["yang_ren", "lu_clash", "tian_de", "wen_chang", "lu", "day_clash"]
     keywords = _get_trigger_rag_keywords(labels)
@@ -157,7 +164,9 @@ def test_get_trigger_rag_keywords_capped():
 
 def test_get_trigger_rag_keywords_unknown_labels():
     """_get_trigger_rag_keywords should skip labels not in the mapping."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _get_trigger_rag_keywords,
+    )
 
     keywords = _get_trigger_rag_keywords(["unknown_trigger", "yang_ren"])
     assert keywords == ["杨仁"]
@@ -165,7 +174,9 @@ def test_get_trigger_rag_keywords_unknown_labels():
 
 def test_build_trigger_context():
     """_build_trigger_context should format trigger labels with Chinese names."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _build_trigger_context
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _build_trigger_context,
+    )
 
     context = _build_trigger_context(["yang_ren", "lu_clash"], "")
     assert "TRIGGER EVENTS" in context
@@ -175,7 +186,9 @@ def test_build_trigger_context():
 
 def test_build_trigger_context_empty():
     """_build_trigger_context should return empty string when no triggers."""
-    from src.interfaces.telegram.chronomancer.forecast_store import _build_trigger_context
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _build_trigger_context,
+    )
 
     assert _build_trigger_context([], "") == ""
 
@@ -269,7 +282,9 @@ def test_score_day_for_profile_returns_raw_model_not_dict():
     """
     import inspect
 
-    from src.interfaces.telegram.chronomancer.forecast_store import _score_day_for_profile
+    from src.interfaces.telegram.chronomancer.forecast_store import (
+        _score_day_for_profile,
+    )
 
     sig = inspect.signature(_score_day_for_profile)
     assert sig.return_annotation is not None

@@ -18,7 +18,6 @@ Properties:
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
-
 from infrastructure.rag.run_rag_pipeline import CHUNK_OVERLAP, CHUNK_SIZE, chunk_text
 from src.interfaces.telegram.utils import sanitize_surrogates, split_text_into_chunks
 

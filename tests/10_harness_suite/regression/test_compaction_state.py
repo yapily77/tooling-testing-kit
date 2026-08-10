@@ -9,8 +9,8 @@ from __future__ import annotations
 import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from factory.infra.control import COMPACTION_CONFIG
 from factory.infra.context import calculate_tokens, compact_context_if_needed
+from factory.infra.control import COMPACTION_CONFIG
 from factory.infra.models import OrchestratorState
 from factory.infra.pipeline import revert_state
 

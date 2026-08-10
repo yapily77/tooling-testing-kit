@@ -12,7 +12,6 @@ from datetime import date, timedelta
 
 from hypothesis import given, settings
 from hypothesis import strategies as st
-
 from src.interfaces.telegram.chronomancer.coordinator import _resolve_forecast_dates
 from src.interfaces.telegram.chronomancer.ranking import rank_days_aggregate
 

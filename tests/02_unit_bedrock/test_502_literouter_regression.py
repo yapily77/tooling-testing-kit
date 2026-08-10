@@ -14,7 +14,6 @@ Root cause (commit 7cbb5ebe):
 
 import httpx
 import pytest
-
 from admin.controls.controls import (
     CONTROL_SHEET,
     PROVIDERS,

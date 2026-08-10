@@ -3,15 +3,24 @@ import os
 from datetime import date
 
 import pytest
-
-from src.core.schemas.unified import ChartProfile, DailyActivities, Pillar, RankedDay, UserProfile, ValidatedPillar
+from src.core.schemas.unified import (
+    ChartProfile,
+    DailyActivities,
+    Pillar,
+    RankedDay,
+    UserProfile,
+    ValidatedPillar,
+)
 from src.engine.activity_oracle import score_day
 from src.interfaces.telegram.chronomancer.agents import (
     MonthlyReportMonthItem,
     _extract_month_from_master,
     _get_composite_score,
 )
-from src.interfaces.telegram.chronomancer.coordinator import _format_forecast_output, session_to_chart_profile
+from src.interfaces.telegram.chronomancer.coordinator import (
+    _format_forecast_output,
+    session_to_chart_profile,
+)
 from src.interfaces.telegram.session import Session
 
 
@@ -213,7 +222,9 @@ def test_format_forecast_output_sorts_by_composite_score():
 
 
 def test_format_category_forecast():
-    from src.interfaces.telegram.chronomancer.coordinator import _format_category_forecast
+    from src.interfaces.telegram.chronomancer.coordinator import (
+        _format_category_forecast,
+    )
 
     ranked = [
         RankedDay(date="2026-08-01", score=18, verdict="Excellent", reason="Strong career alignment", stem="甲", branch="子"),

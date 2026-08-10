@@ -20,6 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pytest
+from factory.infra._loopguard import run_with_loopguard
 from pydantic import BaseModel
 from pydantic_ai.exceptions import ModelHTTPError, UsageLimitExceeded
 from pydantic_ai.messages import (
@@ -29,8 +30,6 @@ from pydantic_ai.messages import (
     ToolReturnPart,
 )
 from pydantic_ai.models.test import TestModel
-
-from factory.infra._loopguard import run_with_loopguard
 
 
 class _DummyOut(BaseModel):

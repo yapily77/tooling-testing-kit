@@ -30,8 +30,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Lazy import so missing .env doesn't crash collection
-from src.bot.conductor import _apply_extracted, _parse_conductor_response  # noqa: E402
-from src.bot.session import Session, UserProfile  # noqa: E402
+from src.bot.conductor import _apply_extracted, _parse_conductor_response
+from src.bot.session import Session, UserProfile
 
 CHAT_ID = 999_000_002
 

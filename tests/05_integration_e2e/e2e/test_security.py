@@ -1,7 +1,6 @@
 import os
 
 import pytest
-
 from src.bot.db import Database
 
 

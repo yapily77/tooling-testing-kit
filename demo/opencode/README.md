@@ -56,7 +56,7 @@ The scanner reports zero violations — `generate_report.py` was produced by a s
 cd demo/opencode/typescript
 npm install
 npx tsx find_bad_style.ts find_bad_style.ts
-npx tsc --strict --noEmit find_bad_style.ts
+    npx tsc --noEmit -p tsconfig.json
 ```
 
 ---

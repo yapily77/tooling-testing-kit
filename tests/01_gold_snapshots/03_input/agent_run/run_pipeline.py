@@ -8,13 +8,13 @@ load_dotenv()
 
 # Adjust path to find src
 project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
-import sys  # noqa: E402
+import sys
 
 sys.path.insert(0, str(project_root))
 
-from src.core.schemas.unified import UserProfile  # noqa: E402
-from src.engine.pydantic_prompt_engine import run_pydantic_engine  # noqa: E402
-from src.engine.transformer import to_chart_profile  # noqa: E402
+from src.core.schemas.unified import UserProfile
+from src.engine.pydantic_prompt_engine import run_pydantic_engine
+from src.engine.transformer import to_chart_profile
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ async def main():
             print(f"Generated {len(result.months)} monthly reports.")
             first_month = result.months[0]
             if hasattr(first_month, 'rationale'):
-                print(f"First Month Rationale: {getattr(first_month, 'rationale')[:200]}...")
+                print(f"First Month Rationale: {first_month.rationale[:200]}...")
             else:
                 print(f"First Month Error: {getattr(first_month, 'error', 'Unknown Error')}")
 

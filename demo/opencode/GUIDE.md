@@ -104,11 +104,12 @@ cd demo/opencode/typescript
 # AST + CC + style violations
 npx tsx find_bad_style.ts find_bad_style.ts
 
-# Strict type checking
-npx tsc --strict --noEmit find_bad_style.ts
-```
-
-Both commands should report **no violations** once `find_bad_style.ts` is produced and accepted by `clean_ts`.
+    # Strict type checking
+    npx tsc --noEmit -p tsconfig.json
+    ```
+    
+    Both commands should report **no violations** once `find_bad_style.ts` is produced and accepted by `clean_ts`.
+    The `tsconfig.json` already enforces `--strict` + `--skipLibCheck` (required for `ts-morph` type compatibility).
 
 ---
 

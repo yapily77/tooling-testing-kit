@@ -4,14 +4,12 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from _bootstrap import pkg_root  # noqa: F401,E402
-
-from pydantic import BaseModel, Field  # noqa: E402
-from pydantic_ai import Agent  # noqa: E402
-from pydantic_ai.settings import ModelSettings  # noqa: E402
-from utils import get_src_files  # noqa: E402
-
-from control import CONTROL_SHEET  # noqa: E402
+from _bootstrap import pkg_root  # noqa: F401
+from control import CONTROL_SHEET
+from pydantic import BaseModel, Field
+from pydantic_ai import Agent
+from pydantic_ai.settings import ModelSettings
+from utils import get_src_files
 
 
 class SilentKillerCandidate(BaseModel):

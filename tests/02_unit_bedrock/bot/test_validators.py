@@ -3,7 +3,6 @@ Unit tests for the three new Category A deterministic validators in validators.p
 """
 
 import pytest
-
 from src.bot.validators import (
     run_pipeline_guard,
     validate_no_suppressed_stars_flagged_active,

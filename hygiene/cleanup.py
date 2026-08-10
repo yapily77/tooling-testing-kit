@@ -82,8 +82,7 @@ def sync_environment_drift():
         print(f"  Appending {len(missing_vars)} missing variables to .env.example...")
         with open(ENV_EXAMPLE, "a", encoding="utf-8") as f:
             f.write("\n# ── AUTO-SYNCED MISSING VARIABLES ───────────────────────────\n")
-            for var in missing_vars:
-                f.write(f"# {var}=\n")
+            f.writelines(f"# {var}=\n" for var in missing_vars)
         print("  .env.example updated successfully.")
     else:
         print("  ✅ .env.example is fully up-to-date. No environment drift detected.")

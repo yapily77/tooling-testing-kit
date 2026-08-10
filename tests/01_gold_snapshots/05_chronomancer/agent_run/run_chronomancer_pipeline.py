@@ -1,8 +1,8 @@
 import asyncio
 import json
 import logging
-import sys
 import os
+import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -231,8 +231,9 @@ async def phase3_session_amnesia():
     report_results = []
 
     # Clear Redis user_state cache for a clean slate
-    import redis.asyncio as redis
     import os
+
+    import redis.asyncio as redis
     redis_client = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
     await redis_client.delete(f"user_state:{tg_user_id}")
     await redis_client.aclose()

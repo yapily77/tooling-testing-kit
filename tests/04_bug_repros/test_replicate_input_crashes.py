@@ -1,7 +1,8 @@
+
 import pytest
-import asyncio
-from src.interfaces.telegram.session import Session, SessionMetadata
 from src.interfaces.telegram.intake.calendar_node import _run_input_engine
+from src.interfaces.telegram.session import Session, SessionMetadata
+
 
 @pytest.mark.asyncio
 async def test_replicate_classify_ge_ju_crash():
@@ -35,12 +36,10 @@ async def test_replicate_classify_ge_ju_crash():
     assert new_session.profile.structure is not None
 
 
-from src.interfaces.telegram.conductor import run_conductor
-from src.interfaces.telegram.session import Session, SessionMetadata
-from pydantic_ai import Agent
-from pydantic_ai.models.test import TestModel
-import pydantic_ai
 from admin.controls.controls import CONTROL_SHEET
+from pydantic_ai.models.test import TestModel
+from src.interfaces.telegram.conductor import run_conductor
+
 
 @pytest.mark.asyncio
 async def test_replicate_agentrunresult_crash(monkeypatch):
@@ -61,8 +60,6 @@ async def test_replicate_agentrunresult_crash(monkeypatch):
     original_model = getattr(CONTROL_SHEET, "intake_model", None)
     
     # Pydantic AI's Agent class
-    from pydantic_ai import Agent
-    from src.interfaces.telegram.intake.conductor_agent import ConductorResult
     
     mock_model = TestModel()
     monkeypatch.setattr(CONTROL_SHEET, "intake_model", mock_model)

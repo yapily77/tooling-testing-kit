@@ -2,7 +2,6 @@ from datetime import date
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from src.interfaces.telegram.chronomancer.coordinator import handle_forecast_category
 from src.interfaces.telegram.db import Database
 from src.interfaces.telegram.intake.intake import handle_intake

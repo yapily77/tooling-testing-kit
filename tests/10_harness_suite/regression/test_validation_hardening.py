@@ -115,8 +115,17 @@ def test_templates_parsing():
 
 def test_draft_plan_validation_hardening():
     from factory.infra.models import (
-        DraftPlan, Epic, UserStory, RubricCube, SubTaskBrief, Strategy,
-        ParallelisableWorkplan, WorkGroup, ApprovedTask, EvidenceItem, ToolPreferenceItem
+        ApprovedTask,
+        DraftPlan,
+        Epic,
+        EvidenceItem,
+        ParallelisableWorkplan,
+        RubricCube,
+        Strategy,
+        SubTaskBrief,
+        ToolPreferenceItem,
+        UserStory,
+        WorkGroup,
     )
     from pydantic import ValidationError
 

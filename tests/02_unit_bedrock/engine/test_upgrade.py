@@ -1,7 +1,16 @@
-from src.engine.classical_rules import get_chong_base_severity, get_element_phase_multiplier, get_ge_ju_pattern, get_xing_branches, get_hai_severity
+from src.engine.classical_rules import (
+    get_chong_base_severity,
+    get_element_phase_multiplier,
+    get_hai_severity,
+    get_xing_branches,
+)
+
 """V30 → V31 Upgrade Verification Tests."""
 
-from src.engine.contradiction_resolver import calculate_combo_clash_net, calculate_temporal_weight
+from src.engine.contradiction_resolver import (
+    calculate_combo_clash_net,
+    calculate_temporal_weight,
+)
 from src.engine.da_yun import calculate_da_yun
 from src.engine.module2_root import (
     calculate_dm_strength_tier1,
@@ -20,7 +29,10 @@ from src.engine.module3_interaction import (
     get_si_shen_harmony_stability,
     get_xing_severity,
 )
-from src.engine.module6_ten_gods import get_seasonal_ten_god_weight, get_ten_god_magnitude_multiplier
+from src.engine.module6_ten_gods import (
+    get_seasonal_ten_god_weight,
+    get_ten_god_magnitude_multiplier,
+)
 from src.engine.module8_scoring import get_dm_luck_interaction
 from src.engine.module13_spectrum import calculate_strength_profile
 from src.engine.orchestrator import run_full_engine
@@ -61,7 +73,7 @@ class TestV31CriticalFixes:
         Upside (Wang=1.5) > downside (Si=0.4) so seasonal weakness dampens but
         doesn't devastate medicine potency. See unified.py docstring."""
         assert get_element_phase_multiplier("Si") == 0.4, (
-            f"Expected Si=0.4 (intentional asymmetry)"
+            "Expected Si=0.4 (intentional asymmetry)"
         )
 
     def test_xing_labels_correct(self):

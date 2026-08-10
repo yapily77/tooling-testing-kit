@@ -16,7 +16,6 @@ from __future__ import annotations
 #        UNVERIFIABLE    : producer could not be executed (DB/network/state)
 #
 # This is the DEFINITIVE Layer 1: it proves crashes by execution, not guesswork.
-
 import argparse
 import ast
 import asyncio
@@ -29,8 +28,10 @@ from pathlib import Path
 from typing import Any
 
 # Add workspace root to sys.path to allow absolute imports
-from _bootstrap import pkg_root, target_root  # noqa: F401,E402  (target_root on sys.path so src.* resolves)
-
+from _bootstrap import (
+    pkg_root,
+    target_root,
+)
 from pydantic import BaseModel
 
 try:
@@ -278,11 +279,11 @@ def instantiate_model(class_name: str, mod_path: str) -> BaseModel | None:
 _SAMPLES: dict[str, Any] = {
     "chartprofile": build_sample_profile,
     "pillar": lambda: Pillar(stem="Jia", branch="Zi"),
-    "dict": lambda: {},
+    "dict": dict,
     "str": lambda: "",
     "int": lambda: 0,
     "bool": lambda: False,
-    "list": lambda: [],
+    "list": list,
 }
 
 

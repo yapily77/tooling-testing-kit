@@ -3,7 +3,6 @@ Unit tests for Day 4-5: Platform Abstraction Layer + TelegramAdapter
 Tests ChannelAdapter ABC, message parsing, capabilities, and guardrails.
 """
 import pytest
-
 from src.platforms.base import (
     ChannelCapabilities,
     IncomingMessage,

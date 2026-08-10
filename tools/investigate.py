@@ -7,9 +7,8 @@ from pathlib import Path
 # Use control.py for model config and repo root
 WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
 
-from pydantic_ai import Agent  # noqa: E402
-
-from control import ControlSheet, REPO_ROOT  # noqa: E402
+from control import REPO_ROOT, ControlSheet
+from pydantic_ai import Agent
 
 
 def estimate_tokens(text: str) -> int:

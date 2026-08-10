@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+
 from dotenv import load_dotenv
 
 # Setup minimal logging to see MEM0_PERF

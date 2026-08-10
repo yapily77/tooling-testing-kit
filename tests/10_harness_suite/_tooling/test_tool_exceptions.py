@@ -1,14 +1,15 @@
 """Tests to verify that IDE modification tools raise ModelRetry on errors/failures.
 """
-import sys
 import json
+import sys
 from pathlib import Path
+
 import pytest
 from pydantic_ai.exceptions import ModelRetry
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-import factory.infra.tools as tools
+from factory.infra import tools
 
 
 def test_replace_text_raises_model_retry_on_error(monkeypatch):

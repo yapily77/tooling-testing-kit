@@ -1,7 +1,7 @@
-import numpy as np
 from unittest.mock import AsyncMock, MagicMock, patch
-import pytest
 
+import numpy as np
+import pytest
 from src.engine.rag_client import query_classical_text, query_classical_text_async
 
 

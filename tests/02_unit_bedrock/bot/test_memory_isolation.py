@@ -9,8 +9,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 import respx
-from httpx import Response
-
 from src.memory.memory_manager import memory_manager
 
 

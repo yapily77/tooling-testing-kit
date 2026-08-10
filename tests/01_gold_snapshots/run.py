@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: E402
 """
 GOLD Standard E2E Test Runner for my-repo
 

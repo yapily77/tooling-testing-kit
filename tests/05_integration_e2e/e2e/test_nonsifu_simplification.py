@@ -7,7 +7,6 @@ Shows raw input → simplified output side-by-side.
 import os
 
 import pytest
-
 from src.engine.narrative_simplifier import simplify_advisory, simplify_month_narrative
 
 SAMPLE_TECHNICAL_ADVISORY = """

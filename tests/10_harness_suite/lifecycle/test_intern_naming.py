@@ -14,8 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pytest
-from pydantic import ValidationError
-
+from factory.infra.agent import _intern_agent_id
 from factory.infra.models import (
     ApprovedTask,
     Epic,
@@ -26,7 +25,7 @@ from factory.infra.models import (
     UserStory,
     WorkGroup,
 )
-from factory.infra.agent import _intern_agent_id
+from pydantic import ValidationError
 
 
 def _task(tid: str) -> ApprovedTask:

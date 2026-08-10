@@ -2,7 +2,6 @@ import os
 from unittest.mock import patch
 
 import pytest
-
 from src.interfaces.telegram.intake.calendar_node import _run_input_engine
 from src.interfaces.telegram.session import Session, SessionMetadata
 

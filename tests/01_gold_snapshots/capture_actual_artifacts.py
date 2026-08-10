@@ -80,9 +80,9 @@ def extract_bot_messages(log_path: Path) -> list[str]:
         return []
     text = log_path.read_text(encoding="utf-8", errors="replace")
     messages = []
-    for m in re.finditer(r"sendMessage\((.*?)\)", text, re.S):
+    for m in re.finditer(r"sendMessage\((.*?)\)", text, re.DOTALL):
         block = m.group(1)
-        text_match = re.search(r"text=['\"](.*?)['\"]", block, re.S)
+        text_match = re.search(r"text=['\"](.*?)['\"]", block, re.DOTALL)
         if text_match:
             messages.append(text_match.group(1).encode("utf-8").decode("unicode_escape", errors="replace"))
     return messages

@@ -17,8 +17,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.bot.conductor import _parse_conductor_response  # noqa: E402
-from src.engine.openrouter import call_openrouter_async_with_history  # noqa: E402
+from src.bot.conductor import _parse_conductor_response
+from src.engine.openrouter import call_openrouter_async_with_history
 
 SCENARIOS = [
     {

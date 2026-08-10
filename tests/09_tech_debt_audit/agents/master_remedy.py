@@ -6,7 +6,7 @@ from pathlib import Path
 project_root = Path(__file__).parents[3].resolve()
 sys.path.append(str(Path(__file__).parent))
 
-from base_agent import apply_diff, call_gemini  # noqa: E402
+from base_agent import apply_diff, call_gemini
 
 TASKS = [
     {

@@ -15,7 +15,6 @@ Fails loud at import when KIT_LIVE=true and a required var is missing
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
 
 # kit root must be importable for `from config import load_config` below
@@ -38,7 +37,7 @@ collect_ignore = [
 
 # --- canonical KIT_* -> legacy-env bridge (single source of truth) ---
 # Source kit-facing vars HERE so a downloading user only fills kit-tests/.env.
-from config import load_config  # noqa: E402
+from config import load_config
 
 _path, _base_url, _api_key, _model, _mem0_model = load_config()
 os.environ.setdefault("KIT_PATH", _path or str(_ROOT))

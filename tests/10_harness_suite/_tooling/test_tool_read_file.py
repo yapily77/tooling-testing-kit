@@ -1,6 +1,7 @@
 import os
-import tempfile
 import subprocess
+import tempfile
+
 
 def test_read_file_line_numbers():
     with tempfile.NamedTemporaryFile("w+", encoding="utf-8", dir=".", suffix=".txt", delete=False) as f:

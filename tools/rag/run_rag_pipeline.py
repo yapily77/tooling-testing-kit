@@ -180,7 +180,7 @@ def embed(texts: list[str]) -> list[list[float]]:
     r = requests.post(EMBED_URL, json={"input": texts}, timeout=60)
     if r.status_code != 200:
         log(f"  Embedding error {r.status_code}: {r.text[:200]}")
-        log(f"  First text repr: {repr(texts[0][:100])}")
+        log(f"  First text repr: {texts[0][:100]!r}")
     r.raise_for_status()
     return [item["embedding"] for item in r.json()["data"]]
 

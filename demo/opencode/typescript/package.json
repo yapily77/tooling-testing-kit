@@ -1,0 +1,23 @@
+{
+  "name": "opencode-typescript-demo",
+  "version": "0.1.0",
+  "description": "TypeScript anti-slop case study (clean_ts quality gate verification)",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "scan": "tsx find_bad_style.ts find_bad_style.ts",
+    "typecheck": "tsc --strict --noEmit find_bad_style.ts",
+    "verify": "npm run scan && npm run typecheck"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "commander": "^12.0.0",
+    "eslint": "^8.57.0",
+    "ts-morph": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}

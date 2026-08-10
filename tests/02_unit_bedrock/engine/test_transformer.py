@@ -11,7 +11,6 @@ Callers also switched to UserProfile.model_validate() directly.
 """
 import pytest
 from pydantic import ValidationError
-
 from src.core.schemas.unified import UserProfile
 from src.engine.transformer import to_user_profile
 

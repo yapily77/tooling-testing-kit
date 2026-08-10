@@ -5,11 +5,12 @@ execution.py's guardrail validation loop — when guardrail_check.py
 crashes or produces unparseable output, the task must be blocked
 (fail-loudly discipline), not silently passed.
 """
-import sys
-import json
 import asyncio
+import json
 import subprocess as real_subprocess
+import sys
 from pathlib import Path
+
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))

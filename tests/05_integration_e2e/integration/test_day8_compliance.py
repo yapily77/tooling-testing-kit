@@ -7,7 +7,6 @@ import uuid
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
 from src.database.models import (
     Base,
     ChatLog,
