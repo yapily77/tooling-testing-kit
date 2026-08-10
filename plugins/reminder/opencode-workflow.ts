@@ -43,5 +43,7 @@ At every single turn, you MUST strictly adhere to the following rules:
         output.system.push(cachedPrimeOutput);
       }
     },
-  };
+};
+
+export default RemindWorkflowPlugin;
 };
