@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+/plugins/typescript/clean_ts/node_modules/
 .pnpm-store/
 .venv/
 venv/
@@ -28,6 +29,7 @@ env.d/
 
 # Python
 __pycache__/
+/plugins/python/clean_py/__pycache__/
 *.pyc
 *.pyo
 *.pyd

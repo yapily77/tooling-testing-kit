@@ -9,7 +9,48 @@ Run \`bd prime\` for workflow context, or install hooks (\`bd hooks install\`) f
 - \`bd close <id>\` - Complete work
 - \`bd dolt push\` - Push beads to remote
 
-For full workflow details: \`bd prime\`
+For full workflow details: `bd prime`
+
+## Code Quality
+
+**Hygiene & linting:** No `ruff`/`black`/`mypy` in this repo (check `.venv` before relying on them). Static analysis lives under `hygiene/` — see `hygiene/README.md` and `hygiene/GUIDE.md`. Daily scans are driven by `hygiene/daily/`.
+
+**Tests:** pytest 9.1.1, configured via `[tool.pytest.ini_options]` in `pyproject.toml`.
+```bash
+.venv/bin/python -m pytest                 # run everything
+.venv/bin/python -m pytest tests/08_static_gates   # single suite
+.venv/bin/python -m pytest -x -q           # fail fast, concise
+.venv/bin/python -m pytest --lf            # re-run last failures only
+```
+Test discovery spans `tests/examples` and `tools/test` (see `pyproject.toml` `testpaths`). The `tests/` tree is bucketed by purpose (01-gold snapshots, 02-unit, 05-e2e, 08-static gates, etc.).
+
+**Tools:** Most dev tooling is its own package under `tools/` (AST refactorings, symbol queries, knowledge graph). Each sub-tool has its own entry module; run `.venv/bin/python tools/<tool>.py --help`. A shared harness lives in `tools/_codebase_common.py`.
+
+## Modules
+
+| Area        | Path           | Notes                                                       |
+|-------------|----------------|-------------------------------------------------------------|
+| Core src    | `src/`         | `interfaces/` — public module surface                       |
+| Dev tools   | `tools/`       | Standalone scripts; `tools/pyproject.toml` may declare its own deps |
+| Hygiene     | `hygiene/`     | Linters/scanners + daily automation                         |
+| Plugins     | `plugins/`     | `opencode/`, `python/`, `typescript/`                       |
+| Tests       | `tests/`       | Bucketed suites; `tests/08_static_gates` for quality gates  |
+| Examples    | `examples/`    | Sample targets + scanner output samples                     |
+| Issues      | `.beads/`      | Local Dolt DB + JSONL export; run `bd prime` / `bd ready`   |
+
+## Issue Tracking
+
+Always use `bd` — do **not** write markdown TODO lists.
+
+```bash
+bd ready                       # work available now
+bd show <id>                   # inspect an issue
+bd create "Title" --type task  # new work item
+bd update <id> --claim         # claim it
+bd close <id>                  # finish + archive
+bd remember "key — note"       # persist project memory
+bd dolt push                   # sync beads to remote
+```
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker

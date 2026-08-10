@@ -22,6 +22,7 @@ The **Tooling & Testing Kit** is a production-grade Python engineering toolkit d
 | **[`tools/`](./tools)** | AST code refactoring, codebase search, and RAG retrieval utilities | Portable via `KIT_TARGET_ROOT` | `python tools/test/run_all.py` |
 | **[`tests/`](./tests)** | Golden snapshot, property-based fuzzing, and harness test patterns | Offline or live mode | `pytest tests/examples/` |
 | **[`examples/`](./examples)** | Worked examples, sample targets, and generated audit report samples | Quick demonstration | `python hygiene/scanners/run_all.py --scripts` |
+| **[`plugins/`](./plugins)** | AST-based code quality cleaners (clean_py, clean_ts) + OpenCode tool wrappers | Static, pre-commit / CLI | `clean_py validate file.py` · `clean_ts validate file.ts` |
 
 ---
 
@@ -76,6 +77,7 @@ tooling-testing-kit/
 ├── examples/                # Worked examples & sample scanner outputs
 │   ├── sample_target.py     # Sample target module with intentional code smells
 │   └── scanner_output_example.md # Formatted audit output demonstration
+├── plugins/                 # Code quality cleaner tools (Python/TS/OpenCode)
 ├── CONTRIBUTING.md          # Open collaboration & contribution guidelines
 ├── pyproject.toml           # Unified root package configuration
 └── README.md                # Main repository guide
