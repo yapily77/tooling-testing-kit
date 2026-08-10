@@ -15,7 +15,7 @@ def _cleanup(*paths: Path) -> None:
     for p in paths:
         try:
             p.unlink()
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
 
 

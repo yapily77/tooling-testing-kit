@@ -25,7 +25,7 @@ def main():
 
     try:
         content = _normalize_content(path.read_text(encoding="utf-8"))
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"ERROR: Failed to read {args.relative_path}: {e}")
         raise
         return

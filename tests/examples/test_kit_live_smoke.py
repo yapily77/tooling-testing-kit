@@ -40,9 +40,7 @@ def _run_config_import(env_overlay: dict[str, str]) -> subprocess.CompletedProce
         cwd=str(ROOT),
         env=env,
         capture_output=True,
-        text=True,
-    )
-
+        text=True, check=False)
 
 def test_kit_live_false_imports_cleanly() -> None:
     """KIT_LIVE=false (default) => config.py imports without raising."""

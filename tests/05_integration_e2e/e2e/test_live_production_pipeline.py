@@ -103,7 +103,7 @@ async def test_live_production_pipeline():
              # We won't return yet, let's see if master.json was partially written
         else:
              print(f"OK: Master JSON generated at {master_json_path}")
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"FAIL: PIPELINE CRASHED: {e}")
         traceback.print_exc()
         raise
@@ -122,7 +122,7 @@ async def test_live_production_pipeline():
             loop=loop
         ))
         print(f"OK: Executive Summary generated at {summary_md_path}")
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"FAIL: SUMMARIZER FAILED: {e}")
         traceback.print_exc()
         raise
@@ -133,7 +133,7 @@ async def test_live_production_pipeline():
     try:
         stitch_and_convert(str(summary_md_path), str(final_html_path))
         print(f"OK: FINAL HTML READY: {final_html_path}")
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"FAIL: CONSOLIDATOR FAILED: {e}")
         raise
         return

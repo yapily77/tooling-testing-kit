@@ -15,7 +15,7 @@ def split_file(path):
     try:
         with open(path, encoding="utf-8") as f:
             content = f.read()
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"  [!] Failed to read {path}: {e}")
         raise
         return

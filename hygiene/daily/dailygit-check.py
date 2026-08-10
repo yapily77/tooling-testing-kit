@@ -18,7 +18,7 @@ def load_exceptions(exceptions_path: Path) -> list[str]:
     try:
         with open(exceptions_path, encoding="utf-8") as f:
             return json.load(f)
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"{YELLOW}Warning: Failed to load exceptions.json: {e}{RESET}")
         raise
         return []

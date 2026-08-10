@@ -73,7 +73,7 @@ def get_definitions(file_path: Path) -> tuple[dict[str, tuple[str, int]], set[st
         collector = DefinitionCollector(file_path)
         collector.visit(tree)
         return {name: (t, line) for name, t, line in collector.definitions}, collector.whitelisted_names
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"Error parsing {file_path}: {e}")
         raise
         return {}, set()

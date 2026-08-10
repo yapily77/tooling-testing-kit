@@ -74,7 +74,7 @@ def fix_file_imports(file_path: Path) -> bool:
         ast.parse(final_code)
         file_path.write_text(final_code, encoding="utf-8")
         return True
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"Failed fixing imports for {file_path.name}: {e}")
         raise
         return False

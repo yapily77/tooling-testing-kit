@@ -15,7 +15,7 @@ def main():
             ["git", "diff", "--color=never", str(ui_file)],
             capture_output=True,
             text=True
-        )
+        , check=False)
         if res.stdout.strip():
             print(f"\n⚠️ Narrative drift detected in {ui_file.relative_to(gold_dir.parent.parent)}:")
             print(res.stdout)

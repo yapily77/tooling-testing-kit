@@ -150,9 +150,7 @@ def _run_ruff(path: Path) -> subprocess.CompletedProcess:
         capture_output=True,
         cwd=str(PROJECT_ROOT),
         text=True,
-        timeout=30,
-    )
-
+        timeout=30, check=False)
 
 def _syntax_ok(path: Path) -> bool:
     return path.suffix == ".py"
@@ -197,9 +195,7 @@ def _typecheck_run(path: Path) -> subprocess.CompletedProcess | None:
         capture_output=True,
         cwd=str(PROJECT_ROOT),
         text=True,
-        timeout=180,
-    )
-
+        timeout=180, check=False)
 
 def _typecheck_result(path: Path, result: subprocess.CompletedProcess) -> CheckResult:
     output = (result.stdout or "") + (result.stderr or "")
@@ -543,8 +539,8 @@ def sanitize(file_path: str) -> CheckResult:
             capture_output=True,
             cwd=str(PROJECT_ROOT),
             text=True,
-            timeout=15,
-        )
+            timeout=15, check=False)
+
         output = result.stdout.strip()
         return CheckResult(success=result.returncode == 0, message=output)
     except subprocess.TimeoutExpired:

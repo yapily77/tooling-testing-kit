@@ -124,7 +124,7 @@ def discover_models(files: list[Path]) -> dict[str, str]:
         try:
             with open(file_path, encoding="utf-8", errors="ignore") as f:
                 tree = ast.parse(f.read(), filename=str(file_path))
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             continue
         mod_path = str(file_path.relative_to(workspace_root())).replace("/", ".").replace(".py", "")
         for node in ast.walk(tree):
@@ -341,7 +341,7 @@ def load_candidates() -> list[dict[str, Any]]:
                 cands = data.get("verified", []) + data.get("failed", [])
                 if cands:
                     return cands
-            except Exception:
+            except (OSError, ValueError, TypeError, KeyError, AttributeError):
                 continue
     return []
 

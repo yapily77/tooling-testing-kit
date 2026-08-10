@@ -37,7 +37,7 @@ async def _intern_done(brief: str, task_id: str | None = None) -> str:
         sp = Path(stage_path("src/a.py"))
         if sp.exists():
             sp.write_text("x = 3")
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
         pass
 
     return json.dumps({

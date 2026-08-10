@@ -101,14 +101,14 @@ def get_src_files() -> list[Path]:
             changed_files: set[str] = set()
             res1 = subprocess.run(
                 ["git", "diff", "--name-only", "HEAD"], capture_output=True, text=True
-            )
+    check=False)
             if res1.returncode == 0:
                 changed_files.update(res1.stdout.strip().split("\n"))
             res2 = subprocess.run(
                 ["git", "ls-files", "--others", "--exclude-standard"],
                 capture_output=True,
-                text=True,
-            )
+                text=True, check=False)
+
             if res2.returncode == 0:
                 changed_files.update(res2.stdout.strip().split("\n"))
 
@@ -121,7 +121,7 @@ def get_src_files() -> list[Path]:
                 if any(_is_under_path(path, root) for root in scan_roots) and path.is_file():
                     paths.append(path)
             return paths
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
             print(f"Error getting git diff files: {e}", file=sys.stderr)
             raise
             return []
@@ -152,7 +152,7 @@ def get_src_files() -> list[Path]:
                 seen.add(key)
                 unique.append(p)
         return [p for p in unique if p.is_file()]
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"Error getting git files: {e}", file=sys.stderr)
         # Fallback: recursively walk each root excluding __pycache__
         all_paths = []

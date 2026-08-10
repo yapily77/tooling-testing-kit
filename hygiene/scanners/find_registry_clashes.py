@@ -165,7 +165,7 @@ def scan_file_ast(path: Path, registry_map: dict) -> tuple[list[CallSite], dict[
     try:
         content = path.read_text(encoding="utf-8")
         tree = ast.parse(content, filename=str(path))
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print("❌ ERROR: " + f"AST parse failed for {path}: {e}")
         raise
         return [], {}

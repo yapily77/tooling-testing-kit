@@ -44,8 +44,8 @@ def test_smoke_cli_detects_bug2(tmp_path):
     rc = subprocess.run(
         [sys.executable, str(REPO_ROOT / "factory" / "tools" / "smoke_test.py"), str(target)],
         capture_output=True,
-        text=True,
-    )
+        text=True, check=False)
+
     assert rc.returncode == 1, (
         f"smoke gate should FAIL on DictMap[str] bug; rc={rc.returncode} "
         f"out={rc.stdout}{rc.stderr}"
@@ -67,8 +67,8 @@ def test_smoke_cli_passes_correct_pattern(tmp_path):
     rc = subprocess.run(
         [sys.executable, str(REPO_ROOT / "factory" / "tools" / "smoke_test.py"), str(target)],
         capture_output=True,
-        text=True,
-    )
+        text=True, check=False)
+
     assert rc.returncode == 0, (
         f"smoke gate should PASS on DictMap[Model]; rc={rc.returncode} "
         f"out={rc.stdout}{rc.stderr}"

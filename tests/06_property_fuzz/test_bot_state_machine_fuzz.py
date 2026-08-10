@@ -131,7 +131,7 @@ def _fresh_db():
     """
     try:
         delete_session(CHAT_ID, PLATFORM)
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
         pass
 
 
@@ -238,7 +238,7 @@ def _run_sequence(actions):
         # Ensure a session row exists for this user before fuzzing.
         try:
             get_session(CHAT_ID, PLATFORM)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

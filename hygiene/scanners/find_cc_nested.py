@@ -42,12 +42,12 @@ def main():
         try:
             with open(fpath, encoding="utf-8", errors="ignore") as f:
                 source = f.read()
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             continue
 
         try:
             blocks = cc_visit(source)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             continue
 
         if not blocks:

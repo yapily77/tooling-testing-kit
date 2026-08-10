@@ -135,7 +135,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
                         if matching_messages:
                             intercepted_text = "\n\n".join(matching_messages)
                             break
-                except Exception:
+                except (OSError, ValueError, TypeError, KeyError, AttributeError):
                     pass
                 time.sleep(0.5)
 

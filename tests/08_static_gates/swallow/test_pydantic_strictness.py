@@ -16,7 +16,7 @@ def get_all_pydantic_models() -> list[type[BaseModel]]:
     ):
         try:
             mod = importlib.import_module(modname)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             continue
 
         mod_file = getattr(mod, "__file__", None)

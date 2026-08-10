@@ -92,8 +92,8 @@ def start_server(config: WorkerConfig) -> subprocess.Popen:
         stdout=stdout,
         stderr=subprocess.STDOUT,
         text=True,
-        preexec_fn=os.setsid,
-    )
+        preexec_fn=os.setsid, check=False)
+
     if not wait_for_health(config):
         stop_process(process)
         raise RuntimeError(f"Worker {config.worker_id} server did not become healthy")
@@ -109,7 +109,7 @@ def stop_process(process: subprocess.Popen) -> None:
     except Exception:
         try:
             os.killpg(os.getpgid(process.pid), signal.SIGKILL)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
 
 
@@ -166,7 +166,7 @@ def wait_for_report(config: WorkerConfig, timeout: int = 180) -> bool:
             conn.close()
             if row and row[0] > 0:
                 return True
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
         time.sleep(2)
     return False

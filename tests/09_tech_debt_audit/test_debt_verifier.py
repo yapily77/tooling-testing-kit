@@ -57,7 +57,7 @@ class DebtVerifier:
             try:
                 with open(full_path, encoding="utf-8", errors="ignore") as f:
                     lines = f.readlines()
-            except Exception as e:
+            except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
                 print(f"  [ERROR] Could not read file: {e}")
                 raise
                 continue

@@ -99,8 +99,8 @@ def process_file(file_path: Path, dry_run: bool, idx: int, total: int) -> FileRe
     # --- Layer 1: Ruff (SIM, RET, UP, F, ERA) ---
     ruff_res = subprocess.run(
         RUFF_CMD + [str(file_path)],
-        capture_output=True, text=True,
-    )
+        capture_output=True, text=True, check=False)
+
     # Ruff exits 1 when unfixed issues remain — collect them for the LLM handoff.
     if ruff_res.returncode != 0 and ruff_res.stdout.strip():
         res.needs_llm = True
@@ -109,8 +109,8 @@ def process_file(file_path: Path, dry_run: bool, idx: int, total: int) -> FileRe
     # --- Layer 2: Refurb (reports only) ---
     refurb_res = subprocess.run(
         REFURB_CMD + [str(file_path)],
-        capture_output=True, text=True,
-    )
+        capture_output=True, text=True, check=False)
+
     if refurb_res.stdout.strip():
         res.needs_llm = True
         res.issues += f"--- Refurb Suggestions ---\n{refurb_res.stdout.strip()}\n\n"
@@ -140,8 +140,8 @@ def process_file(file_path: Path, dry_run: bool, idx: int, total: int) -> FileRe
     # --- Layer 4: ruff format — normalize style (Pyright runs in post-pass) ---
     subprocess.run(
         RUFF_FORMAT_CMD + [str(file_path)],
-        capture_output=True, text=True,
-    )
+        capture_output=True, text=True, check=False)
+
     res.logs.append("  🎨 [FORMAT] ruff format applied.")
     res.logs.append(f"  ✨ [SUCCESS] Updated {file_path.name} with flattened code.")
     res.status = "modified"

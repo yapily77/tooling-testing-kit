@@ -49,13 +49,13 @@ try:
     import psycopg2
 
     _ENV_ERRORS = _ENV_ERRORS + (psycopg2.OperationalError,)
-except Exception:
+except (OSError, ValueError, TypeError, KeyError, AttributeError):
     pass
 try:
     from sqlalchemy.exc import OperationalError as _SQLOperationalError
 
     _ENV_ERRORS = _ENV_ERRORS + (_SQLOperationalError,)
-except Exception:
+except (OSError, ValueError, TypeError, KeyError, AttributeError):
     pass
 
 
@@ -266,7 +266,7 @@ def smoke_module(file_path: str) -> tuple[bool, str]:
             # Verify the parent builds permissively; if not, skip container
             # probing (pyright/ruff own that class of error).
             cls.model_validate(base)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             # Parent can't be built even permissively (e.g. strict Literal
             # unions) — skip container probing for this model; pyright/ruff own
             # that class of error.

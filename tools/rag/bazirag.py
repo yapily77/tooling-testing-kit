@@ -96,7 +96,7 @@ async def search_single(
 ) -> list[dict]:
     try:
         query_vector = await get_embedding(keyword, http_client)
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"⚠️ Embedding failed for '{keyword}': {e}", file=sys.stderr)
         raise
         return []
@@ -104,7 +104,7 @@ async def search_single(
     try:
         query_np = np.array(query_vector, dtype=np.float32).reshape(1, -1)
         scores, ids = index.search(query_np, k=30)
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"⚠️ TurboVec search failed for '{keyword}': {e}", file=sys.stderr)
         raise
         return []

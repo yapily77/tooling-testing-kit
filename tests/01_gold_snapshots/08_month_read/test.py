@@ -57,7 +57,7 @@ async def setup_mock_session(chat_id: int, profile: UserProfile) -> None:
     # Clean slate
     try:
         delete_session(chat_id)
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
         pass
 
     session = Session(

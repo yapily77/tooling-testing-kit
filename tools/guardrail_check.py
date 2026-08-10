@@ -93,8 +93,8 @@ def lint_file(file_path: str) -> tuple[bool, str]:
         capture_output=True,
         cwd=str(PROJECT_ROOT),
         text=True,
-        timeout=60,
-    )
+        timeout=60, check=False)
+
     output = (result.stdout or "") + (result.stderr or "")
     return (result.returncode == 0, output.strip())
 
@@ -179,8 +179,8 @@ def typecheck_file(file_path: str, changed: set[int] | None = None) -> tuple[boo
             capture_output=True,
             cwd=str(PROJECT_ROOT),
             text=True,
-            timeout=180,
-        )
+            timeout=180, check=False)
+
     except FileNotFoundError:
         return (True, "pyright not installed; skipped type check.")
 
@@ -310,8 +310,8 @@ def typecheck_union(
             capture_output=True,
             cwd=str(PROJECT_ROOT),
             text=True,
-            timeout=300,
-        )
+            timeout=300, check=False)
+
     except FileNotFoundError:
         return (True, "pyright not installed; skipped type check.")
 
@@ -491,8 +491,8 @@ def validate(file_path: str, edit_set: list[str] | None = None) -> dict:
                 capture_output=True,
                 text=True,
                 cwd=str(sandbox),
-                timeout=240,
-            )
+                timeout=240, check=False)
+
             smoke_payload = (
                 json.loads(smoke_res.stdout.strip().splitlines()[-1])
                 if smoke_res.stdout.strip()

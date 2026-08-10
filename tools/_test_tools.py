@@ -54,7 +54,7 @@ def test_mcp_git_guardrail_imports():
         else:
             print(f"{RED}❌ mcp_git_guardrail.py is missing tools: {missing}{RESET}")
             return False
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"{RED}❌ mcp_git_guardrail.py import/registration test failed: {e}{RESET}")
         raise
         return False

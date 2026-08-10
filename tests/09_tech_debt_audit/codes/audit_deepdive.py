@@ -62,7 +62,7 @@ def main():
         try:
             with open(json_store_path, encoding="utf-8") as f:
                 results = json.load(f)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
 
     for idx, item in enumerate(truly_dead, 1):

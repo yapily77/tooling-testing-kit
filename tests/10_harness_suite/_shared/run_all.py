@@ -81,8 +81,8 @@ def run_one(path: Path, per_file_timeout: int) -> FileResult:
     try:
         proc = subprocess.run(
             [sys.executable, "-m", "pytest", str(path), "-q", "-p", "no:cacheprovider"],
-            capture_output=True, text=True, cwd=HERE, timeout=per_file_timeout,
-        )
+            capture_output=True, text=True, cwd=HERE, timeout=per_file_timeout, check=False)
+
         rc = proc.returncode
         out = proc.stdout + proc.stderr
         timed_out = False

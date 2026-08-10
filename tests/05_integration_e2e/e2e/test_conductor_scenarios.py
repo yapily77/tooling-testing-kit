@@ -145,7 +145,7 @@ async def run_test(url: str, tc_id: str, verbose: bool):
                 if resp.status_code != 200:
                     print(f"Error: Webhook returned {resp.status_code}: {resp.text}")
                     return
-            except Exception as e:
+            except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
                 print(f"Connection error: {e}")
                 raise
                 return

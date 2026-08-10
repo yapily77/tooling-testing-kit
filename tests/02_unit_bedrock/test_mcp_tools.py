@@ -50,7 +50,7 @@ def run_test(tool_name: str, func, *args, **kwargs):
         else:
             print(f"❌ FAILED: {res.get('message') if isinstance(res, dict) else res}")
             return False
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         import traceback
         print(f"💥 CRASHED: {type(e).__name__}: {e}")
         traceback.print_exc()

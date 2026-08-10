@@ -67,7 +67,7 @@ async def search_exa(query: str) -> list[SearchResult]:
                 SearchResult(url=r["url"], title=r.get("title", "No Title"), provider="Exa", rank=i + 1)
                 for i, r in enumerate(data.get("results", []))
             ]
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"Exa Search Error: {e}")
         raise
         return []
@@ -93,7 +93,7 @@ async def search_tavily(query: str) -> list[SearchResult]:
                 SearchResult(url=r["url"], title=r.get("title", "No Title"), provider="Tavily", rank=i + 1)
                 for i, r in enumerate(data.get("results", []))
             ]
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"Tavily Search Error: {e}")
         raise
         return []
@@ -112,7 +112,7 @@ async def search_searxng(query: str) -> list[SearchResult]:
                 SearchResult(url=r["url"], title=r.get("title", "No Title"), provider="SearXNG", rank=i + 1)
                 for i, r in enumerate(data.get("results", [])[:30])
             ]
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"SearXNG Search Error: {e}")
         raise
         return []
@@ -220,7 +220,7 @@ class WebOrchestrator:
                     await asyncio.to_thread(file_path.write_text, file_content, encoding="utf-8")
                     return file_path, has_actual
 
-                except Exception as e:
+                except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
                     print(f"Extraction Error [{res.url}]: {e}")
                     raise
                     return None

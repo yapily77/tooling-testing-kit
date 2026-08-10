@@ -137,8 +137,8 @@ def test_add_constant_empty_value_fails():
     result = subprocess.run(
         [sys.executable, "factory/tools/add_constant.py", "src/a.py", "MY_CONST", ""],
         capture_output=True, text=True,
-        cwd=str(Path(__file__).resolve().parents[1]), timeout=10,
-    )
+        cwd=str(Path(__file__).resolve().parents[1]), timeout=10, check=False)
+
     assert result.returncode != 0
     assert "no value supplied" in result.stdout
 
@@ -150,8 +150,8 @@ def test_add_constant_class_def_rejected():
          "src/core/schemas/unified.py", "MyClass",
          "class MyClass:\n    pass"],
         capture_output=True, text=True,
-        cwd=str(Path(__file__).resolve().parents[1]), timeout=10,
-    )
+        cwd=str(Path(__file__).resolve().parents[1]), timeout=10, check=False)
+
     # The tool resolves the path relative to the project; if unified.py exists,
     # it should reject the class definition, not "file not found".
     if "File not found" not in result.stdout:

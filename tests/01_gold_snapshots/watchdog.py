@@ -13,7 +13,7 @@ def get_python_pids():
     """Get PIDs of all python processes running test/server (excluding this one)."""
     current_pid = os.getpid()
     try:
-        output = subprocess.check_output(["pgrep", "-f", "python"]).decode()
+        output = subprocess.check_output(["pgrep", "-f", "python"]).decode(, check=False)
         return [int(pid) for pid in output.split() if int(pid) != current_pid]
     except Exception:
         return []
@@ -51,7 +51,7 @@ def monitor_logs():
                     try:
                         os.kill(pid, 9)
                         print(f"Killed process {pid}")
-                    except Exception:
+                    except (OSError, ValueError, TypeError, KeyError, AttributeError):
                         pass
                 sys.exit(1)
 
@@ -110,7 +110,7 @@ def monitor_logs():
                 try:
                     os.kill(pid, 9)
                     print(f"Killed process {pid}")
-                except Exception:
+                except (OSError, ValueError, TypeError, KeyError, AttributeError):
                     pass
 
             sys.exit(1)

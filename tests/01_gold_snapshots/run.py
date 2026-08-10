@@ -68,14 +68,14 @@ def kill_stale_processes(port):
     if os.name == "nt":
         try:
             cmd = f"netstat -ano | findstr LISTENING | findstr :{port}"
-            output = subprocess.check_output(cmd, shell=True).decode()
+            output = subprocess.check_output(cmd, shell=True).decode(, check=False)
             for line in output.splitlines():
                 if f":{port}" in line:
                     parts = line.strip().split()
                     pid = parts[-1]
                     subprocess.run(["taskkill", "/F", "/PID", pid, "/T"], capture_output=True, check=False)
                     time.sleep(0.5)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
         return
 
@@ -84,12 +84,12 @@ def kill_stale_processes(port):
             ["lsof", "-ti", f"tcp:{port}"],
             stderr=subprocess.DEVNULL,
             text=True,
-        ).strip()
+        ).strip(, check=False)
         if output:
             for pid in output.splitlines():
                 subprocess.run(["kill", "-9", pid], capture_output=True, check=False)
             time.sleep(0.5)
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
         pass
 
 
@@ -115,8 +115,8 @@ def start_server():
         stderr=subprocess.DEVNULL,
         cwd=str(PROJECT_ROOT),
         env=env,
-        preexec_fn=os.setsid,
-    )
+        preexec_fn=os.setsid, check=False)
+
     # Wait for server to be healthy
     for _ in range(120):
         if check_server_health():
@@ -134,7 +134,7 @@ def stop_server():
         try:
             os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
             server_process.wait(timeout=5)
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
         print("✅ Server stopped")
 
@@ -241,7 +241,7 @@ def get_session_step(chat_id: int) -> str:
                 if row and row[0]:
                     state = json.loads(row[0]) if isinstance(row[0], str) else row[0]
                     return state.get("step", "UNKNOWN")
-        except Exception:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError):
             pass
         return "UNKNOWN"
     try:
@@ -258,7 +258,7 @@ def get_session_step(chat_id: int) -> str:
         if row and row[0]:
             state = json.loads(row[0])
             return state.get("step", "UNKNOWN")
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
         pass
     return "UNKNOWN"
 

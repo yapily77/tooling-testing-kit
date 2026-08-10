@@ -48,7 +48,7 @@ def main():
                     continue
                 try:
                     content = _normalize_content(fp.read_text(encoding="utf-8"))
-                except Exception:
+                except (OSError, ValueError, TypeError, KeyError, AttributeError):
                     continue
                 for i, line in enumerate(content.splitlines()):
                     if re.search(args.pattern, line, flags):

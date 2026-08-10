@@ -30,7 +30,7 @@ def main():
     try:
         content = _normalize_content(path.read_text(encoding="utf-8"))
         tree = ast.parse(content)
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(json.dumps(fail(f"Failed to parse {args.relative_path}: {e}"), indent=2))
         raise
         return
