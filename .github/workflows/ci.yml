@@ -40,3 +40,23 @@ jobs:
       - name: Run Pytest Test Suite
         run: |
           pytest tests/examples/
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Build & Lint TypeScript Plugins + Demos
+        run: |
+          # plugins/typescript/clean_ts
+          cd plugins/typescript/clean_ts
+          npm ci
+          npx tsc --strict --noEmit
+          npx eslint src/**/*.ts
+          cd ../../../..
+
+          # demo/opencodec/typescript
+          cd demo/opencodec/typescript
+          npm ci
+          npx tsc --strict --noEmit

@@ -58,7 +58,7 @@ all = [
 
 [project.scripts]
 hygiene-scan = "hygiene.scanners.run_all:main"
-clean_py = "clean_py.cli:main"
+kit-clean-py = "clean_py.cli:main"
 
 [tool.setuptools.packages.find]
 where = [".", "plugins/python"]
