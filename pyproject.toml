@@ -67,4 +67,4 @@ include = ["hygiene*", "tools*", "tests*", "clean_py*"]
 [tool.pytest.ini_options]
 testpaths = ["tests/examples", "tools/test"]
 python_files = ["test_*.py", "*_test.py"]
-addopts = "-v --tb=short"
+addopts = "-v --tb=short ${PYTEST_EXTRA_ARGS:-}"
