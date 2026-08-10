@@ -9,7 +9,7 @@ try {
 }
 
 export const RemindWorkflowPlugin: Plugin = async ({ project }) => {
-  console.log(`[Plugin] RemindWorkflowPlugin loaded for: ${project?.name || 'unknown'}`);
+  console.log(`[Plugin] RemindWorkflowPlugin loaded for: ${(project as any)?.name || 'unknown'}`);
 
   return {
     "experimental.chat.system.transform": async (_input, output) => {
@@ -43,7 +43,12 @@ At every single turn, you MUST strictly adhere to the following rules:
         output.system.push(cachedPrimeOutput);
       }
     },
+  };
 };
 
-export default RemindWorkflowPlugin;
+(RemindWorkflowPlugin as any).id = "remind-workflow";
+
+export default {
+  id: "remind-workflow",
+  server: RemindWorkflowPlugin,
 };

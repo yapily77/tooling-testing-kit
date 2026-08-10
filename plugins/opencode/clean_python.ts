@@ -5,6 +5,7 @@
 // to the `clean_py` pip package. This file only handles security gating,
 // temp-file hygiene, retry tracking, and sub-process delegation.
 
+import type { Plugin } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin";
 import { execFile } from "node:child_process";
 import * as crypto from "node:crypto";
@@ -173,7 +174,7 @@ async function resolveSecureTargetPath(workspaceDir: string, filePath: string): 
 }
 
 // --- TOOL EXPORT ---
-export default tool({
+export const cleanPythonTool = tool({
     description:
         "Deterministically verifies Python code against strict quality constraints (Ruff, MyPy strict, Radon CC < 6, AST anti-slop) by delegating to the `clean_py` pip package, before atomically writing to disk. Enforces secure writes inside the workspace.",
     args: {
@@ -282,3 +283,18 @@ export default tool({
         }
     },
 });
+
+export const cleanPythonPlugin: Plugin = async () => {
+    return {
+        tool: {
+            clean_python: cleanPythonTool,
+        },
+    };
+};
+
+(cleanPythonPlugin as any).id = "clean-python";
+
+export default {
+    id: "clean-python",
+    server: cleanPythonPlugin,
+};

@@ -6,6 +6,7 @@
 // This file only handles security gating, temp-file hygiene, retry tracking,
 // and sub-process delegation.
 
+import type { Plugin } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin";
 import { execFile } from "node:child_process";
 import * as crypto from "node:crypto";
@@ -176,7 +177,7 @@ async function resolveSecureTargetPath(workspaceDir: string, filePath: string): 
 }
 
 // --- TOOL EXPORT ---
-export default tool({
+export const cleanTsTool = tool({
     description:
         "Deterministically verifies TypeScript code against strict quality constraints (AST policy, tsc strict, ESLint-equivalent rules, cyclomatic complexity < 6, type safety) by delegating to the `clean_ts` Node CLI, before atomically writing to disk. Enforces secure writes inside the workspace.",
     args: {
@@ -285,3 +286,18 @@ export default tool({
         }
     },
 });
+
+export const cleanTsPlugin: Plugin = async () => {
+    return {
+        tool: {
+            clean_ts: cleanTsTool,
+        },
+    };
+};
+
+(cleanTsPlugin as any).id = "clean-ts";
+
+export default {
+    id: "clean-ts",
+    server: cleanTsPlugin,
+};
