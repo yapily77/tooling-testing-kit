@@ -44,3 +44,4 @@ htmlcov/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+tooling.code-workspace
