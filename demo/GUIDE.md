@@ -1,113 +1,202 @@
-# 🧭 Demo Guide — Running & Verifying Case Studies
+# 🧭 Demo Guide — Setup, Run & Verify
 
-> **Step-by-step. 5 minutes to run your first case study.**
+![Python](https://img.shields.io/badge/python-3.12+-blue?logo=python)
+![TypeScript](https://img.shields.io/badge/typescript-5.9+-blue?logo=typescript)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-> **Related docs:** `README.md` (overview & file index) · `FAQ.md` (troubleshooting & design rationale)
+> **Complete guide to installing, configuring, and executing the Python and TypeScript anti-slop case studies + example scripts.**
 
 ---
 
 ## 1. Prerequisites
 
+> ⚠️ You do not need a single `kit` package install to follow this guide — each case study directory is self-contained with its own dependencies.
+
+### Shared (all demos)
+
 | Requirement | Version | Notes |
 |---|---|---|
-| Python | 3.12+ | All scripts use `pathlib` and modern type syntax |
-| `uv` | latest | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| `clean_python` plugin | installed | See root `README.md` for plugin installation |
+| `uv` | latest | Required for Python demo + script runs |
+| Node.js | >= 18 | Ships with `npx`; required for TypeScript demo + script runs |
+| `kit` repo | latest | Contains `demo/opencode/` and `demo/scripts/` |
+
+### Python demo only
+
+| Requirement | Version | Purpose |
+|---|---|---|
+| Python | 3.12+ | Runtime for `find_bad_style.py`, `generate_report.py`, `example-clean-script.py` |
+| `radon` | latest | Cyclomatic complexity analysis (`uv pip install radon`) |
+| `mypy` | latest | Strict type checking (`uv pip install mypy`) |
+| `ruff` | latest | Lint enforcement (`uv pip install ruff`) |
+
+### TypeScript demo only
+
+| Requirement | Version | Notes |
+|---|---|---|
+| TypeScript | ^5.9 | `npm install typescript` (local devDependency) or global |
+| `tsx` | latest | `npm install tsx` (local) or `npm install -g tsx` |
+| ESLint + `@typescript-eslint` | latest | Enforced via `clean_ts` / `eslint.config.ts` |
+| `clean_ts` plugin | installed | See `plugins/typescript/` — the gate that intercepts `.ts` writes |
 
 ---
 
-## 2. Running Individual Case Studies
+## 2. Python Demo (clean_python anti-slop)
 
-### find_cc_nested.py — Cyclomatic Complexity Scanner
+This is the canonical case study. A subagent was given the prompt in `case_generate.md`:
+
+> Write a python script `generate_report.py` that reads JSON test logs from a directory, calculates statistics, and outputs a formatted Markdown summary report.
+
+The subagent **must** route every `.py` file through the `clean_python` tool (`verify_and_commit_code`), which enforces:
+
+| Gate | Enforced By | Threshold |
+|---|---|---|
+| Cyclomatic complexity | Radon CC | < 6 |
+| Strict type checking | MyPy `--strict` | `--disallow-untyped-defs`, `--no-implicit-optional` |
+| AST anti-slop | `find_bad_style.py` AST policy | No bare `except:` or `except Exception: pass` |
+| Lint | Ruff (E/F/W) | Clean imports, modern Python |
+
+### Inspect the evidence
 
 ```bash
-# Find functions with CC >= 6 (default threshold)
-uv run demo/opencode/python/find_cc_nested.py --min-cc 6 demo/opencode/python/find_bad_style.py
-
-# Show all functions sorted by CC
-uv run demo/opencode/python/find_cc_nested.py --min-cc 1 demo/opencode/python/*.py
+cd demo/opencode/python
+ls case_generate.md find_bad_style.py find_cc_nested.py generate_report.py
 ```
 
-Scans use `radon.complexity.cc_visit()` to compute cyclomatic complexity. Functions exceeding the threshold are sorted descending and printed in a formatted table.
+- `case_generate.md` — the case specification with 4-problem rationale.
+- `find_bad_style.py` — AST scanner for mutable defaults, missing type hints, and unsafe `open()`.
+- `find_cc_nested.py` — Radon cyclomatic complexity checker.
+- `generate_report.py` — the clean output that passed every gate.
+- `test_daily_pillar.py` — pytest suite covering cross-year pillar resolution (Dec → Jan edge cases).
+- `find_hallucinations.py` / `find_hallucinations_slop.py` — paired LLM-output validators (clean vs slop).
 
-### find_bad_style.py — Style Violation Scanner
-
-```bash
-# Check for mutable defaults, missing type hints, unsafe open()
-uv run demo/opencode/python/find_bad_style.py --files demo/opencode/python/find_cc_nested.py
-```
-
-Uses a custom `ast.NodeVisitor` (`GoogleStyleVisitor`) to detect:
-- `mutable_defaults` — `def func(x=[])` or `def func(x={})`
-- `unsafe_open` — `open()` without `with` context manager
-- `missing_type_hints` — function args or return type missing annotations
-
-**Exit code:** `1` if violations found, `0` if clean.
-
-### find_hallucinations.py — LLM Output Validator
+### Verify the output
 
 ```bash
-# Compare original vs refactored code for API drift
-uv run demo/opencode/python/find_hallucinations.py original.py refactored.py
-```
+cd demo/opencode/python
 
-Validates LLM-refactored code against the original by checking:
-1. **Pydantic field mismatches** — field names/types changed
-2. **Invalid imports** — imports that don't resolve or don't exist in original
-3. **Suspicious API usage** — `.get()` on non-dict objects (enums, Pydantic models)
-4. **Call signature drift** — argument count changed from original
-5. **Try/except count** — flags ≥ 3 try blocks (CC bloat pattern)
+# AST + style violations — should report ZERO
+uv run python find_bad_style.py generate_report.py
 
-### generate_report.py — Generated Report Generator
+# Cyclomatic complexity — should report NO functions >= 6
+uv run python find_cc_nested.py --min-cc 6 generate_report.py
 
-```bash
-# Read JSON test logs and produce a Markdown summary
-uv run demo/opencode/python/generate_report.py --input ./logs/ --output ./report.md
-```
-
-Reads JSON log files from a directory, calculates statistics (total tests, pass/fail counts, average execution time, error distribution), and outputs a formatted Markdown summary report.
-
-### test_daily_pillar.py — Cross-Year Pillar Tests
-
-```bash
-# Run the full test suite
-uv run pytest demo/opencode/python/test_daily_pillar.py -v
-
-# Run a specific test class
-uv run pytest demo/opencode/python/test_daily_pillar.py::TestResolveDailyPillarRange -v
-```
-
-Tests `resolve_daily_pillar_range()` and `get_month_anchor_for_date()` for correct behavior across year boundaries (Dec → Jan transitions).
-
----
-
-## 3. Running with clean_python Plugin
-
-The `clean_python` plugin enforces quality gates before code reaches disk. All `.py` files in `demo/opencode/python/` must pass:
-
-- **Radon CC < 6** for every function
-- **MyPy strict** type annotations
-- **AST anti-slop**: no bare `except:` or `except Exception: pass`
-- **Ruff**: clean imports, modern Python standards
-
-```bash
-# The plugin intercepts writes automatically when used via OpenCode
-# For manual verification:
-.venv/bin/ruff check demo/opencode/python/*.py
-.venv/bin/mypy --strict demo/opencode/python/*.py
-.venv/bin/python -m radon cc demo/opencode/python/*.py
+# Run the test suite
+uv run pytest test_daily_pillar.py -v
 ```
 
 ---
 
-## 4. Understanding Cache Files
+## 3. TypeScript Demo (clean_ts anti-slop)
 
-| Cache Directory | Contents |
-|---|---|
-| `.mypy_cache/` | MyPy type-checking results |
-| `.ruff_cache/` | Ruff lint scan results |
+This case study mirrors the Python scenario. A subagent is given the prompt in `case_generate.md`:
 
-These are safe to delete — they regenerate on each run:
+> Write a TypeScript script `generate_report.ts` that reads JSON test logs from a directory, calculates statistics (total tests, pass/fail counts, average execution time, and error distribution), and outputs a formatted Markdown summary report. Make sure it includes robust error handling and CLI argument parsing.
+
+The subagent **must** route every `.ts` file through the `clean_ts` tool (`verify_and_commit_code`), which enforces:
+
+| Gate | Enforced By | Threshold |
+|---|---|---|
+| Cyclomatic complexity | `ts/complexity` rule | < 6 (configured as `[[2, 5]]`) |
+| Strict type checking | `tsc --strict` | `--noImplicitAny`, `--strictNullChecks` |
+| AST anti-slop | `no-empty` + `no-useless-catch` | No empty/comment-only catch bodies |
+| ESLint | `eslint:recommended` + `@typescript-eslint/recommended` strict | `no-explicit-any`, `explicit-function-return-type`, `no-unused-vars` |
+
+### Inspect the evidence
+
+```bash
+cd demo/opencode/typescript
+ls case_generate.md find_bad_style.ts tsconfig.json
+```
+
+- `case_generate.md` — the case specification with 4-problem rationale.
+- `find_bad_style.ts` — TS scanner for high CC, swallowed catch, missing types, and ESLint violations.
+- `tsconfig.json` — strict TypeScript compiler configuration.
+
+### Verify the output
+
+```bash
+cd demo/opencode/typescript
+
+# Install deps (once)
+npm install
+
+# AST + CC + style violations — should report ZERO
+npx tsx find_bad_style.ts find_bad_style.ts
+
+# Strict type checking
+npx tsc --strict --noEmit find_bad_style.ts
+
+# Lint (if eslint is configured)
+npx eslint find_bad_style.ts
+```
+
+---
+
+## 4. Example Scripts (`scripts/`)
+
+The `scripts/` directory contains:
+
+- `01-install-plugins.md` — step-by-step plugin installation walkthrough (`remind-workflow`, `clean_python`, `clean_ts`).
+- `example-clean-script.py` — Python word-frequency analyzer that passes all quality gates.
+- `example-clean-script.ts` — TypeScript mirror of the same, passing `tsc --strict` + ESLint.
+
+### Run them
+
+```bash
+cd demo/scripts
+
+# Python example
+uv run python example-clean-script.py README.md
+
+# TypeScript example
+npx tsx example-clean-script.ts README.md
+```
+
+---
+
+## 5. Re-running the Scanners
+
+### Scanning an arbitrary Python file
+
+```bash
+cd demo/opencode/python
+uv run python find_bad_style.py <file>
+```
+
+### Scanning an arbitrary TypeScript file
+
+```bash
+cd demo/opencode/typescript
+npx tsx find_bad_style.ts <file>
+```
+
+### Checking cyclomatic complexity of any Python file
+
+```bash
+cd demo/opencode/python
+uv run python find_cc_nested.py --min-cc 6 <file>
+```
+
+---
+
+## 6. Environment Variables
+
+| Variable | Default | Scope | Description |
+|---|---|---|---|
+| `DISABLE_CLEAN_PYTHON` | (unset) | Python | Set to `true` to bypass `clean_python` linter verification |
+| `DISABLE_CLEAN_TS` | (unset) | TypeScript | Set to `true` to bypass `clean_ts` linter verification |
+| `KIT_API_KEY` | (unset) | Both | Optional — only needed if an LLM-audit tier is enabled (e.g. `find_hallucinations.py`) |
+| `KIT_BASE_URL` | (unset) | Both | Optional — LLM endpoint for hallucination verification |
+| `KIT_LIVE` | `false` | Both | Offline mode; set to `true` only when an LLM tier is configured |
+
+---
+
+## 7. Cache Management
+
+| Cache Directory | Contents | Safe to delete? |
+|---|---|---|
+| `demo/opencode/python/.mypy_cache/` | MyPy type-checking results | Yes — regenerates on each run |
+| `demo/opencode/python/.ruff_cache/` | Ruff lint scan results | Yes — regenerates on each run |
 
 ```bash
 rm -rf demo/opencode/python/.mypy_cache demo/opencode/python/.ruff_cache
@@ -115,34 +204,17 @@ rm -rf demo/opencode/python/.mypy_cache demo/opencode/python/.ruff_cache
 
 ---
 
-## 5. Troubleshooting
+## 8. Related Resources
 
-| Problem | Fix |
+| Resource | Scope |
 |---|---|
-| `ModuleNotFoundError: No module named 'radon'` | Install deps: `uv pip install radon mypy ruff` |
-| `--files` argument rejected | Ensure you're passing actual file paths, not a directory |
-| Tests fail with `ImportError` | The test file imports from `kit_python` — ensure the package is installed |
-| CC values seem wrong | Check if `radon` is installed in the active virtualenv |
-
----
-
-## 6. Case Study: case_generate.md
-
-The `case_generate.md` file contains a prompt specification for generating `generate_report.py`. It tests whether the subagent:
-
-1. Uses the `clean_python` tool (not raw `write`/`edit`) for `.py` files
-2. Passes all quality gates (CC < 6, MyPy strict, AST anti-slop, Ruff)
-3. Produces a working, modular script on the first attempt
-
-Read it to understand the anti-slop validation workflow:
-
-```bash
-.venv/bin/python -c "print(open('demo/opencode/python/case_generate.md').read())"
-```
-
----
-
-## Related Documentation
-
-- **[README.md](./README.md)** — Overview, file index, and directory structure
-- **[FAQ.md](./FAQ.md)** — Design rationale, cost questions, and CI/CD guidance
+| [README.md](./README.md) | Overview of all demos, quality gates, and directory layout |
+| [FAQ.md](./FAQ.md) | Troubleshooting, cost questions, and parity comparison |
+| `demo/opencode/python/case_generate.md` | Python case specification with 4-problem rationale |
+| `demo/opencode/typescript/case_generate.md` | TypeScript case specification with 4-problem rationale |
+| `demo/scripts/01-install-plugins.md` | Plugin installation walkthrough |
+| `demo/scripts/example-clean-script.py` | Python example: passes all quality gates |
+| `demo/scripts/example-clean-script.ts` | TypeScript example: passes all quality gates |
+| [`plugins/python/clean_python/`](../../plugins/python/clean_python/) | The `clean_python` quality gate source |
+| [`plugins/typescript/clean_ts/`](../../plugins/typescript/clean_ts/) | The `clean_ts` quality gate source |
+| [Hygiene README](../../hygiene/README.md) | Architecture and overview of the `kit-hygiene` static + LLM audit pipeline |

@@ -1,0 +1,20 @@
+{
+  "waves": [
+    {
+      "wave": 1,
+      "title": "Rewrite tooling-level demo docs to match opencode/{python,typescript} + scripts/",
+      "agents": 1,
+      "target": "demo/{README,GUIDE,FAQ}.md",
+      "depends_on": "demo/opencode/{README,GUIDE,FAQ}.md (already rewritten)",
+      "output": "tooling-level demo docs reflect demo/opencode/python + typescript + scripts/ tree"
+    },
+    {
+      "wave": 2,
+      "title": "Update AGENTS.md to reference new demo tree + demo/opencode + demo/scripts",
+      "agents": 1,
+      "target": "AGENTS.md",
+      "depends_on": "wave 1 complete",
+      "output": "AGENTS.md Modules section reflects demo/opencode/{python,typescript} + scripts/"
+    }
+  ]
+}

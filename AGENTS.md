@@ -33,7 +33,8 @@ Test discovery spans `tests/examples` and `tools/test` (see `pyproject.toml` `te
 | Core src    | `src/`         | `interfaces/` — public module surface                       |
 | Dev tools   | `tools/`       | Standalone scripts; `tools/pyproject.toml` may declare its own deps |
 | Hygiene     | `hygiene/`     | Linters/scanners + daily automation                         |
-| Plugins     | `plugins/`     | `opencode/`, `python/`, `typescript/`                       |
+| Plugins     | `plugins/`     | OpenCode plugin wrappers (`clean_python.ts`, `clean_ts.ts`) |
+| Demo        | `demo/`        | Case studies: `opencode/python/` + `opencode/typescript/` + `scripts/` |
 | Tests       | `tests/`       | Bucketed suites; `tests/08_static_gates` for quality gates  |
 | Examples    | `examples/`    | Sample targets + scanner output samples                     |
 | Issues      | `.beads/`      | Local Dolt DB + JSONL export; run `bd prime` / `bd ready`   |
