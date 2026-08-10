@@ -65,7 +65,7 @@ The format is based on [Semantic Versioning](https://semver.org/):
 ### Notes
 - **Not all tests pass** at this cut: the my-repo-only slices
   (`01_gold_snapshots/`, `02_unit_bedrock/`, `04_bug_repros/`, `05_integration_e2e/`,
-  `10_harness_suite/`, `math_chapters/`) require the my-repo `src2.*` source
+  `10_harness_suite/`, `math_chapters/`) require the my-repo `src.*` source
   tree + `sqlalchemy` and are **out of scope for the cloner download**. They are
   excluded from default collection by root `conftest.py` `collect_ignore`.
 - Validated cloner surface remains green: `uv run pytest examples -q` (14/14) with

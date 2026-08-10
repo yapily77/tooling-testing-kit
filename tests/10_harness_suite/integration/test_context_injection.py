@@ -112,11 +112,11 @@ def test_task_context_tier_selects_a_and_b(tmp_path):
 # ── unit: staging copies (fzqa2) ──────────────────────────────────────────
 def test_stage_copies_mirrors_files(tmp_path, monkeypatch):
     _monkeypatch_repo(tmp_path, monkeypatch)
-    src = tmp_path / "src2" / "m.py"
+    src = tmp_path / "src" / "m.py"
     src.parent.mkdir(parents=True, exist_ok=True)
     src.write_text("CODE\n", encoding="utf-8")
-    staged = stage_paths(["src2/m.py"])
-    _stage_copies(["src2/m.py"], staged)
+    staged = stage_paths(["src/m.py"])
+    _stage_copies(["src/m.py"], staged)
     dst = Path(staged[0])
     assert dst.exists()
     assert dst.read_text(encoding="utf-8") == "CODE\n"
@@ -125,12 +125,12 @@ def test_stage_copies_mirrors_files(tmp_path, monkeypatch):
 # ── unit: tier B map (qkm3p) ─────────────────────────────────────────────
 def test_build_tier_b_map_lists_symbols(tmp_path, monkeypatch):
     _monkeypatch_repo(tmp_path, monkeypatch)
-    src = tmp_path / "src2" / "m.py"
+    src = tmp_path / "src" / "m.py"
     src.parent.mkdir(parents=True, exist_ok=True)
     src.write_text("def foo():\n    pass\n\nclass Bar:\n    pass\n", encoding="utf-8")
-    m = _build_tier_b_map(["src2/m.py"])
+    m = _build_tier_b_map(["src/m.py"])
     # The map is anchored on the file path and labelled as structural (Tier B).
-    assert "src2/m.py" in m
+    assert "src/m.py" in m
     assert "STRUCTURAL MAP" in m
     # get_file_symbols is hard-wired to the real PROJECT_ROOT, so in this test
     # it returns a "File not found" note rather than live symbols — that path
@@ -146,10 +146,10 @@ def test_tier_b_injects_map_without_halt(tmp_path, monkeypatch):
     # Tier B triggers when a task's TOTAL tokens exceed TASK_TOKEN_THRESHOLD
     # (10K) but the single file does not exceed TIER_B_SLICE_THRESHOLD (100K).
     paths = []
-    f = tmp_path / "src2" / "mod0.py"
+    f = tmp_path / "src" / "mod0.py"
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(("x = 1\n" * 5_000), encoding="utf-8")
-    paths.append("src2/mod0.py")
+    paths.append("src/mod0.py")
     assert task_context_tier(paths) == "B"
     task = ApprovedTask(id="intern01", title="t1", file_paths=paths,
                         instruction="edit modules", acceptance="ok",
@@ -159,11 +159,11 @@ def test_tier_b_injects_map_without_halt(tmp_path, monkeypatch):
 
     async def intern_fn(brief: str, task_id: str | None = None) -> str:
         spawned[task_id or "intern01"] = brief
-        staged_file = Path(stage_path("src2/mod0.py"))
+        staged_file = Path(stage_path("src/mod0.py"))
         if staged_file.exists():
             staged_file.write_text(staged_file.read_text(encoding="utf-8") + "\n# edit\n", encoding="utf-8")
         return json.dumps({"status": "done", "task_id": task_id or "intern01",
-                            "files_changed": ["src2/mod0.py"], "diff_summary": "edited mod0.py", "notes": ""})
+                            "files_changed": ["src/mod0.py"], "diff_summary": "edited mod0.py", "notes": ""})
 
     asyncio.run(run_execute_phase(plan, TEMP_DIR / "tier_b", asyncio.Semaphore(5), intern_fn))
     brief = spawned["intern01"]
@@ -173,11 +173,11 @@ def test_tier_b_injects_map_without_halt(tmp_path, monkeypatch):
 # ── integration: vze01 split escalation halts on oversized file ───────────
 def test_halt_when_single_file_exceeds_slice_budget(tmp_path, monkeypatch):
     _monkeypatch_repo(tmp_path, monkeypatch)
-    huge = tmp_path / "src2" / "huge.py"
+    huge = tmp_path / "src" / "huge.py"
     huge.parent.mkdir(parents=True, exist_ok=True)
     # > TIER_B_SLICE_THRESHOLD tokens: even a slice read would blow context.
     huge.write_text("x = " + "1" * 1_000_000 + "\n", encoding="utf-8")
-    task = ApprovedTask(id="intern01", title="t1", file_paths=["src2/huge.py"],
+    task = ApprovedTask(id="intern01", title="t1", file_paths=["src/huge.py"],
                         instruction="edit huge", acceptance="ok",
                         tool_preference="CLI-wrapper")
     plan = _plan_with([task])

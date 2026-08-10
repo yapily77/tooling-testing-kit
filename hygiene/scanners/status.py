@@ -36,7 +36,7 @@ def compute_cc(node: ast.AST) -> int:
     return cc
 
 
-def scan_live_cc(target_dir: str = "src2") -> dict[str, dict[str, int]]:
+def scan_live_cc(target_dir: str = "src") -> dict[str, dict[str, int]]:
     all_violations: dict[str, dict[str, int]] = {}
     for root, _, files in os.walk(target_dir):
         for file in files:

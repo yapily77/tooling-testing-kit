@@ -12,8 +12,8 @@ Callers also switched to UserProfile.model_validate() directly.
 import pytest
 from pydantic import ValidationError
 
-from src2.core.schemas.unified import UserProfile
-from src2.engine.transformer import to_user_profile
+from src.core.schemas.unified import UserProfile
+from src.engine.transformer import to_user_profile
 
 VALID_PILLAR = {"stem": "Jia", "branch": "Zi"}
 
@@ -118,7 +118,7 @@ class TestManualIntakeScenario:
 
     def test_input_engine_dict_structure(self):
         """The exact dict from _run_input_engine must produce a valid UserProfile."""
-        from src2.core.schemas import ValidatedPillar as Pillar
+        from src.core.schemas import ValidatedPillar as Pillar
 
         dp = Pillar(stem="Jia", branch="Zi")
         mp = Pillar(stem="Yi", branch="Chou")
@@ -146,7 +146,7 @@ class TestManualIntakeScenario:
 
     def test_input_engine_via_to_user_profile(self):
         """The same dict passed through to_user_profile() must also work."""
-        from src2.core.schemas import ValidatedPillar as Pillar
+        from src.core.schemas import ValidatedPillar as Pillar
 
         dp = Pillar(stem="Jia", branch="Zi")
         mp = Pillar(stem="Yi", branch="Chou")

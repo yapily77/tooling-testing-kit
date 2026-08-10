@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from src2.interfaces.telegram.chronomancer.state_writer import _last_exchange, update_user_state_background
-from src2.core.memory.memory_manager import memory_manager, _db
+from src.interfaces.telegram.chronomancer.state_writer import _last_exchange, update_user_state_background
+from src.core.memory.memory_manager import memory_manager, _db
 
 @pytest.mark.asyncio
 async def test_last_exchange_memory_leak_fix():
@@ -13,12 +13,12 @@ async def test_last_exchange_memory_leak_fix():
     
     # We expect the StateWriter to pop the user_id out in the finally block
     # We will mock the agent run to return immediately and avoid LLM call
-    with patch("src2.interfaces.telegram.chronomancer.state_writer.state_writer_agent.run") as mock_run:
+    with patch("src.interfaces.telegram.chronomancer.state_writer.state_writer_agent.run") as mock_run:
         mock_run.return_value = MagicMock(output=MagicMock(model_dump_json=lambda: "{}"))
         
         # We also mock Redis and Mem0 to prevent external connections
         with patch("redis.asyncio.from_url"), \
-             patch("src2.interfaces.telegram.chronomancer.state_writer._read_mem0", return_value=""):
+             patch("src.interfaces.telegram.chronomancer.state_writer._read_mem0", return_value=""):
              
             await update_user_state_background(user_id, current_exchange, "GeJu", [])
             

@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 
-from src2.interfaces.telegram.intake.calendar_node import _run_input_engine
-from src2.interfaces.telegram.session import Session, SessionMetadata
+from src.interfaces.telegram.intake.calendar_node import _run_input_engine
+from src.interfaces.telegram.session import Session, SessionMetadata
 
 # Bypass Mem0 initialization error
 os.environ["MEM0_MODEL"] = "dummy"
@@ -34,8 +34,8 @@ async def test_run_input_engine_dict_validation():
         metadata=SessionMetadata(intake=intake_data)
     )
 
-    with patch("src2.interfaces.telegram.bridge.db.get_semantic_id") as mock_get_semantic_id, \
-         patch("src2.engine.module0_geju.classify_ge_ju") as mock_classify_ge_ju:
+    with patch("src.interfaces.telegram.bridge.db.get_semantic_id") as mock_get_semantic_id, \
+         patch("src.engine.module0_geju.classify_ge_ju") as mock_classify_ge_ju:
         mock_get_semantic_id.return_value = "mock_semantic_id"
         mock_ge_ju_res = {
             "ge_ju": {

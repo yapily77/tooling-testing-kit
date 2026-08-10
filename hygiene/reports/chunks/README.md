@@ -1,7 +1,7 @@
 # kit-hygiene reports — placeholder format samples
 
 `chunks/` holds **sanitized format samples only** (`.placeholder.*`). They show
-end users the SHAPE of a generated report without leaking real `src2/` paths,
+end users the SHAPE of a generated report without leaking real `src/` paths,
 live findings, or credentials.
 
 | Placeholder file | Real report produced by | Format |
@@ -16,4 +16,4 @@ Each scanner writes to `kit-hygiene/reports/` at runtime, e.g.:
 - `registry_clashes.json` + `registry_clashes_checkpoint.jsonl`
 
 Real reports use the **same schema** as the placeholders; only the values differ
-(live `src2/` paths, line numbers, findings, ISO timestamps).
+(live `src/` paths, line numbers, findings, ISO timestamps).

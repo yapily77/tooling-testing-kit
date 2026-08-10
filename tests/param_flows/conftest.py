@@ -6,7 +6,7 @@ import pytest
 import sqlalchemy
 import sqlalchemy.ext.asyncio
 
-# 🔥 CRITICAL: Disable external services BEFORE any src2 import
+# 🔥 CRITICAL: Disable external services BEFORE any src import
 os.environ["SENTRY_DSN"] = ""
 os.environ["DISABLE_SENTRY"] = "1"
 os.environ["LOGFIRE_NO_PLACEHOLDER"] = "true"
@@ -23,7 +23,7 @@ def _mock_create_engine(url, *args, **kwargs):
         eng = _orig_create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
         from sqlalchemy.dialects.sqlite.base import SQLiteTypeCompiler
 
-        from src2.core.database.models import Base
+        from src.core.database.models import Base
 
         SQLiteTypeCompiler.visit_JSONB = lambda self, type_, **kw: "JSON"
         SQLiteTypeCompiler.visit_UUID = lambda self, type_, **kw: "CHAR(32)"
@@ -45,7 +45,7 @@ sqlalchemy.ext.asyncio.create_async_engine = _mock_create_async_engine
 # Module-level patch: stays active for entire pytest session, BEFORE
 # memory_manager.py:26 triggers _db = Database("bot.db") at import time
 patch(
-    "src2.interfaces.telegram.db.Database._run_pg_migrations",
+    "src.interfaces.telegram.db.Database._run_pg_migrations",
     lambda self: None,
 ).start()
 

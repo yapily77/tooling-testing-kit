@@ -23,10 +23,10 @@ This plan specifically validates that the strict Pydantic V2 data pipeline corre
 *   **Wealth:** "Want to know if 2026 is a good year to buy a house."
 
 ## Scope & Constraints
-*   **Entry Point:** `src2.interfaces.telegram.bridge.map_profile_to_k3()` simulating an `/input` followed by tailoring completion.
-*   **Anti-Corruption Seam (C5):** Ensure the raw payload + tailoring context correctly passes into `src2.core.schemas.unified.ChartProfile` via `model_validate()`. (Requires adding `tailoring_context` fields to `ChartProfile`).
+*   **Entry Point:** `src.interfaces.telegram.bridge.map_profile_to_k3()` simulating an `/input` followed by tailoring completion.
+*   **Anti-Corruption Seam (C5):** Ensure the raw payload + tailoring context correctly passes into `src.core.schemas.unified.ChartProfile` via `model_validate()`. (Requires adding `tailoring_context` fields to `ChartProfile`).
 *   **Engine Core (C4):** The internal engine must receive fully typed structures and serialize them properly for the LLM. 
-*   **Egress:** Ensure the `tailoring_context` is physically present in the final prompt constructed by `src2.engine.prompt_maker.py`.
+*   **Egress:** Ensure the `tailoring_context` is physically present in the final prompt constructed by `src.engine.prompt_maker.py`.
 
 ## Test Execution Steps
 
@@ -50,7 +50,7 @@ This plan specifically validates that the strict Pydantic V2 data pipeline corre
 ### 4. Monthly Report Generation (Prompt Engine)
 *   **Action:** Invoke the pipeline that builds the monthly narrative/report.
 *   **Validation:**
-    *   Intercept or verify the prompt built in `src2.engine.prompt_maker.make_month` contains the `tailoring_context` string.
+    *   Intercept or verify the prompt built in `src.engine.prompt_maker.make_month` contains the `tailoring_context` string.
     *   Confirm there are no silent swallowing of exceptions (Fail Fast, Fail Loudly).
     *   The resulting JSON must contain the monthly outputs reflecting the pipeline run.
 

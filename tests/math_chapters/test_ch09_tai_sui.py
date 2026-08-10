@@ -7,12 +7,12 @@ Strictly enforces English CapitalCase formatting for stems, branches, and elemen
 
 import pytest
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     LuckHarmonyEntry,
     TaiSuiConditionCheck,
     TaiSuiTrigger,
 )
-from src2.engine.module1_macro import (
+from src.engine.module1_macro import (
     _compute_tai_sui_section,
     _convert_conditions_to_triggers,
     _filter_tai_sui_by_shen,

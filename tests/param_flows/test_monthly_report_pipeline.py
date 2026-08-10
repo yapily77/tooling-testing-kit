@@ -24,16 +24,16 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src2.core.schemas.unified import StrengthTier
-from src2.interfaces.telegram.pipeline import (
+from src.core.schemas.unified import StrengthTier
+from src.interfaces.telegram.pipeline import (
     ReportPipelineChunk,
     _build_master_json_path,
     _calculate_report_index,
     _extract_chat_id,
     run_full_report_pipeline,
 )
-from src2.interfaces.telegram.queue_worker import QueueManager
-from src2.interfaces.telegram.reliability import PipelineAbortError
+from src.interfaces.telegram.queue_worker import QueueManager
+from src.interfaces.telegram.reliability import PipelineAbortError
 
 
 @pytest.fixture(autouse=True)
@@ -134,7 +134,7 @@ def test_extract_chat_id(chunk, expected_chat_id):
 ])
 def test_calculate_report_index(mock_db, existing_reports, expected_index):
     mock_db.get_all_reports_for_user.return_value = existing_reports
-    with patch("src2.interfaces.telegram.pipeline.db", mock_db):
+    with patch("src.interfaces.telegram.pipeline.db", mock_db):
         assert _calculate_report_index(123) == expected_index
 
 
@@ -157,12 +157,12 @@ async def test_pipeline_aborts_on_invalid_profile(mock_db, mock_session, mock_me
     chat_id = 123456
     alias = "Alice"
 
-    with patch("src2.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, alias)), \
-         patch("src2.interfaces.telegram.bridge.validate_profile", return_value=(False, ["day_pillar is missing stem"])), \
-         patch("src2.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.pipeline.db", mock_db), \
-         patch("src2.interfaces.telegram.pipeline.memory_manager", mock_memory_manager):
+    with patch("src.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, alias)), \
+         patch("src.interfaces.telegram.bridge.validate_profile", return_value=(False, ["day_pillar is missing stem"])), \
+         patch("src.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.pipeline.db", mock_db), \
+         patch("src.interfaces.telegram.pipeline.memory_manager", mock_memory_manager):
 
         with pytest.raises(PipelineAbortError):
             await run_full_report_pipeline(chat_id)
@@ -183,18 +183,18 @@ async def test_full_pipeline_success_12_months(mock_db, mock_session, mock_memor
     chat_id = 123456
     profile_data = {"day_pillar": {"stem": "Bing", "branch": "Wu"}}
 
-    with patch("src2.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, "Alice")), \
-         patch("src2.interfaces.telegram.bridge.validate_profile", return_value=(True, [])), \
-         patch("src2.interfaces.telegram.bridge.map_profile_to_k3", return_value=profile_data), \
-         patch("src2.interfaces.telegram.bridge.save_k3_profile", return_value=str(tmp_path / "profile.json")), \
-         patch("src2.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-          patch("src2.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.pipeline.db", mock_db), \
-         patch("src2.interfaces.telegram.pipeline.memory_manager", mock_memory_manager), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-          patch("src2.interfaces.telegram.pipeline_check.verify_monthly_pipeline_readiness", new_callable=AsyncMock, return_value=True), \
-          patch("src2.interfaces.telegram.pipeline._run_pipeline_engine", new_callable=AsyncMock) as mock_engine, \
-          patch("src2.interfaces.telegram.chronomancer.prebuild_annual_calendar", new_callable=AsyncMock):
+    with patch("src.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, "Alice")), \
+         patch("src.interfaces.telegram.bridge.validate_profile", return_value=(True, [])), \
+         patch("src.interfaces.telegram.bridge.map_profile_to_k3", return_value=profile_data), \
+         patch("src.interfaces.telegram.bridge.save_k3_profile", return_value=str(tmp_path / "profile.json")), \
+         patch("src.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+          patch("src.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.pipeline.db", mock_db), \
+         patch("src.interfaces.telegram.pipeline.memory_manager", mock_memory_manager), \
+         patch("src.interfaces.telegram.session.save_session"), \
+          patch("src.interfaces.telegram.pipeline_check.verify_monthly_pipeline_readiness", new_callable=AsyncMock, return_value=True), \
+          patch("src.interfaces.telegram.pipeline._run_pipeline_engine", new_callable=AsyncMock) as mock_engine, \
+          patch("src.interfaces.telegram.chronomancer.prebuild_annual_calendar", new_callable=AsyncMock):
 
         mock_engine.return_value = MagicMock(
             months=[MagicMock() for _ in range(12)],
@@ -235,18 +235,18 @@ async def test_pipeline_handles_mixed_month_results(mock_db, mock_session, mock_
     chat_id = 123456
     profile_data = {"day_pillar": {"stem": "Bing", "branch": "Wu"}}
 
-    with patch("src2.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, "Alice")), \
-         patch("src2.interfaces.telegram.bridge.validate_profile", return_value=(True, [])), \
-         patch("src2.interfaces.telegram.bridge.map_profile_to_k3", return_value=profile_data), \
-         patch("src2.interfaces.telegram.bridge.save_k3_profile", return_value=str(tmp_path / "profile.json")), \
-         patch("src2.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock), \
-          patch("src2.interfaces.telegram.pipeline.db", mock_db), \
-          patch("src2.interfaces.telegram.pipeline.memory_manager", mock_memory_manager), \
-          patch("src2.interfaces.telegram.session.save_session"), \
-          patch("src2.interfaces.telegram.pipeline_check.verify_monthly_pipeline_readiness", new_callable=AsyncMock, return_value=True), \
-          patch("src2.interfaces.telegram.pipeline._run_pipeline_engine", new_callable=AsyncMock) as mock_engine, \
-          patch("src2.interfaces.telegram.chronomancer.prebuild_annual_calendar", new_callable=AsyncMock):
+    with patch("src.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, "Alice")), \
+         patch("src.interfaces.telegram.bridge.validate_profile", return_value=(True, [])), \
+         patch("src.interfaces.telegram.bridge.map_profile_to_k3", return_value=profile_data), \
+         patch("src.interfaces.telegram.bridge.save_k3_profile", return_value=str(tmp_path / "profile.json")), \
+         patch("src.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock), \
+          patch("src.interfaces.telegram.pipeline.db", mock_db), \
+          patch("src.interfaces.telegram.pipeline.memory_manager", mock_memory_manager), \
+          patch("src.interfaces.telegram.session.save_session"), \
+          patch("src.interfaces.telegram.pipeline_check.verify_monthly_pipeline_readiness", new_callable=AsyncMock, return_value=True), \
+          patch("src.interfaces.telegram.pipeline._run_pipeline_engine", new_callable=AsyncMock) as mock_engine, \
+          patch("src.interfaces.telegram.chronomancer.prebuild_annual_calendar", new_callable=AsyncMock):
 
         month_responses = [MagicMock() for _ in range(10)]
         error_payloads = [
@@ -277,18 +277,18 @@ async def test_pipeline_engine_exception_notifies_developer(mock_db, mock_sessio
     chat_id = 123456
     profile_data = {"day_pillar": {"stem": "Bing", "branch": "Wu"}}
 
-    with patch("src2.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, "Alice")), \
-         patch("src2.interfaces.telegram.bridge.validate_profile", return_value=(True, [])), \
-         patch("src2.interfaces.telegram.bridge.map_profile_to_k3", return_value=profile_data), \
-         patch("src2.interfaces.telegram.bridge.save_k3_profile", return_value="/tmp/profile.json"), \
-         patch("src2.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock) as mock_dev, \
-          patch("src2.interfaces.telegram.pipeline.db", mock_db), \
-          patch("src2.interfaces.telegram.pipeline.memory_manager", mock_memory_manager), \
-          patch("src2.interfaces.telegram.session.save_session"), \
-          patch("src2.interfaces.telegram.pipeline_check.verify_monthly_pipeline_readiness", new_callable=AsyncMock, return_value=True), \
-          patch("src2.interfaces.telegram.pipeline._run_pipeline_engine", new_callable=AsyncMock, side_effect=RuntimeError("LLM gateway down")), \
-          patch("src2.interfaces.telegram.chronomancer.prebuild_annual_calendar", new_callable=AsyncMock):
+    with patch("src.interfaces.telegram.pipeline._initialize_session", new=lambda chat_id: (mock_session, "Alice")), \
+         patch("src.interfaces.telegram.bridge.validate_profile", return_value=(True, [])), \
+         patch("src.interfaces.telegram.bridge.map_profile_to_k3", return_value=profile_data), \
+         patch("src.interfaces.telegram.bridge.save_k3_profile", return_value="/tmp/profile.json"), \
+         patch("src.interfaces.telegram.pipeline.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.pipeline.send_developer_message", new_callable=AsyncMock) as mock_dev, \
+          patch("src.interfaces.telegram.pipeline.db", mock_db), \
+          patch("src.interfaces.telegram.pipeline.memory_manager", mock_memory_manager), \
+          patch("src.interfaces.telegram.session.save_session"), \
+          patch("src.interfaces.telegram.pipeline_check.verify_monthly_pipeline_readiness", new_callable=AsyncMock, return_value=True), \
+          patch("src.interfaces.telegram.pipeline._run_pipeline_engine", new_callable=AsyncMock, side_effect=RuntimeError("LLM gateway down")), \
+          patch("src.interfaces.telegram.chronomancer.prebuild_annual_calendar", new_callable=AsyncMock):
 
         with pytest.raises(RuntimeError, match="LLM gateway down"):
             await run_full_report_pipeline(chat_id)
@@ -320,7 +320,7 @@ async def test_queue_manager_add_job_caps(
     mock_db.get_user_job_count_today.return_value = user_job_count
     mock_db.get_global_job_count_today.return_value = global_count
 
-    with patch("src2.interfaces.telegram.security.get_user_limits", return_value={"max_reports_per_day": tier_cap}):
+    with patch("src.interfaces.telegram.security.get_user_limits", return_value={"max_reports_per_day": tier_cap}):
         qm = QueueManager(mock_db)
         result = await qm.add_job(user_id=123456)
         assert result is expected
@@ -337,7 +337,7 @@ async def test_queue_manager_dedup_blocks_active_job(mock_db):
     mock_db.get_global_job_count_today.return_value = 0
     mock_db.get_active_jobs.return_value = [{"id": "job-1", "status": "pending"}]
 
-    with patch("src2.interfaces.telegram.security.get_user_limits", return_value={"max_reports_per_day": 2}):
+    with patch("src.interfaces.telegram.security.get_user_limits", return_value={"max_reports_per_day": 2}):
         qm = QueueManager(mock_db)
         result = await qm.add_job(user_id=123456)
         assert result is False
@@ -350,7 +350,7 @@ async def test_queue_manager_dedup_no_active_jobs_allows_enqueue(mock_db):
     mock_db.get_global_job_count_today.return_value = 0
     mock_db.get_active_jobs.return_value = []
 
-    with patch("src2.interfaces.telegram.security.get_user_limits", return_value={"max_reports_per_day": 2}):
+    with patch("src.interfaces.telegram.security.get_user_limits", return_value={"max_reports_per_day": 2}):
         qm = QueueManager(mock_db)
         result = await qm.add_job(user_id=123456)
         assert result is True
@@ -363,7 +363,7 @@ async def test_queue_manager_dedup_no_active_jobs_allows_enqueue(mock_db):
 
 @pytest.mark.asyncio
 async def test_queue_worker_processes_dequeued_job(mock_db):
-    with patch("src2.interfaces.telegram.queue_worker.process_report", new_callable=AsyncMock) as mock_proc:
+    with patch("src.interfaces.telegram.queue_worker.process_report", new_callable=AsyncMock) as mock_proc:
         qm = QueueManager(mock_db)
 
         await qm._run_job({"id": "job1", "user_id": 123, "retry_count": 0})
@@ -381,8 +381,8 @@ async def test_queue_worker_transient_failure_triggers_retry(mock_db):
             state["called"] = True
             raise ValueError("Temporary LLM hiccup")
 
-    with patch("src2.interfaces.telegram.queue_worker.process_report", side_effect=raise_once), \
-         patch("src2.interfaces.telegram.queue_worker.asyncio") as mock_asyncio_mod:
+    with patch("src.interfaces.telegram.queue_worker.process_report", side_effect=raise_once), \
+         patch("src.interfaces.telegram.queue_worker.asyncio") as mock_asyncio_mod:
         mock_asyncio_mod.sleep = AsyncMock()
         qm = QueueManager(mock_db)
 
@@ -398,10 +398,10 @@ async def test_queue_worker_transient_failure_triggers_retry(mock_db):
 async def test_queue_worker_permanent_failure_resets_session_and_notifies(mock_db):
     qm = QueueManager(mock_db)
 
-    with patch("src2.interfaces.telegram.queue_worker.process_report", new_callable=AsyncMock, side_effect=PipelineAbortError("Profile validation failed")), \
-         patch("src2.interfaces.telegram.session.get_session") as mock_get_session, \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock) as mock_send:
+    with patch("src.interfaces.telegram.queue_worker.process_report", new_callable=AsyncMock, side_effect=PipelineAbortError("Profile validation failed")), \
+         patch("src.interfaces.telegram.session.get_session") as mock_get_session, \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock) as mock_send:
 
         mock_session_obj = MagicMock()
         mock_session_obj.step = "PROCESSING"
@@ -439,7 +439,7 @@ async def test_queue_worker_retry_exhausted_is_permanent_failure(mock_db):
     [],
 ])
 def test_report_menu_text(tmp_path, monthly_forecasts):
-    from src2.interfaces.telegram.report_utils import get_report_menu_text
+    from src.interfaces.telegram.report_utils import get_report_menu_text
 
     json_path = tmp_path / "master.json"
     with open(json_path, "w") as f:
@@ -459,7 +459,7 @@ def test_report_menu_text(tmp_path, monthly_forecasts):
 
 @pytest.mark.parametrize("file_exists", [True, False])
 def test_report_menu_missing_file(tmp_path, file_exists):
-    from src2.interfaces.telegram.report_utils import get_report_menu_text
+    from src.interfaces.telegram.report_utils import get_report_menu_text
 
     path = str(tmp_path / "missing.json")
     if file_exists:
@@ -477,7 +477,7 @@ def test_report_menu_missing_file(tmp_path, file_exists):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("sifu_mode", [True, False])
 async def test_month_narrative_sifu_mode_bypass(mock_db, mock_session, tmp_path, sifu_mode):
-    from src2.interfaces.telegram.report_utils import MonthData, MonthMetadata, get_month_narrative
+    from src.interfaces.telegram.report_utils import MonthData, MonthMetadata, get_month_narrative
 
     master_json_path = tmp_path / "master.json"
     month_data = MonthData(
@@ -490,7 +490,7 @@ async def test_month_narrative_sifu_mode_bypass(mock_db, mock_session, tmp_path,
     with open(master_json_path, "w") as f:
         json.dump(master_json, f)
 
-    with patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock):
+    with patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock):
         result = await get_month_narrative(
             str(master_json_path),
             0,
@@ -512,7 +512,7 @@ async def test_month_narrative_sifu_mode_bypass(mock_db, mock_session, tmp_path,
 
 @pytest.mark.asyncio
 async def test_month_narrative_not_found_when_empty_json(tmp_path):
-    from src2.interfaces.telegram.report_utils import get_month_narrative
+    from src.interfaces.telegram.report_utils import get_month_narrative
 
     master_json_path = tmp_path / "empty.json"
     with open(master_json_path, "w") as f:
@@ -525,7 +525,7 @@ async def test_month_narrative_not_found_when_empty_json(tmp_path):
 
 @pytest.mark.asyncio
 async def test_month_narrative_not_found_when_file_missing(tmp_path):
-    from src2.interfaces.telegram.report_utils import get_month_narrative
+    from src.interfaces.telegram.report_utils import get_month_narrative
 
     result = await get_month_narrative(str(tmp_path / "nonexistent.json"), 0, chat_id=123)
     assert "⚠️" in result
@@ -538,7 +538,7 @@ async def test_month_narrative_not_found_when_file_missing(tmp_path):
 
 @pytest.mark.asyncio
 async def test_generate_12_months_concurrent_produces_12_results(mock_db, tmp_path):
-    from src2.engine.monthly_generator import generate_12_months_concurrently
+    from src.engine.monthly_generator import generate_12_months_concurrently
 
     chat_id = 123456
     profile = MagicMock()
@@ -547,16 +547,16 @@ async def test_generate_12_months_concurrent_produces_12_results(mock_db, tmp_pa
     profile.wealth_concern = "invest"
     profile.relationship_concern = "harmony"
 
-    with patch.dict("sys.modules", {"src2.interfaces.telegram.db": MagicMock(db=mock_db)}), \
-         patch("src2.engine.monthly_generator._fetch_rag_context", new_callable=AsyncMock, return_value="RAG context"), \
-         patch("src2.engine.monthly_generator.run_full_engine", return_value=MagicMock(engine_outputs=None)), \
-         patch("src2.engine.monthly_generator.to_chart_profile", return_value=profile), \
-         patch("src2.engine.monthly_generator.serialise_profile", return_value=MagicMock(model_dump_json=MagicMock(return_value="{}"))), \
-         patch("src2.engine.monthly_generator.serialise_egress", return_value=""), \
-         patch("src2.engine.monthly_generator.resolve_daily_pillar_range", return_value="Daily pillars data"), \
-         patch("src2.engine.monthly_generator._build_age_ge_ju_framing", return_value="Framing text"), \
-         patch("src2.engine.monthly_generator._derive_age", return_value=30), \
-         patch("src2.engine.monthly_generator.report_agent") as mock_agent:
+    with patch.dict("sys.modules", {"src.interfaces.telegram.db": MagicMock(db=mock_db)}), \
+         patch("src.engine.monthly_generator._fetch_rag_context", new_callable=AsyncMock, return_value="RAG context"), \
+         patch("src.engine.monthly_generator.run_full_engine", return_value=MagicMock(engine_outputs=None)), \
+         patch("src.engine.monthly_generator.to_chart_profile", return_value=profile), \
+         patch("src.engine.monthly_generator.serialise_profile", return_value=MagicMock(model_dump_json=MagicMock(return_value="{}"))), \
+         patch("src.engine.monthly_generator.serialise_egress", return_value=""), \
+         patch("src.engine.monthly_generator.resolve_daily_pillar_range", return_value="Daily pillars data"), \
+         patch("src.engine.monthly_generator._build_age_ge_ju_framing", return_value="Framing text"), \
+         patch("src.engine.monthly_generator._derive_age", return_value=30), \
+         patch("src.engine.monthly_generator.report_agent") as mock_agent:
 
         mock_agent.run = AsyncMock(return_value=MagicMock(output="Month forecast text"))
 
@@ -569,7 +569,7 @@ async def test_generate_12_months_concurrent_produces_12_results(mock_db, tmp_pa
 
 @pytest.mark.asyncio
 async def test_generate_12_months_failure_propagates(mock_db):
-    from src2.engine.monthly_generator import generate_12_months_concurrently
+    from src.engine.monthly_generator import generate_12_months_concurrently
 
     chat_id = 123456
     profile = MagicMock()
@@ -587,16 +587,16 @@ async def test_generate_12_months_failure_propagates(mock_db):
             raise RuntimeError("LLM failure on month 1")
         return MagicMock(output=f"Forecast {call_count}")
 
-    with patch.dict("sys.modules", {"src2.interfaces.telegram.db": MagicMock(db=mock_db)}), \
-         patch("src2.engine.monthly_generator._fetch_rag_context", new_callable=AsyncMock, return_value=""), \
-         patch("src2.engine.monthly_generator.run_full_engine", return_value=MagicMock(engine_outputs=None)), \
-         patch("src2.engine.monthly_generator.to_chart_profile", return_value=profile), \
-         patch("src2.engine.monthly_generator.serialise_profile", return_value=MagicMock(model_dump_json=MagicMock(return_value="{}"))), \
-         patch("src2.engine.monthly_generator.serialise_egress", return_value=""), \
-         patch("src2.engine.monthly_generator.resolve_daily_pillar_range", return_value="daily"), \
-         patch("src2.engine.monthly_generator._build_age_ge_ju_framing", return_value=""), \
-         patch("src2.engine.monthly_generator._derive_age", return_value=30), \
-         patch("src2.engine.monthly_generator.report_agent") as mock_agent:
+    with patch.dict("sys.modules", {"src.interfaces.telegram.db": MagicMock(db=mock_db)}), \
+         patch("src.engine.monthly_generator._fetch_rag_context", new_callable=AsyncMock, return_value=""), \
+         patch("src.engine.monthly_generator.run_full_engine", return_value=MagicMock(engine_outputs=None)), \
+         patch("src.engine.monthly_generator.to_chart_profile", return_value=profile), \
+         patch("src.engine.monthly_generator.serialise_profile", return_value=MagicMock(model_dump_json=MagicMock(return_value="{}"))), \
+         patch("src.engine.monthly_generator.serialise_egress", return_value=""), \
+         patch("src.engine.monthly_generator.resolve_daily_pillar_range", return_value="daily"), \
+         patch("src.engine.monthly_generator._build_age_ge_ju_framing", return_value=""), \
+         patch("src.engine.monthly_generator._derive_age", return_value=30), \
+         patch("src.engine.monthly_generator.report_agent") as mock_agent:
 
         mock_agent.run = flaky_run
 
@@ -626,8 +626,8 @@ async def test_queue_worker_start_worker_processes_job(mock_db):
 
     mock_db.dequeue_job.side_effect = dequeue_side_effect
 
-    with patch("src2.interfaces.telegram.queue_worker.process_report", new_callable=AsyncMock) as mock_proc, \
-         patch("src2.interfaces.telegram.queue_worker._background_tasks"):
+    with patch("src.interfaces.telegram.queue_worker.process_report", new_callable=AsyncMock) as mock_proc, \
+         patch("src.interfaces.telegram.queue_worker._background_tasks"):
         await qm.start_worker()
 
         mock_proc.assert_awaited_once_with({"user_id": 123})

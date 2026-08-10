@@ -3,8 +3,8 @@ from pathlib import Path
 
 
 def main():
-    json_store_path = Path("TEST/codes/20260626_SRC2/dead_code_deepdive_results.json")
-    json_out_path = Path("TEST/codes/20260626_SRC2/dead_code_deepdive_results_DropOnly.json")
+    json_store_path = Path("TEST/codes/20260626_src/dead_code_deepdive_results.json")
+    json_out_path = Path("TEST/codes/20260626_src/dead_code_deepdive_results_DropOnly.json")
 
     if not json_store_path.exists():
         print(f"Error: {json_store_path} not found.")

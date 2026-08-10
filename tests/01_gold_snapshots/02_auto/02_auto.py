@@ -63,10 +63,10 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
 
         # Reset user data in DB to ensure locked flow is triggered correctly
         try:
-            from src2.interfaces.telegram.db import Database
+            from src.interfaces.telegram.db import Database
             db = Database()
             db.delete_all_user_data(chat_id)
-            from src2.interfaces.telegram.session import delete_session
+            from src.interfaces.telegram.session import delete_session
             delete_session(chat_id)
         except Exception as e:
             print(f"Warning: Failed to clear DB data for user {chat_id}: {e}")
@@ -85,10 +85,10 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
             # Reset user data and session before starting Path B (Step 8)
             if step_num == 8:
                 try:
-                    from src2.interfaces.telegram.db import Database
+                    from src.interfaces.telegram.db import Database
                     db = Database()
                     db.delete_all_user_data(chat_id)
-                    from src2.interfaces.telegram.session import delete_session
+                    from src.interfaces.telegram.session import delete_session
                     delete_session(chat_id)
                 except Exception as e:
                     print(f"Warning: Failed to clear DB data for user {chat_id} at Step 8: {e}")

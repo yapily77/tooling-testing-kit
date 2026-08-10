@@ -35,8 +35,8 @@ def test_read_prompt_front_matter_scope(tmp_path: Path) -> None:
         "Resume: false\n"
         "bd: xyz\n"
         "scope:\n"
-        "  - src2/core/schemas/unified.py\n"
-        "  - src2/engine/\n"
+        "  - src/core/schemas/unified.py\n"
+        "  - src/engine/\n"
         "---\n"
         "# EPIC\n"
         "do the thing\n",
@@ -44,7 +44,7 @@ def test_read_prompt_front_matter_scope(tmp_path: Path) -> None:
     resume, task, scope, start_phase, stop_phase = read_prompt(p)
     assert resume is False
     assert "do the thing" in task
-    assert scope == ["src2/core/schemas/unified.py", "src2/engine/"]
+    assert scope == ["src/core/schemas/unified.py", "src/engine/"]
     assert start_phase is None
     assert stop_phase is None
 
@@ -52,12 +52,12 @@ def test_read_prompt_front_matter_scope(tmp_path: Path) -> None:
 def test_read_prompt_resume_true(tmp_path: Path) -> None:
     p = _write_prompt(
         tmp_path,
-        "---\nResume: true\nbd: t1\nscope:\n  - src2/engine/module1_macro.py\n---\nbody text\n",
+        "---\nResume: true\nbd: t1\nscope:\n  - src/engine/module1_macro.py\n---\nbody text\n",
     )
     resume, task, scope, start_phase, stop_phase = read_prompt(p)
     assert resume is True
     assert task.strip() == "body text"
-    assert scope == ["src2/engine/module1_macro.py"]
+    assert scope == ["src/engine/module1_macro.py"]
     assert start_phase is None
     assert stop_phase is None
 
@@ -179,24 +179,24 @@ def test_inject_repo_map_file_entry_lists_symbols_and_kg(tmp_path: Path) -> None
 
 
 def test_inject_repo_map_folder_entry_is_labelled(tmp_path: Path) -> None:
-    out = inject_repo_map(["src2/core/schemas/"])
-    assert "FOLDER (in scope, edit staged copy): factory/temp/src2/core/schemas/" in out
+    out = inject_repo_map(["src/core/schemas/"])
+    assert "FOLDER (in scope, edit staged copy): factory/temp/src/core/schemas/" in out
     assert "STRUCTURE" in out
 
 
 def test_inject_repo_map_mixed_scope(tmp_path: Path) -> None:
     out = inject_repo_map(
-        ["src2/core/schemas/unified.py", "src2/engine/"]
+        ["src/core/schemas/unified.py", "src/engine/"]
     )
-    assert "FILE (edit staged copy): factory/temp/src2/core/schemas/unified.py" in out
-    assert "FOLDER (in scope, edit staged copy): factory/temp/src2/engine/" in out
+    assert "FILE (edit staged copy): factory/temp/src/core/schemas/unified.py" in out
+    assert "FOLDER (in scope, edit staged copy): factory/temp/src/engine/" in out
 
 
 def test_inject_repo_map_strips_json_envelope() -> None:
     # Regression: the shadow tools emit {"success", "message", "data"} JSON
     # envelopes. The injected context MUST be clean text, not the raw envelope
     # (ev1gf — intern.md:72-78 showed garbage JSON).
-    out = inject_repo_map(["src2/core/schemas/unified.py"])
+    out = inject_repo_map(["src/core/schemas/unified.py"])
     assert '"success"' not in out
     assert '"message"' not in out
     assert "REPO MAP" in out
@@ -204,11 +204,11 @@ def test_inject_repo_map_strips_json_envelope() -> None:
 
 def test_inject_repo_map_tree_is_py_only_and_not_gitignored() -> None:
     # Regression: the orientation tree MUST contain only .py files under
-    # src2/ (+ tests/) and MUST exclude anything matched by .gitignore. The
+    # src/ (+ tests/) and MUST exclude anything matched by .gitignore. The
     # old get_repo_structure dump flooded the intern brief with _docs/, _prd/,
     # .beads/*.darc, WEB/*.html, logs/training_data/*.json, bot*.log, etc.
-    out = inject_repo_map(["src2/core/schemas/unified.py"])
-    assert "STRUCTURE (src2/ + tests/, .py only):" in out
+    out = inject_repo_map(["src/core/schemas/unified.py"])
+    assert "STRUCTURE (src/ + tests/, .py only):" in out
     for noise in (
         "logs/",
         "training_data",

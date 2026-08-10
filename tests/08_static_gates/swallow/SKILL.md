@@ -11,7 +11,7 @@ Before hunting for silent swallows or writing validation code:
 1. **Ruff CI Shield Check**: Verify that `pyproject.toml` or `ruff.toml` explicitly selects the blind-except and swallow rules (`BLE`, `S110`, `SIM105`, `RET503`).
 2. **Pydantic Strictness**: Ensure that all Pydantic model configurations are audited. Verify `extra = "forbid"` and `validate_assignment = True` are enforced to prevent silent data discarding.
 3. **Log Trap Fixture Check**: Ensure `conftest.py` contains a globally scoped fixture (using `caplog`) that explicitly fails any test emitting an unexpected `ERROR` or `CRITICAL` log.
-4. **AST Target Scoping**: If running custom AST scanners, restrict the target directory strictly to the deterministic math/engine paths (e.g., `src2/engine/`) to avoid false positives in external library wrappers.
+4. **AST Target Scoping**: If running custom AST scanners, restrict the target directory strictly to the deterministic math/engine paths (e.g., `src/engine/`) to avoid false positives in external library wrappers.
 
 ## 🏗️ Design Mindsets
 
@@ -22,7 +22,7 @@ Before hunting for silent swallows or writing validation code:
   * **Standard Code**:
     ```python
     def test_no_silent_pydantic_swallows():
-        models = get_all_pydantic_models("src2") # Using importlib/inspect
+        models = get_all_pydantic_models("src") # Using importlib/inspect
         violating = [
             m.__name__ for m in models 
             if m.model_config.get("extra") != "forbid"

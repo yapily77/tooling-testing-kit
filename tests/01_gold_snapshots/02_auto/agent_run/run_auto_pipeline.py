@@ -7,18 +7,18 @@ import os
 project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from src2.core.schemas.unified import UserProfile
-from src2.interfaces.telegram.session import Session, SessionMetadata
-from src2.interfaces.telegram.intake.calendar_node import _run_auto_engine
-from src2.interfaces.telegram.tailoring import build_tailoring_context
-from src2.engine.transformer import to_chart_profile
-from src2.engine.pydantic_prompt_engine import run_pydantic_engine
+from src.core.schemas.unified import UserProfile
+from src.interfaces.telegram.session import Session, SessionMetadata
+from src.interfaces.telegram.intake.calendar_node import _run_auto_engine
+from src.interfaces.telegram.tailoring import build_tailoring_context
+from src.engine.transformer import to_chart_profile
+from src.engine.pydantic_prompt_engine import run_pydantic_engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Dummy DB dependency for calendar_node's db.get_semantic_id
-import src2.interfaces.telegram.bridge as bridge
+import src.interfaces.telegram.bridge as bridge
 class MockDB:
     def get_semantic_id(self, chat_id):
         return f"mock_semantic_{chat_id}"

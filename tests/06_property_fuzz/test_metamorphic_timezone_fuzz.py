@@ -1,6 +1,6 @@
 """Metamorphic fuzzing tests for timezone & absolute-time invariance.
 
-Target: src2/engine/daily_pillar.py — ``resolve_daily_pillar_from_datetime``
+Target: src/engine/daily_pillar.py — ``resolve_daily_pillar_from_datetime``
 
 Strategy:
   1. ``st.datetimes()`` generates an absolute UTC moment.
@@ -22,7 +22,7 @@ from datetime import UTC, datetime, timedelta, timezone
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from src2.engine.daily_pillar import (
+from src.engine.daily_pillar import (
     BRANCH_ORDER,
     STEM_ORDER,
     Pillar,

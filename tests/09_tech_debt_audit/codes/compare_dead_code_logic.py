@@ -158,7 +158,7 @@ def main():
     }
     global_whitelist.update(src_decorator_whitelists)
 
-    # Load src2 audit report
+    # Load src audit report
     audit_path = Path("TEST/codes/dead_code_audit.json")
     if not audit_path.exists():
         print("Error: TEST/codes/dead_code_audit.json not found. Run the audit first.")
@@ -172,22 +172,22 @@ def main():
     truly_dead = []
     accidentally_dropped = []
     false_positives_same = []
-    new_in_src2 = []
+    new_in_src = []
 
     for item in audit_results:
         name = item["name"]
-        file_path_src2 = item["file_path"]
-        status_src2 = item["status"]  # CONFIRMED_DEAD or FALSE_POSITIVE
+        file_path_src = item["file_path"]
+        status_src = item["status"]  # CONFIRMED_DEAD or FALSE_POSITIVE
         t = item["type"]
 
         # Check if it existed in src
         if name not in src_defs_map:
-            new_in_src2.append({
+            new_in_src.append({
                 "name": name,
                 "type": t,
-                "file_path_src2": file_path_src2,
-                "status_src2": status_src2,
-                "reason_src2": item.get("reason", "")
+                "file_path_src": file_path_src,
+                "status_src": status_src,
+                "reason_src": item.get("reason", "")
             })
             continue
 
@@ -200,15 +200,15 @@ def main():
         else:
             is_alive_src = check_static_references("src", src_contents, src_ast_trees, file_path_src, name)
 
-        if status_src2 == "CONFIRMED_DEAD":
+        if status_src == "CONFIRMED_DEAD":
             if is_alive_src:
                 accidentally_dropped.append({
                     "name": name,
                     "type": t,
                     "file_path_src": file_path_src,
                     "line_src": line_src,
-                    "file_path_src2": file_path_src2,
-                    "reason_src2": item.get("reason", "")
+                    "file_path_src": file_path_src,
+                    "reason_src": item.get("reason", "")
                 })
             else:
                 truly_dead.append({
@@ -216,58 +216,58 @@ def main():
                     "type": t,
                     "file_path_src": file_path_src,
                     "line_src": line_src,
-                    "file_path_src2": file_path_src2
+                    "file_path_src": file_path_src
                 })
-        elif status_src2 == "FALSE_POSITIVE":
-            # False Positive means alive in src2
+        elif status_src == "FALSE_POSITIVE":
+            # False Positive means alive in src
             false_positives_same.append({
                 "name": name,
                 "type": t,
                 "file_path_src": file_path_src,
                 "is_alive_src": is_alive_src,
-                "file_path_src2": file_path_src2,
-                "reason_src2": item.get("reason", "")
+                "file_path_src": file_path_src,
+                "reason_src": item.get("reason", "")
             })
 
     # Render unified report
     print("\n" + "="*80)
-    print("📋 MATRIX ALIGNMENT REPORT: src vs src2")
+    print("📋 MATRIX ALIGNMENT REPORT: src vs src")
     print("="*80)
 
     print(f"\n🛑 [DEAD in both] Truly Dead Legacy Code ({len(truly_dead)} items):")
-    print("These existed in src but were already unused/dead there, and are safe to delete in src2.")
+    print("These existed in src but were already unused/dead there, and are safe to delete in src.")
     for item in sorted(truly_dead[:15], key=lambda x: x["name"]):
         print(f"  - {item['type']} `{item['name']}` (defined in {item['file_path_src']}:{item['line_src']})")
     if len(truly_dead) > 15:
         print(f"  ... and {len(truly_dead) - 15} more items.")
 
-    print(f"\n⚠️ [DEAD in src2, ALIVE in src] ACCIDENTALLY DROPPED ({len(accidentally_dropped)} items):")
-    print("CRITICAL: These were referenced/imported in the original src, but their callers were dropped in src2!")
+    print(f"\n⚠️ [DEAD in src, ALIVE in src] ACCIDENTALLY DROPPED ({len(accidentally_dropped)} items):")
+    print("CRITICAL: These were referenced/imported in the original src, but their callers were dropped in src!")
     for item in sorted(accidentally_dropped, key=lambda x: x["name"]):
         print(f"  - {item['type']} `{item['name']}`")
         print(f"    Original: {item['file_path_src']}:{item['line_src']}")
-        print(f"    Current:  {item['file_path_src2']}")
-        print(f"    src2 Audit Reason: {item['reason_src2']}")
+        print(f"    Current:  {item['file_path_src']}")
+        print(f"    src Audit Reason: {item['reason_src']}")
 
-    print(f"\n✅ [FALSE_POSITIVE in src2] Alive status ({len(false_positives_same)} items):")
+    print(f"\n✅ [FALSE_POSITIVE in src] Alive status ({len(false_positives_same)} items):")
     # Group by whether they were also alive in src
     same_count = sum(1 for x in false_positives_same if x["is_alive_src"])
     diff_count = len(false_positives_same) - same_count
     print(f"  - Consistent (Alive in both): {same_count}")
-    print(f"  - Discrepancy (Alive in src2, Dead in src): {diff_count}")
+    print(f"  - Discrepancy (Alive in src, Dead in src): {diff_count}")
     for item in false_positives_same:
         if not item["is_alive_src"]:
-            print(f"    * Note: `{item['name']}` ({item['type']}) is active in src2 but was dead in src. (New dynamic reference or refactoring).")
+            print(f"    * Note: `{item['name']}` ({item['type']}) is active in src but was dead in src. (New dynamic reference or refactoring).")
 
-    print(f"\n🆕 [Added in src2] New definitions ({len(new_in_src2)} items):")
-    new_dead = [x for x in new_in_src2 if x["status_src2"] == "CONFIRMED_DEAD"]
-    new_alive = [x for x in new_in_src2 if x["status_src2"] == "FALSE_POSITIVE"]
-    print(f"  - New but Dead in src2: {len(new_dead)}")
-    print(f"  - New and Alive in src2: {len(new_alive)}")
+    print(f"\n🆕 [Added in src] New definitions ({len(new_in_src)} items):")
+    new_dead = [x for x in new_in_src if x["status_src"] == "CONFIRMED_DEAD"]
+    new_alive = [x for x in new_in_src if x["status_src"] == "FALSE_POSITIVE"]
+    print(f"  - New but Dead in src: {len(new_dead)}")
+    print(f"  - New and Alive in src: {len(new_alive)}")
     if new_dead:
         print("  Top new dead items:")
         for item in sorted(new_dead[:10], key=lambda x: x["name"]):
-            print(f"    * {item['type']} `{item['name']}` in {item['file_path_src2']}")
+            print(f"    * {item['type']} `{item['name']}` in {item['file_path_src']}")
 
 if __name__ == "__main__":
     main()

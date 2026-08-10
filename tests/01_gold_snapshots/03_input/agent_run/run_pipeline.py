@@ -6,15 +6,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Adjust path to find src2
+# Adjust path to find src
 project_root = Path(__file__).resolve().parent.parent.parent.parent.parent
 import sys  # noqa: E402
 
 sys.path.insert(0, str(project_root))
 
-from src2.core.schemas.unified import UserProfile  # noqa: E402
-from src2.engine.pydantic_prompt_engine import run_pydantic_engine  # noqa: E402
-from src2.engine.transformer import to_chart_profile  # noqa: E402
+from src.core.schemas.unified import UserProfile  # noqa: E402
+from src.engine.pydantic_prompt_engine import run_pydantic_engine  # noqa: E402
+from src.engine.transformer import to_chart_profile  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ async def main():
     logger.info(f"UserProfile instantiated successfully: {user_profile.alias}")
 
     logger.info("Converting to ChartProfile for Engine (C4)...")
-    from src2.interfaces.telegram.tailoring import build_tailoring_context
+    from src.interfaces.telegram.tailoring import build_tailoring_context
     chart_profile_dict = user_profile.model_dump()
     chart_profile_dict["tailoring_concerns"] = tailoring_concerns
     chart_profile_dict["tailoring_context"] = build_tailoring_context(tailoring_concerns)

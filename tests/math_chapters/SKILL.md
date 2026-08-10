@@ -9,7 +9,7 @@ description: Enforces BaZi project testing standards, including Pytest patterns,
 Before writing or modifying any Bazi math tests:
 1. **CapitalCase Check**: Verify that absolutely NO Chinese characters (e.g., '甲', '子', '木', '正印') are used as test inputs, keys, or expected outputs. All references must be English CapitalCase (e.g., 'Jia', 'Zi', 'Wood', 'Direct Resource').
 2. **Validation Seam Injection**: Ensure the test file imports and utilizes `assert_key_format_convention` from `TEST.math.conftest` to run recursive checks on all output structures.
-3. **Pydantic Model Usage**: Verify that mock chart data is constructed using `ChartProfile` and `Pillar` classes from `src2.core.schemas.unified`, NOT raw Python dictionaries.
+3. **Pydantic Model Usage**: Verify that mock chart data is constructed using `ChartProfile` and `Pillar` classes from `src.core.schemas.unified`, NOT raw Python dictionaries.
 4. **Type Hinting**: Ensure all Pytest test functions are strictly type-hinted (e.g., `def test_function_name() -> None:`).
 
 ## 🏗️ Design Mindsets
@@ -25,7 +25,7 @@ Before writing or modifying any Bazi math tests:
 ### 2. Pydantic Schema First (`ChartProfile` & `Pillar`)
 * **Why**: The V31 engine refactor relies heavily on strongly-typed Pydantic models. Passing raw dictionaries into engine functions will bypass crucial validation logic or cause runtime crashes when the engine attempts to access object attributes using dot notation (`profile.year_pillar.stem` instead of `profile["year_pillar"]["stem"]`).
 * **Action**:
-  * Import dependencies correctly: `from src2.core.schemas.unified import ChartProfile, Pillar`.
+  * Import dependencies correctly: `from src.core.schemas.unified import ChartProfile, Pillar`.
   * Construct full objects for tests:
     ```python
     profile = ChartProfile(

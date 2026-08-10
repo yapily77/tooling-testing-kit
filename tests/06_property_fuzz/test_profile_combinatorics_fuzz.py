@@ -3,11 +3,11 @@
 Ticket: my-repo-6oba (Ticket 3 — Contradictory Data Validation)
 
 Targets:
-- src2.core.schemas.unified: UserProfile (extra="forbid", gender migration
+- src.core.schemas.unified: UserProfile (extra="forbid", gender migration
   validator, strength normalization), ChartProfile, ValidatedPillar, LLMResponsePayload
-- src2.engine.transformer: to_user_profile, to_chart_profile, normalize_elements,
+- src.engine.transformer: to_user_profile, to_chart_profile, normalize_elements,
   normalize_gender, normalize_strength
-- src2.interfaces.telegram.conductor: _parse_manual_template, _apply_extracted
+- src.interfaces.telegram.conductor: _parse_manual_template, _apply_extracted
 
 Invariants asserted:
 1. Contradiction-Rejection: UserProfile(extra="forbid") raises ValidationError on
@@ -24,7 +24,7 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     _BRANCHES,
     _STEMS,
     JIA_ZI_60,
@@ -34,15 +34,15 @@ from src2.core.schemas.unified import (
     UserProfile,
     ValidatedPillar,
 )
-from src2.engine.transformer import (
+from src.engine.transformer import (
     normalize_elements,
     normalize_gender,
     normalize_strength,
     to_chart_profile,
     to_user_profile,
 )
-from src2.interfaces.telegram.conductor import _apply_extracted, _parse_manual_template
-from src2.interfaces.telegram.session import Session
+from src.interfaces.telegram.conductor import _apply_extracted, _parse_manual_template
+from src.interfaces.telegram.session import Session
 
 CANONICAL_ELEMENTS = {"Wood", "Fire", "Earth", "Metal", "Water"}
 _STEM_SET = set(_STEMS)

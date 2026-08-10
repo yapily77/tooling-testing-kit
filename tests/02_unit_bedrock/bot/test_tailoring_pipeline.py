@@ -1,8 +1,8 @@
 import asyncio
-from src2.core.schemas.unified import UserProfile
-from src2.engine.transformer import to_chart_profile
-from src2.interfaces.telegram.tailoring import build_tailoring_context
-from src2.engine.prompt_maker import make_month
+from src.core.schemas.unified import UserProfile
+from src.engine.transformer import to_chart_profile
+from src.interfaces.telegram.tailoring import build_tailoring_context
+from src.engine.prompt_maker import make_month
 
 def test_tailoring_threaded():
     raw_payload = {

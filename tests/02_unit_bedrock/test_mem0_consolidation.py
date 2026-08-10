@@ -69,7 +69,7 @@ def test_inhouse_embedder_accepts_task_type():
     """
     import inspect
 
-    from src2.core.memory.mem0_store import InHouseBGEM3Embedder
+    from src.core.memory.mem0_store import InHouseBGEM3Embedder
 
     sig = inspect.signature(InHouseBGEM3Embedder.embed)
     params = list(sig.parameters.keys())

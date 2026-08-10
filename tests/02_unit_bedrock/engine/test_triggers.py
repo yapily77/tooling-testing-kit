@@ -4,7 +4,7 @@ Unit tests for Module 9: Trigger Detection (module9_triggers.py) - V31 Pydantic 
 
 import pytest
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     ChartProfile,
     KVList,
     KVPair,
@@ -19,7 +19,7 @@ from src2.core.schemas.unified import (
     QiInteraction,
     UnifiedInteractionOutput,
 )
-from src2.engine.module9_triggers import (
+from src.engine.module9_triggers import (
     calculate_trigger_potency,
     detect_clash_triggers,
     detect_da_yun_triggers,

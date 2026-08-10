@@ -6,7 +6,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext
 
-# Add project root to path so we can import from admin and src2
+# Add project root to path so we can import from admin and src
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 from admin.controls.controls import gemma_4_31b_it
@@ -43,7 +43,7 @@ agent = Agent(
         "STRICT RULES:\n"
         "- Do not guess. Read the file first before editing.\n"
         "- Make the smallest possible surgical change to fix the issue.\n"
-        "- Never modify files in the `src/` directory (only `src2/` or tests)."
+        "- Never modify files in the `src/` directory (only `src/` or tests)."
     ),
 )
 
@@ -75,7 +75,7 @@ def apply_fix(ctx: RunContext[DebuggerDeps], relative_path: str, target_code: st
     if not path.exists():
         return f"Error: File {relative_path} does not exist."
     if "src/" in relative_path:
-        return "Error: Modifying the src/ directory is strictly banned. Modify src2/ instead."
+        return "Error: Modifying the src/ directory is strictly banned. Modify src/ instead."
 
     try:
         content = path.read_text(encoding="utf-8")

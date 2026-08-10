@@ -27,7 +27,7 @@
 
 ## Why we need to do this
 
-The Bazi engine in `src2/engine/` contains 12+ modules of metaphysical math rules (seasonal multipliers, hidden stem rooting, Ten God taxonomy, clash/harm/punishment mechanics, luck pillar triggers, special structures, synthesis, and spectrum scoring). Across Batches 1–4, numerous helpers, multipliers, and edge-case resolution mechanisms were restored or refactored. Without a comprehensive test suite:
+The Bazi engine in `src/engine/` contains 12+ modules of metaphysical math rules (seasonal multipliers, hidden stem rooting, Ten God taxonomy, clash/harm/punishment mechanics, luck pillar triggers, special structures, synthesis, and spectrum scoring). Across Batches 1–4, numerous helpers, multipliers, and edge-case resolution mechanisms were restored or refactored. Without a comprehensive test suite:
 
 - **Regression risk**: Any change to a helper function could silently corrupt downstream calculations (e.g., a wrong seasonal multiplier cascading into incorrect DM strength tiers).
 - **Dead-code drift**: Restored helpers that are never called in the active engine path become invisible technical debt.

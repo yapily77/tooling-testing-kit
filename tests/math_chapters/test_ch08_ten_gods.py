@@ -11,9 +11,9 @@ Tests for Chapter 08 math specs:
 
 from typing import Any
 
-from src2.core.schemas import TenGodsInput
-from src2.core.schemas.unified import TenGod, TenGodEntry
-from src2.engine.module6_ten_gods import (
+from src.core.schemas import TenGodsInput
+from src.core.schemas.unified import TenGod, TenGodEntry
+from src.engine.module6_ten_gods import (
     calculate_ten_god_dominance,
     calculate_ten_gods,
     check_fill_void_trigger,
@@ -25,7 +25,7 @@ from src2.engine.module6_ten_gods import (
     get_seasonal_ten_god_weight,
     get_ten_god_magnitude_multiplier,
 )
-from src2.engine.module12_compatibility import check_ten_god_pair_compatibility
+from src.engine.module12_compatibility import check_ten_god_pair_compatibility
 
 
 def test_get_ten_god_magnitude_multiplier(assert_key_format_convention: Any) -> None:

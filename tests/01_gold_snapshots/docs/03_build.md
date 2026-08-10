@@ -25,7 +25,7 @@ Recommended: extract to `[my-repo-only: TEST/GOLD/_helpers.py not in kit downloa
 
 ## B. REFACTOR (existing files to modify)
 
-### 1. `src2/interfaces/telegram/app.py`
+### 1. `src/interfaces/telegram/app.py`
 - Add `POST /webhook/test` route:
   - same secret-token check + `update_id` dedupe as `/webhook`;
   - read `channel = request.headers.get("X-Test-Channel", "test_telegram01")`;
@@ -35,7 +35,7 @@ Recommended: extract to `[my-repo-only: TEST/GOLD/_helpers.py not in kit downloa
 - `_process_web_webhook_logic_inner(data, platform: str = "telegram")` → pass `platform`
   into both `handle_intake(chat_id, text_val, platform=platform)` call sites.
 
-### 2. `src2/interfaces/telegram/db.py`
+### 2. `src/interfaces/telegram/db.py`
 - `_get_or_create_uuid(self, chat_id, platform: str = "telegram")`:
   - use `platform` in the `filter_by(platform=platform, ...)` lookup and
     `PlatformAccount(platform=platform, ...)` create;
@@ -45,14 +45,14 @@ Recommended: extract to `[my-repo-only: TEST/GOLD/_helpers.py not in kit downloa
   `get_semantic_id` / `ensure_semantic_id` → add `platform` param (default `"telegram"`,
   zero regression for the ~40 other internal callers).
 
-### 3. `src2/interfaces/telegram/session.py`
+### 3. `src/interfaces/telegram/session.py`
 - `get_session(chat_id, platform="telegram")` → `db.get_session(chat_id, platform)`.
 - `save_session(session, platform="telegram")` → `db.update_session(..., platform)`.
 - `delete_session(chat_id, platform="telegram")`.
 - Surface `is_new` + `User.tier` on the returned `Session` (new optional fields) so the
   intake model can read old/new + paying/free.
 
-### 4. `src2/interfaces/telegram/intake/intake.py`
+### 4. `src/interfaces/telegram/intake/intake.py`
 - `handle_intake(chat_id, text, platform: str = "telegram")` → thread `platform` into
   `get_session` / `save_session`; read `is_new` + `User.tier` for branching the welcome /
   flow (new vs returning, free vs paying).

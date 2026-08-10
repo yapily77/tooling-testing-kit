@@ -11,13 +11,13 @@ Validates:
 
 import pytest
 
-from src2.core.schemas.unified import ChartProfile, Pillar
-from src2.engine.classical_rules import (
+from src.core.schemas.unified import ChartProfile, Pillar
+from src.engine.classical_rules import (
     get_element_phase_multiplier,
     get_month_ruling_element,
 )
-from src2.engine.element_phase import get_element_phase, get_phase_multiplier
-from src2.engine.module2_root import (
+from src.engine.element_phase import get_element_phase, get_phase_multiplier
+from src.engine.module2_root import (
     calculate_dm_strength_tier1,
     calculate_root_score,
     classify_dm_strength,

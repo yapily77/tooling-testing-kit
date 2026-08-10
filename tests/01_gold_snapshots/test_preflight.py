@@ -120,7 +120,7 @@ async def check_valkey_ready() -> bool:
 
 async def check_celery_worker_ready() -> bool:
     try:
-        from src2.worker.celery_app import app
+        from src.worker.celery_app import app
 
         valkey_host = os.getenv("VALKEY_HOST", "127.0.0.1")
         valkey_port = os.getenv("VALKEY_PORT", "6379")
@@ -151,7 +151,7 @@ async def check_celery_worker_ready() -> bool:
             print_status(
                 "6. Celery Workers Active",
                 False,
-                "No active workers detected. Start worker using 'celery -A src2.worker.celery_app worker --loglevel=info'",
+                "No active workers detected. Start worker using 'celery -A src.worker.celery_app worker --loglevel=info'",
             )
     except Exception as e:
         print_status("6. Celery Workers Active", False, f"Configuration or connection failed. Error: {e}")

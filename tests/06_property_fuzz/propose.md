@@ -5,7 +5,7 @@ This document identifies 5 high-value candidates for expanding the BaZi engine's
 ---
 
 ### 1. Target: `_sigmoid` (module11_probability.py)
-* **Location:** `src2/engine/module11_probability.py:26`
+* **Location:** `src/engine/module11_probability.py:26`
 * **Why it needs fuzzing:**
   This function computes `1.0 / (1.0 + math.exp(-x))`. While Python's `math.exp()` handles `inf` and `-inf` gracefully (returning `inf` and `0.0` respectively), the function silently collapses extreme inputs to `0.0` or `1.0` without any guard or warning. If a developer later refactors this to use a different math library or removes the `1.0 +` term, a `ZeroDivisionError` could emerge. The function is also a critical input to `_luck_layer_envelope`, which multiplies its output by a range — a NaN propagated here would poison all downstream probability scores.
 * **Proposed Fuzzing Strategy (Hypothesis):**
@@ -20,7 +20,7 @@ This document identifies 5 high-value candidates for expanding the BaZi engine's
 ---
 
 ### 2. Target: `_get_era_medicine_ratio` (module1_macro.py)
-* **Location:** `src2/engine/module1_macro.py:138`
+* **Location:** `src/engine/module1_macro.py:138`
 * **Why it needs fuzzing:**
   This function divides `medicine_count` by `len(era_branches)` with a guard `if era_branches else 0.0`. The guard is a classic mutation target — if a developer removes the guard (e.g., during a refactor that assumes `era_branches` is never empty), a `ZeroDivisionError` will crash the production pipeline at runtime. The function also uses `round(..., 2)` which can silently lose precision for edge-case ratios.
 * **Proposed Fuzzing Strategy (Hypothesis):**
@@ -37,7 +37,7 @@ This document identifies 5 high-value candidates for expanding the BaZi engine's
 ---
 
 ### 3. Target: `_get_spectrum_tier` (module13_spectrum.py)
-* **Location:** `src2/engine/module13_spectrum.py:40`
+* **Location:** `src/engine/module13_spectrum.py:40`
 * **Why it needs fuzzing:**
   This function uses a complex if/elif tree with 6 boundary thresholds (`80, 40, 10, -10, -40, -80`) to classify a continuous score into 6 tiers (`Vibrant`, `Strong`, `Mild Strong`, `Mild Weak`, `Weak`, `Follower`). Boundary off-by-one errors (`>=` vs `>`) are a classic mutation target that cause silent misclassification — a score of exactly `80.0` could be classified as `Strong` instead of `Vibrant`, or vice versa. This is a combinatorial logic trap where edge cases fall through to unhandled states.
 * **Proposed Fuzzing Strategy (Hypothesis):**
@@ -52,7 +52,7 @@ This document identifies 5 high-value candidates for expanding the BaZi engine's
 ---
 
 ### 4. Target: `get_prior_log_odds` (module11_probability.py)
-* **Location:** `src2/engine/module11_probability.py:19`
+* **Location:** `src/engine/module11_probability.py:19`
 * **Why it needs fuzzing:**
   This function computes `math.log(p / (1 - p))` (log-odds transformation). It has a guard for `p == 0.0` but **no guard for `p == 1.0`** — when `p=1.0`, the expression `1 - p = 0` causes a `ZeroDivisionError` in the division, or `math.log(inf)` returns `inf`. If `p` comes from a database or LLM output where `1.0` is a valid probability, this is a silent poison trap. Additionally, `p > 1.0` or `p < 0.0` would produce `math.log(negative)` which raises `ValueError`.
 * **Proposed Fuzzing Strategy (Hypothesis):**
@@ -68,7 +68,7 @@ This document identifies 5 high-value candidates for expanding the BaZi engine's
 ---
 
 ### 5. Target: `_compute_normal_scores` (module13_spectrum.py)
-* **Location:** `src2/engine/module13_spectrum.py:92`
+* **Location:** `src/engine/module13_spectrum.py:92`
 * **Why it needs fuzzing:**
   This function computes a weighted composite score using the formula `((seasonal * 0.30) + (root * 0.35) + (balance * 0.25) + (pattern * 0.10)) * (100.0 / 26.75)`. The magic number `26.75` is a divisor that could silently produce wrong results if changed. The function also clamps intermediate values with `max(-30.0, min(30.0, ...))` and `max(-25.0, min(25.0, ...))`, which are boundary conditions that mutation testing can verify. If any weight is accidentally set to 0 or negative, the composite score loses a dimension without any error.
 * **Proposed Fuzzing Strategy (Hypothesis):**

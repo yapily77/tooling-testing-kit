@@ -15,12 +15,12 @@ from tests.test_gates import _plan
 def test_staging_diff_gate_zero_diff(tmp_path, monkeypatch):
     """Verify that a task with zero-diff staged files is marked blocked."""
     # Create a dummy live file
-    live_file = tmp_path / "src2" / "a.py"
+    live_file = tmp_path / "src" / "a.py"
     live_file.parent.mkdir(parents=True, exist_ok=True)
     live_file.write_text("print('hello')")
     
     # Staged copy is identical -> zero diff
-    staged_file = tmp_path / "admin" / "orchestrator" / "temp" / "src2" / "a.py"
+    staged_file = tmp_path / "admin" / "orchestrator" / "temp" / "src" / "a.py"
     staged_file.parent.mkdir(parents=True, exist_ok=True)
     staged_file.write_text("print('hello')")
     
@@ -34,14 +34,14 @@ def test_staging_diff_gate_zero_diff(tmp_path, monkeypatch):
         return json.dumps({
             "status": "done",
             "task_id": "intern01",
-            "files_changed": ["src2/a.py"],
+            "files_changed": ["src/a.py"],
             "diff_summary": "No changes",
             "notes": "Done"
         })
         
-    # Prepare plan targeting src2/a.py
+    # Prepare plan targeting src/a.py
     plan = _plan()
-    plan.workplan.groups[0].tasks[0].file_paths = ["src2/a.py"]
+    plan.workplan.groups[0].tasks[0].file_paths = ["src/a.py"]
     
     # The execution phase should fail with RuntimeError because of the blocked status
     # The gate no longer raises (it recovers). The staging/load
@@ -53,12 +53,12 @@ def test_staging_diff_gate_zero_diff(tmp_path, monkeypatch):
 
 def test_runtime_load_gate_fails(tmp_path, monkeypatch):
     """Verify that a staged file with a syntax error fails schema validation and blocks."""
-    live_file = tmp_path / "src2" / "a.py"
+    live_file = tmp_path / "src" / "a.py"
     live_file.parent.mkdir(parents=True, exist_ok=True)
     live_file.write_text("class Foo: pass")
     
     # Staged copy has invalid syntax
-    staged_file = tmp_path / "admin" / "orchestrator" / "temp" / "src2" / "a.py"
+    staged_file = tmp_path / "admin" / "orchestrator" / "temp" / "src" / "a.py"
     staged_file.parent.mkdir(parents=True, exist_ok=True)
     staged_file.write_text("class Foo Pydantic syntax error!")
     
@@ -70,13 +70,13 @@ def test_runtime_load_gate_fails(tmp_path, monkeypatch):
         return json.dumps({
             "status": "done",
             "task_id": "intern01",
-            "files_changed": ["src2/a.py"],
+            "files_changed": ["src/a.py"],
             "diff_summary": "broken",
             "notes": "Done"
         })
         
     plan = _plan()
-    plan.workplan.groups[0].tasks[0].file_paths = ["src2/a.py"]
+    plan.workplan.groups[0].tasks[0].file_paths = ["src/a.py"]
     
     # The gate no longer raises (it recovers). The staging/load
     # gating is an EXECUTE-phase concern, so assert it directly at

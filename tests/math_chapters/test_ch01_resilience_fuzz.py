@@ -11,9 +11,9 @@ Validates:
 
 import pytest
 
-from src2.core.schemas.unified import ChartProfile, DmStrengthTier1, Pillar
-from src2.engine.element_phase import get_element_phase
-from src2.engine.module2_root import calculate_dm_strength_tier1
+from src.core.schemas.unified import ChartProfile, DmStrengthTier1, Pillar
+from src.engine.element_phase import get_element_phase
+from src.engine.module2_root import calculate_dm_strength_tier1
 from TEST.math.conftest import assert_key_format_convention
 
 

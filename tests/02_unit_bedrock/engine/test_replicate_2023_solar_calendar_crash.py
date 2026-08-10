@@ -1,8 +1,8 @@
 from datetime import date
 
-from src2.engine.daily_pillar import get_month_anchor_for_date
-from src2.engine.solar_calendar import ANNUAL_PILLAR
-from src2.interfaces.telegram.chronomancer.agents import compute_shen_sha_context, compute_structural_map
+from src.engine.daily_pillar import get_month_anchor_for_date
+from src.engine.solar_calendar import ANNUAL_PILLAR
+from src.interfaces.telegram.chronomancer.agents import compute_shen_sha_context, compute_structural_map
 
 
 def test_get_month_anchor_for_date_handles_unsupported_years_gracefully():

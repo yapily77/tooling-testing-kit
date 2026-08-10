@@ -1,9 +1,9 @@
 """Property-based fuzzing tests for RAG/Tokenizer chunking and sanitization utilities.
 
 Targets:
-- split_text_into_chunks: Text chunker for Telegram messages (src2/interfaces/telegram/utils.py)
+- split_text_into_chunks: Text chunker for Telegram messages (src/interfaces/telegram/utils.py)
 - chunk_text: RAG ingestion chunker (infrastructure/rag/run_rag_pipeline.py)
-- sanitize_surrogates: Unicode surrogate/Zalgo sanitizer (src2/interfaces/telegram/utils.py)
+- sanitize_surrogates: Unicode surrogate/Zalgo sanitizer (src/interfaces/telegram/utils.py)
 
 Strategy: Hypothesis st.text() generating Zalgo text (combining characters),
 massive Unicode blocks (CJK), mixed bidirectional text (Arabic + English),
@@ -20,7 +20,7 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from infrastructure.rag.run_rag_pipeline import CHUNK_OVERLAP, CHUNK_SIZE, chunk_text
-from src2.interfaces.telegram.utils import sanitize_surrogates, split_text_into_chunks
+from src.interfaces.telegram.utils import sanitize_surrogates, split_text_into_chunks
 
 # Suppress health checks for fuzzing: too_slow (large inputs are expected),
 # large_base_example (10k+ char strings are the test goal),

@@ -14,8 +14,8 @@ Validates:
 
 import pytest
 
-from src2.core.schemas.unified import PillarMap
-from src2.engine.module0_geju_utils import ROOT_STRENGTH_THRESHOLD, _has_meaningful_root
+from src.core.schemas.unified import PillarMap
+from src.engine.module0_geju_utils import ROOT_STRENGTH_THRESHOLD, _has_meaningful_root
 from TEST.math.conftest import assert_key_format_convention
 
 # ============================================================================

@@ -2,10 +2,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src2.core.schemas.unified import ChartProfile, OracleDeps, OracleQueryIntent
-from src2.interfaces.telegram.chronomancer.oracle_coordinator import handle_oracle
-from src2.interfaces.telegram.chronomancer.oracle_gatherer import gather_oracle_deps
-from src2.interfaces.telegram.chronomancer.state_writer import UserState
+from src.core.schemas.unified import ChartProfile, OracleDeps, OracleQueryIntent
+from src.interfaces.telegram.chronomancer.oracle_coordinator import handle_oracle
+from src.interfaces.telegram.chronomancer.oracle_gatherer import gather_oracle_deps
+from src.interfaces.telegram.chronomancer.state_writer import UserState
 
 
 @pytest.mark.asyncio
@@ -68,8 +68,8 @@ async def test_handle_oracle_coordinator_flow():
     mock_narrator_agent.run = AsyncMock(return_value=mock_narrator_result)
 
     with (
-        patch("src2.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_rewriter_agent", return_value=mock_rewriter_agent),
-        patch("src2.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_narrator_agent", return_value=mock_narrator_agent),
+        patch("src.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_rewriter_agent", return_value=mock_rewriter_agent),
+        patch("src.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_narrator_agent", return_value=mock_narrator_agent),
     ):
         profile = ChartProfile(day_master="Bing", dm_element="Fire")
         user_state = UserState()
@@ -123,8 +123,8 @@ async def test_handle_oracle_conversation_history_formatting():
     conversation_history = [mock_history_item_1, mock_history_item_2]
 
     with (
-        patch("src2.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_rewriter_agent", return_value=mock_rewriter_agent),
-        patch("src2.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_narrator_agent", return_value=mock_narrator_agent),
+        patch("src.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_rewriter_agent", return_value=mock_rewriter_agent),
+        patch("src.interfaces.telegram.chronomancer.oracle_coordinator.get_oracle_narrator_agent", return_value=mock_narrator_agent),
     ):
         profile = ChartProfile(day_master="Bing", dm_element="Fire")
         user_state = UserState()

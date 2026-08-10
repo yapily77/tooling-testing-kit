@@ -170,7 +170,7 @@ def _import_module_and_verify(symbol: str, module_path: str) -> str | None:
 
 
 def _check_import_symbol(symbol: str, module_path: str) -> str | None:
-    if not module_path or not module_path.startswith("src2"):
+    if not module_path or not module_path.startswith("src"):
         return None
     return _import_module_and_verify(symbol, module_path)
 

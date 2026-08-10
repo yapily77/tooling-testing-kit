@@ -140,8 +140,8 @@ def validate_import_paths(refactored_path: str) -> list:
         if not module_path:
             continue  # Skip relative imports (relative module path)
 
-        # Skip non-src2 imports
-        if not module_path.startswith("src2"):
+        # Skip non-src imports
+        if not module_path.startswith("src"):
             continue
 
         try:

@@ -44,7 +44,7 @@ def _make_plan() -> ExecutablePlan:
     task = ApprovedTask(
         id="intern01",
         title="t",
-        file_paths=["src2/x.py"],
+        file_paths=["src/x.py"],
         instruction="i",
         acceptance="a",
         tool_preference="AST-edit",
@@ -97,7 +97,7 @@ def _intern_json(task_id: str = "intern01") -> str:
         {
             "status": "done",
             "task_id": task_id,
-            "files_changed": ["src2/x.py"],
+            "files_changed": ["src/x.py"],
             "diff_summary": "x",
             "notes": "y",
         }

@@ -13,8 +13,8 @@ from datetime import date, timedelta
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src2.interfaces.telegram.chronomancer.coordinator import _resolve_forecast_dates
-from src2.interfaces.telegram.chronomancer.ranking import rank_days_aggregate
+from src.interfaces.telegram.chronomancer.coordinator import _resolve_forecast_dates
+from src.interfaces.telegram.chronomancer.ranking import rank_days_aggregate
 
 UNSAFE_EXCEPTIONS = (RecursionError, KeyError, IndexError, TypeError, AttributeError, ZeroDivisionError, OverflowError, MemoryError)
 

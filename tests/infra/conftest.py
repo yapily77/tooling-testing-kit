@@ -11,7 +11,7 @@ import sqlalchemy.ext.asyncio
 # Add project root to Python path for test imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Ensure required test env vars are set before any src2 import
+# Ensure required test env vars are set before any src import
 os.environ.setdefault("SENTRY_DSN", "")
 os.environ.setdefault("DISABLE_SENTRY", "1")
 os.environ.setdefault("LOGFIRE_NO_PLACEHOLDER", "true")
@@ -39,7 +39,7 @@ def _mock_create_engine(url, *args, **kwargs):
         eng = _orig_create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
         from sqlalchemy.dialects.sqlite.base import SQLiteTypeCompiler
 
-        from src2.core.database.models import Base
+        from src.core.database.models import Base
 
         SQLiteTypeCompiler.visit_JSONB = lambda self, type_, **kw: "JSON"  # type: ignore[attr-defined]
         SQLiteTypeCompiler.visit_UUID = lambda self, type_, **kw: "CHAR(32)"  # type: ignore[attr-defined]
@@ -64,7 +64,7 @@ sqlalchemy.ext.asyncio.create_async_engine = _mock_create_async_engine
 
 # Patch Database migrations for import-time database calls
 patch(
-    "src2.interfaces.telegram.db.Database._run_pg_migrations",
+    "src.interfaces.telegram.db.Database._run_pg_migrations",
     lambda self: None,
 ).start()
 

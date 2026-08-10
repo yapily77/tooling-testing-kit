@@ -59,7 +59,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
 
         # Reset user data in DB to ensure locked flow is triggered correctly
         try:
-            from src2.interfaces.telegram.db import Database
+            from src.interfaces.telegram.db import Database
             db = Database()
             db.delete_all_user_data(chat_id)
         except Exception as e:
@@ -156,7 +156,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
 
         # Try to read the generated K3 profile from disk and append to UI.md as Markdown table
         try:
-            from src2.core.memory.memory_manager import memory_manager
+            from src.core.memory.memory_manager import memory_manager
             # [my-repo-only: TEST/GOLD/utils.py not in kit download]
             from TEST.GOLD.utils import format_engine_profile_markdown
             profile_path = memory_manager.get_profile_path(chat_id)

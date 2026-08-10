@@ -37,14 +37,14 @@ agent = Agent(
 
 def main():
     deepdive_md_path = Path("TEST/codes/Dead_Codes_20260628_DeepDive.md")
-    json_store_path = Path("TEST/codes/20260626_SRC2/dead_code_deepdive_results.json")
+    json_store_path = Path("TEST/codes/20260626_src/dead_code_deepdive_results.json")
 
     if not deepdive_md_path.exists():
         print(f"Error: {deepdive_md_path} not found.")
         return
 
     # Load Truly Dead items from the matrix JSON
-    comp_json_path = Path("TEST/codes/20260626_SRC2/dead_code_comparison.json")
+    comp_json_path = Path("TEST/codes/20260626_src/dead_code_comparison.json")
     if not comp_json_path.exists():
         print(f"Error: {comp_json_path} not found.")
         return
@@ -67,7 +67,7 @@ def main():
 
     for idx, item in enumerate(truly_dead, 1):
         name = item["name"]
-        file_src = item.get("file_path_src", item.get("file_path_src2", ""))
+        file_src = item.get("file_path_src", item.get("file_path_src", ""))
 
         # Check if already processed
         unique_key = f"{name}::{file_src}"
@@ -89,7 +89,7 @@ def main():
         prompt = (
             f"Symbol Name: {name}\n"
             f"Symbol Type: {item['type']}\n"
-            f"File Path in src: {file_src2}\n\n"
+            f"File Path in src: {file_src}\n\n"
             f"File Content context:\n```python\n{content}\n```\n\n"
             f"Please verify if this symbol `{name}` is truly unused or if it has callers. "
             "Examine if its logic got consolidated into another function or replaced by a new pattern. "
@@ -105,9 +105,9 @@ def main():
                 "type": item["type"],
                 "file_path_src": item["file_path_src"],
                 "line_src": item["line_src"],
-                "file_path_src2": file_src2,
-                "line_src2": item.get("line_src2", item.get("line_src", 1)),
-                "reason_src2": item.get("reason_src2", ""),
+                "file_path_src": file_src,
+                "line_src": item.get("line_src", item.get("line_src", 1)),
+                "reason_src": item.get("reason_src", ""),
                 "review": audit_out.review,
                 "recommendation": audit_out.recommendation
             }
@@ -148,7 +148,7 @@ def main():
     }
 
     for val in results.values():
-        cat = categorize_path(val["file_path_src2"], val["name"])
+        cat = categorize_path(val["file_path_src"], val["name"])
         categorized_data[cat].append(val)
 
     md_lines = []
@@ -166,14 +166,14 @@ def main():
         md_lines.append("|---|---|---|---|---|---|---|\n")
 
         for idx, item in enumerate(sorted(items, key=lambda x: x["name"]), 1):
-            clean_reason = item["reason_src2"].replace("|", "\\|").replace("\n", " ")
+            clean_reason = item["reason_src"].replace("|", "\\|").replace("\n", " ")
             file_link_src = f"[{Path(item['file_path_src']).name}](file://{Path(item['file_path_src']).absolute()}#L{item['line_src']})"
-            file_link_src2 = f"[{Path(item['file_path_src2']).name}](file://{Path(item['file_path_src2']).absolute()}#L{item['line_src2']})"
+            file_link_src = f"[{Path(item['file_path_src']).name}](file://{Path(item['file_path_src']).absolute()}#L{item['line_src']})"
 
             clean_review = item["review"].replace("|", "\\|").replace("\n", " ")
             decision_box = f"[x] {item['recommendation']}" if "Recommended" in item['recommendation'] else f"[ ] {item['recommendation']}"
 
-            md_lines.append(f"| {idx} | `{item['name']}`<br>({item['type']}) | {file_link_src} | {file_link_src2} | {clean_reason} | {clean_review} | {decision_box} |\n")
+            md_lines.append(f"| {idx} | `{item['name']}`<br>({item['type']}) | {file_link_src} | {file_link_src} | {clean_reason} | {clean_review} | {decision_box} |\n")
         md_lines.append("\n")
 
     md_content = "".join(md_lines)

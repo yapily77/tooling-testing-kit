@@ -34,7 +34,7 @@ def test_build_repo_map_strips_envelope():
         {
             "success": True,
             "message": "ok",
-            "data": {"structure": "repo/\n├── src2/\n│   └── engine/"},
+            "data": {"structure": "repo/\n├── src/\n│   └── engine/"},
         }
     )
     saved = tools_mod._run_tool
@@ -68,7 +68,7 @@ def test_unscoped_repo_map_is_small():
 
 def test_scoped_repo_map_is_capped():
     """A scoped (intern) map must be length-capped to avoid payload blow-up."""
-    mp = tools_mod._build_repo_map(scope_paths=["src2/engine/unified.py"])
+    mp = tools_mod._build_repo_map(scope_paths=["src/engine/unified.py"])
     assert len(mp.encode()) < 20_000
 
 

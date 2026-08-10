@@ -65,11 +65,11 @@ def main():
     exceptions_path = Path(__file__).parent.parent / "exceptions.json"
     exceptions = load_exceptions(exceptions_path)
 
-    # Filter files: must be Python files in src2/ or kit-hygiene/ and not in exceptions
+    # Filter files: must be Python files in src/ or kit-hygiene/ and not in exceptions
     files_to_scan = []
     for f in changed_files:
         path = Path(f)
-        if path.suffix == ".py" and (f.startswith("src2/") or f.startswith("kit-hygiene/")):
+        if path.suffix == ".py" and (f.startswith("src/") or f.startswith("kit-hygiene/")):
             if f not in exceptions:
                 files_to_scan.append(f)
 

@@ -23,11 +23,11 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Find files with functions exceeding CC > 5 using radon, "
-                    "scoped to src2/, aligned with kill_tries.py."
+                    "scoped to src/, aligned with kill_tries.py."
     )
     parser.add_argument("--limit", type=int, default=10, help="Number of top files to show (default: 10)")
     parser.add_argument("--min-cc", type=int, default=6, help="Minimum per-function CC threshold (default: 6 = >5)")
-    parser.add_argument("--target-dir", type=str, default="src2", help="Directory to scan (default: src2)")
+    parser.add_argument("--target-dir", type=str, default="src", help="Directory to scan (default: src)")
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[2]

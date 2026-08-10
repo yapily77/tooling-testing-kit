@@ -36,12 +36,12 @@ async def test_blacklisted_user_denied_access(mock_db, mock_session, platform):
     chat_id = 123456789
     text = "/daily"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.security.check_user_access", return_value=False), \
-         patch("src2.interfaces.telegram.app.text_manager"):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.security.check_user_access", return_value=False), \
+         patch("src.interfaces.telegram.app.text_manager"):
 
-        from src2.interfaces.telegram.app import _route_message_data
+        from src.interfaces.telegram.app import _route_message_data
         await _route_message_data({"chat": {"id": chat_id}, "text": text}, platform)
 
         mock_send.assert_called_once()
@@ -54,15 +54,15 @@ async def test_non_chronomancer_user_shows_promo(mock_db, mock_session):
     chat_id = 123456789
     text = "/daily"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.security.check_user_access", return_value=True), \
-         patch("src2.interfaces.telegram.security.can_use_chronomancer", return_value=False), \
-         patch("src2.interfaces.telegram.app.text_manager"):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.security.check_user_access", return_value=True), \
+         patch("src.interfaces.telegram.security.can_use_chronomancer", return_value=False), \
+         patch("src.interfaces.telegram.app.text_manager"):
 
-        from src2.interfaces.telegram.app import _route_message_data
+        from src.interfaces.telegram.app import _route_message_data
         await _route_message_data({"chat": {"id": chat_id}, "text": text}, "telegram")
 
         mock_send.assert_called_once()
@@ -75,13 +75,13 @@ async def test_tailoring_proceed_locked_without_monthly_code(mock_db, mock_sessi
     chat_id = 123456789
     platform = "telegram"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.security.can_generate_report", return_value=False):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.security.can_generate_report", return_value=False):
 
-        from src2.interfaces.telegram.app import _handle_tailoring_proceed
+        from src.interfaces.telegram.app import _handle_tailoring_proceed
         await _handle_tailoring_proceed(chat_id, "Done", mock_session, platform)
 
         mock_send.assert_called_once()
@@ -96,16 +96,16 @@ async def test_queue_rejects_job_shows_capacity_error(mock_db, mock_session, pla
     chat_id = 123456789
     mock_session.step = "PROCESSING"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.security.can_generate_report", return_value=True), \
-         patch("src2.interfaces.telegram.app.queue_manager") as mock_queue:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.security.can_generate_report", return_value=True), \
+         patch("src.interfaces.telegram.app.queue_manager") as mock_queue:
 
         mock_queue.add_job = AsyncMock(return_value=False)
 
-        from src2.interfaces.telegram.app import _handle_tailoring_proceed
+        from src.interfaces.telegram.app import _handle_tailoring_proceed
         await _handle_tailoring_proceed(chat_id, "Done", mock_session, platform)
 
         mock_queue.add_job.assert_called_once_with(chat_id)
@@ -120,15 +120,15 @@ async def test_unauthorized_user_with_non_promo_text(mock_db, mock_session):
     chat_id = 123456789
     text = "hello general question"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.security.check_user_access", return_value=True), \
-         patch("src2.interfaces.telegram.security.can_use_chronomancer", return_value=False), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.app.text_manager"):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.security.check_user_access", return_value=True), \
+         patch("src.interfaces.telegram.security.can_use_chronomancer", return_value=False), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.app.text_manager"):
 
-        from src2.interfaces.telegram.app import _dispatch_message_routing
+        from src.interfaces.telegram.app import _dispatch_message_routing
         await _dispatch_message_routing(text, chat_id, mock_session, "telegram")
 
         mock_send.assert_called_once()

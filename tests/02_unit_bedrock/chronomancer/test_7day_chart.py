@@ -1,9 +1,9 @@
 import datetime
 import os
 
-from src2.core.schemas import DailyActivities, DailyForecastRecord
-from src2.engine.chart_generator import generate_7day_chart, generate_sparklines_summary
-from src2.interfaces.telegram.chronomancer.forecast_store import get_or_create_7day_chart
+from src.core.schemas import DailyActivities, DailyForecastRecord
+from src.engine.chart_generator import generate_7day_chart, generate_sparklines_summary
+from src.interfaces.telegram.chronomancer.forecast_store import get_or_create_7day_chart
 
 
 def _build_mock_records(count: int = 7) -> list[DailyForecastRecord]:

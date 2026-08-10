@@ -5,14 +5,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load env variables BEFORE importing src2 modules
+# Load env variables BEFORE importing src modules
 load_dotenv()
 
-from src2.engine.openrouter import call_openrouter_async  # noqa: E402
+from src.engine.openrouter import call_openrouter_async  # noqa: E402
 
-from src2.engine.orchestrator import run_full_engine  # noqa: E402
-from src2.engine.rag_client import query_classical_text_async  # noqa: E402
-from src2.interfaces.telegram.chronomancer.rag import RAG_INSTRUCTIONS  # noqa: E402
+from src.engine.orchestrator import run_full_engine  # noqa: E402
+from src.engine.rag_client import query_classical_text_async  # noqa: E402
+from src.interfaces.telegram.chronomancer.rag import RAG_INSTRUCTIONS  # noqa: E402
 
 
 async def main():
@@ -38,7 +38,7 @@ async def main():
     print(f"User Profile Loaded: {profile.get('name')} (Strength: {dm_strength})")
 
     # 2. Run Bazi mathematical engine for Month 1 (Index 0 = GengYin)
-    from src2.core.schemas import ChartProfile
+    from src.core.schemas import ChartProfile
     engine_result = run_full_engine(ChartProfile.model_validate(profile), 0)
     month_name = "GengYin (庚寅)"
     print(f"Bazi Engine calculation complete for Month 1 ({month_name}).")
@@ -138,7 +138,7 @@ You are the direct lineage of Master Xu Ziping, the founder of Ziping Bazi. Righ
         prompts[cat] = f"{RAG_INSTRUCTIONS}\n\n=== INPUT DATA ===\n{context_data}"
 
     # 4. Generate RAG search keywords from user concerns
-    from src2.engine.pydantic_prompt_engine import keyword_agent
+    from src.engine.pydantic_prompt_engine import keyword_agent
 
     concern_career = concern_mappings["career"].get(str(user_concerns.get("career") or "1"), "General career guidance.")
     concern_wealth = concern_mappings["wealth"].get(str(user_concerns.get("wealth") or "1"), "General wealth guidance.")

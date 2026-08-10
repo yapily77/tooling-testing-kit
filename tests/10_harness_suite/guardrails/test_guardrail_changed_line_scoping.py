@@ -38,7 +38,7 @@ def _fake_pyright(stdout: str):
 
 def test_parse_pyright_error():
     fp, line = gc._parse_pyright_error(
-        "src2/engine/foo.py:2:5 - error: Cannot assign to attribute"
+        "src/engine/foo.py:2:5 - error: Cannot assign to attribute"
     )
     assert fp is not None and fp.endswith("foo.py")
     assert line == 2

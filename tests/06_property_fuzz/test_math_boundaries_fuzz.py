@@ -11,8 +11,8 @@ import math
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src2.engine.module11_probability import _sigmoid, get_prior_log_odds
-from src2.engine.module13_spectrum import _get_spectrum_tier
+from src.engine.module11_probability import _sigmoid, get_prior_log_odds
+from src.engine.module13_spectrum import _get_spectrum_tier
 
 
 @given(x=st.floats(allow_nan=False, allow_infinity=True))

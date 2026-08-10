@@ -572,7 +572,7 @@ def main():
 
 async def test_bouncer_defense():
     print("Running test_bouncer_defense...")
-    from src2.interfaces.telegram.intake.bouncer_agent import bouncer_agent
+    from src.interfaces.telegram.intake.bouncer_agent import bouncer_agent
 
     # Run the agent directly with an injection payload
     result = await bouncer_agent.run(
@@ -583,12 +583,12 @@ async def test_bouncer_defense():
     assert len(result.output.reply) > 0
 
     # CRITICAL: Assert DB Cleanliness (No UUID created)
-    from src2.interfaces.telegram.db import Database
+    from src.interfaces.telegram.db import Database
 
     db = Database("bot.db")
     # get_user implicitly creates a UUID, so we must check PlatformAccount directly
     session = db.Session()
-    from src2.interfaces.telegram.db import PlatformAccount
+    from src.interfaces.telegram.db import PlatformAccount
 
     pa = session.query(PlatformAccount).filter_by(platform="telegram", platform_user_id=str(99999)).first()
     db.Session.remove()
@@ -598,8 +598,8 @@ async def test_bouncer_defense():
 
 async def test_collector_auto_flow():
     print("Running test_collector_auto_flow...")
-    from src2.core.rotator import get_model
-    from src2.interfaces.telegram.intake.auto_agent import AutoDeps, auto_agent
+    from src.core.rotator import get_model
+    from src.interfaces.telegram.intake.auto_agent import AutoDeps, auto_agent
 
     # Run the collector agent to extract dates
     result = await auto_agent.run(
@@ -617,7 +617,7 @@ async def test_collector_auto_flow():
 
 async def test_monthly_report_generation():
     print("Running test_monthly_report_generation...")
-    from src2.engine.monthly_generator import generate_12_months_concurrently
+    from src.engine.monthly_generator import generate_12_months_concurrently
 
     class MockProfile:
         chat_id = 999

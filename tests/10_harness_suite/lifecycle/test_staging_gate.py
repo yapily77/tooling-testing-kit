@@ -22,25 +22,25 @@ def _cleanup(*paths: Path) -> None:
 def test_stage_path_absolute_temp_collapses():
     repo_root = _repo_root()
     abs_fp = str(
-        repo_root / "admin" / "orchestrator" / "temp" / "src2" / "_staging_t" / "abs.py"
+        repo_root / "admin" / "orchestrator" / "temp" / "src" / "_staging_t" / "abs.py"
     )
-    assert runner.stage_path(abs_fp) == str(TEMP_DIR / "src2" / "_staging_t" / "abs.py")
+    assert runner.stage_path(abs_fp) == str(TEMP_DIR / "src" / "_staging_t" / "abs.py")
 
 
 def test_stage_path_relative_temp_prefixes():
     assert (
-        runner.stage_path("factory/temp/src2/_staging_t/rel1.py")
-        == str(TEMP_DIR / "src2" / "_staging_t" / "rel1.py")
+        runner.stage_path("factory/temp/src/_staging_t/rel1.py")
+        == str(TEMP_DIR / "src" / "_staging_t" / "rel1.py")
     )
     assert (
-        runner.stage_path("temp/src2/_staging_t/rel2.py")
-        == str(TEMP_DIR / "src2" / "_staging_t" / "rel2.py")
+        runner.stage_path("temp/src/_staging_t/rel2.py")
+        == str(TEMP_DIR / "src" / "_staging_t" / "rel2.py")
     )
 
 
 def test_staged_zero_diff_real_edit_not_blocked():
     repo_root = _repo_root()
-    fp = str(repo_root / "admin" / "orchestrator" / "temp" / "src2" / "_staging_t" / "crash.py")
+    fp = str(repo_root / "admin" / "orchestrator" / "temp" / "src" / "_staging_t" / "crash.py")
     mirror = Path(runner.stage_path(fp))
     mirror.parent.mkdir(parents=True, exist_ok=True)
     mirror.write_text("A\n", encoding="utf-8")
@@ -51,7 +51,7 @@ def test_staged_zero_diff_real_edit_not_blocked():
     finally:
         _cleanup(mirror, mirror_orig)
 
-    fp2 = "src2/_staging_t/crash2.py"
+    fp2 = "src/_staging_t/crash2.py"
     mirror2 = Path(runner.stage_path(fp2))
     mirror2.parent.mkdir(parents=True, exist_ok=True)
     mirror2.write_text("A\n", encoding="utf-8")
@@ -64,7 +64,7 @@ def test_staged_zero_diff_real_edit_not_blocked():
 
 
 def test_staged_zero_diff_genuine_zero_diff():
-    fp = "src2/_staging_t/zerodiff.py"
+    fp = "src/_staging_t/zerodiff.py"
     mirror = Path(runner.stage_path(fp))
     mirror.parent.mkdir(parents=True, exist_ok=True)
     mirror.write_text("X\n", encoding="utf-8")
@@ -77,7 +77,7 @@ def test_staged_zero_diff_genuine_zero_diff():
 
 
 def test_staged_zero_diff_new_file_and_hallucinated():
-    fp = "src2/_staging_t/newfile.py"
+    fp = "src/_staging_t/newfile.py"
     mirror = Path(runner.stage_path(fp))
     mirror.parent.mkdir(parents=True, exist_ok=True)
     mirror.write_text("Y\n", encoding="utf-8")
@@ -86,5 +86,5 @@ def test_staged_zero_diff_new_file_and_hallucinated():
     finally:
         _cleanup(mirror)
 
-    fp2 = "src2/_staging_t/does_not_exist.py"
+    fp2 = "src/_staging_t/does_not_exist.py"
     assert runner.staged_zero_diff(fp2) is None

@@ -10,7 +10,7 @@ Validates:
 
 import pytest
 
-from src2.engine.contradiction_resolver import (
+from src.engine.contradiction_resolver import (
     apply_san_hui_nullification,
     calculate_combo_clash_net,
     calculate_temporal_weight,

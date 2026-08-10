@@ -7,7 +7,7 @@ operator). It is NOT exposed to any agent's tool_allow_list — the coder never
 sees or calls it.
 
 For one staged `.py` file it:
-  1. imports the module (with `src2` importable so the edited file's
+  1. imports the module (with `src` importable so the edited file's
      cross-module type annotations resolve);
   2. for every pydantic ``BaseModel`` subclass *defined in that file*, probes
      its typed containers (``DictMap[X]`` / ``dict[..., X]`` with ``X`` a
@@ -153,8 +153,8 @@ def _narrow_container_intent(
 
 
 def _module_dotted(path: Path) -> str | None:
-    """If ``path`` lives under a package root (``src2/`` or ``src/``), return its
-    dotted module name (e.g. ``src2.interfaces.telegram.session``). Returns
+    """If ``path`` lives under a package root (``src/`` or ``src/``), return its
+    dotted module name (e.g. ``src.interfaces.telegram.session``). Returns
     ``None`` when no such marker is present.
     """
     s = str(path.as_posix())

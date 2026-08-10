@@ -19,12 +19,12 @@
 
 import pytest
 
-from src2.core.tools.bazi_engine import (
+from src.core.tools.bazi_engine import (
     get_current_da_yun,
     get_day_master_strength,
     get_pillars,
 )
-from src2.core.tools.user_profile_input import (
+from src.core.tools.user_profile_input import (
     apply_override,
     collect_profile_from_dob,
     get_effective_profile,

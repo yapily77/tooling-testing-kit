@@ -1,5 +1,5 @@
 """Combinatorial parametrized tests for trigger-label extraction in
-``src2.interfaces.telegram.chronomancer.forecast_store``.
+``src.interfaces.telegram.chronomancer.forecast_store``.
 
 These tests cover the pure, math-derived trigger pipeline:
     scored -> events -> trigger labels -> Chinese RAG keywords -> TRIGGERS context block.
@@ -13,7 +13,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src2.interfaces.telegram.chronomancer.forecast_store import (
+from src.interfaces.telegram.chronomancer.forecast_store import (
     TRIGGER_KEYWORD_MAP,
     _build_trigger_context,
     _extract_trigger_labels,

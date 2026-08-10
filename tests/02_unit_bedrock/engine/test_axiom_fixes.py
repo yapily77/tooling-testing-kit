@@ -1,11 +1,11 @@
 """
-Unit tests for Axiom 8.2.2 (Dynamic Proximity) and Axiom 11.3.2 (Severe Clash Overrides) in src2.
+Unit tests for Axiom 8.2.2 (Dynamic Proximity) and Axiom 11.3.2 (Severe Clash Overrides) in src.
 """
 
 from unittest.mock import MagicMock
 
-from src2.engine.contradiction_resolver import resolve_contradictions
-from src2.engine.module6_ten_gods import get_cycle_proximity
+from src.engine.contradiction_resolver import resolve_contradictions
+from src.engine.module6_ten_gods import get_cycle_proximity
 
 
 def test_get_cycle_proximity():

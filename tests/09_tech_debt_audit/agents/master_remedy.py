@@ -12,7 +12,7 @@ TASKS = [
     {
         "id": 1,
         "name": "Data Auditor",
-        "file": "src2/core/schemas/unified.py",
+        "file": "src/core/schemas/unified.py",
         "instruction": "Verify the 16 'core_elements' markers. Use the provided Classical RAG context to ensure mathematical correctness. Remove the TODO markers after verification.",
         "extra_context": "RAG FINDINGS: 'Zheng Guan' is Metal. 'Fei Tian Lu Ma' is Water/Metal. 'Resource' is Water. 'Wealth' is Earth. 'Eating God' is Fire. 'Hurt Officer' is Fire. 'Cong Er' is Fire. 'Cong Cai' is Earth. 'Cong Sha' is Metal."
     },

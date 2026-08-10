@@ -1,9 +1,9 @@
 # Role and Mission
-You are a Staff-Level Code Quality Agent operating in the `opencode` environment. Your mission is to add missing type annotations to the remaining `src2/` files so they pass the `find_bad_style.py` checker with zero violations, while preserving all existing behavior.
+You are a Staff-Level Code Quality Agent operating in the `opencode` environment. Your mission is to add missing type annotations to the remaining `src/` files so they pass the `find_bad_style.py` checker with zero violations, while preserving all existing behavior.
 
 ## Environment Context
 * **Style Checker:** `TEST/find_bad_style.py` — use this to verify your results.
-* **Target Directory:** `src2/` only.
+* **Target Directory:** `src/` only.
 * **Quality Gate:** After your work, running `uv run python TEST/find_bad_style.py --files <target_file>` must report **no violations** for the assigned file.
 * **Skill Reference:** `.agents/skills/python-code/SKILL.md` — read this for the 3 core rules.
 
@@ -15,7 +15,7 @@ Before you deploy them, you must create 10 tickets containing the details of the
 For each agent, you must strictly instruct them to execute the following lifecycle:
 1. **Claim the ticket:** Acknowledge assignment.
 2. **Read constraint files:** Read `TEST/find_bad_style.py` and `.agents/skills/python-code/SKILL.md`
-3. **Understand the target:** Read the target file in `src2/` in full. Identify all functions missing return type annotations or argument annotations (excluding `self`/`cls`).
+3. **Understand the target:** Read the target file in `src/` in full. Identify all functions missing return type annotations or argument annotations (excluding `self`/`cls`).
 4. **Add annotations:** For each function:
    - Add `-> ReturnType` to all functions except `__init__` and `__new__`.
    - Add `: Type` annotations to all arguments except `self` and `cls`.
@@ -31,16 +31,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 ## 🎟️ TICKET DETAILS (To be assigned to Subagents)
 
 ### Ticket 1: Annotate `calendar_node.py`
-**Target File:** `src2/interfaces/telegram/intake/calendar_node.py`
+**Target File:** `src/interfaces/telegram/intake/calendar_node.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in calendar node intake functions.
 * Functions likely return parsed calendar data or `None`.
-* **Strategy:** Trace return types through function bodies. Check `src2/core/schemas/` for available types.
+* **Strategy:** Trace return types through function bodies. Check `src/core/schemas/` for available types.
 * **Constraints:** Preserve all calendar parsing and validation logic.
 
 ### Ticket 2: Annotate `ranking.py`
-**Target File:** `src2/interfaces/telegram/chronomancer/ranking.py`
+**Target File:** `src/interfaces/telegram/chronomancer/ranking.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in oracle ranking functions.
@@ -49,34 +49,34 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all ranking algorithm logic and score calculation.
 
 ### Ticket 3: Annotate `prompt_maker.py`
-**Target File:** `src2/engine/prompt_maker.py`
+**Target File:** `src/engine/prompt_maker.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in prompt generation functions.
 * Functions likely return prompt strings or template structures.
-* **Strategy:** Trace return paths. Likely `str`, `dict[str, Any]`, or `None`. Check existing imports and `src2/core/schemas/`.
+* **Strategy:** Trace return paths. Likely `str`, `dict[str, Any]`, or `None`. Check existing imports and `src/core/schemas/`.
 * **Constraints:** Preserve all prompt template logic and string construction.
 
 ### Ticket 4: Annotate `monthly_generator.py`
-**Target File:** `src2/engine/monthly_generator.py`
+**Target File:** `src/engine/monthly_generator.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in monthly fortune generation functions.
 * Functions likely return generated forecasts or report structures.
-* **Strategy:** Trace return types. May return `dict[str, Any]`, `str`, or `None`. Check `src2/core/schemas/` for types.
+* **Strategy:** Trace return types. May return `dict[str, Any]`, `str`, or `None`. Check `src/core/schemas/` for types.
 * **Constraints:** Preserve all monthly generation algorithms and report formatting.
 
 ### Ticket 5: Annotate `module5_causal.py`
-**Target File:** `src2/engine/module5_causal.py`
+**Target File:** `src/engine/module5_causal.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in Module 5 (Causal/Cause) engine.
 * Functions likely return causal analysis results or element classifications.
-* **Strategy:** Check `src2/core/schemas/` for cause-related types. Functions may return `dict[str, Any]` or custom models.
+* **Strategy:** Check `src/core/schemas/` for cause-related types. Functions may return `dict[str, Any]` or custom models.
 * **Constraints:** Preserve all causal chain analysis and element relationship logic.
 
 ### Ticket 6: Annotate `module13_spectrum.py`
-**Target File:** `src2/engine/module13_spectrum.py`
+**Target File:** `src/engine/module13_spectrum.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in Module 13 (Spectrum) engine.
@@ -85,16 +85,16 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all spectrum analysis and classification logic.
 
 ### Ticket 7: Annotate `da_yun.py`
-**Target File:** `src2/engine/da_yun.py`
+**Target File:** `src/engine/da_yun.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in Da Yun (Great Fortune) engine.
 * Functions likely return da yun period data or fortune charts.
-* **Strategy:** Check `src2/core/schemas/` for da yun types. Functions may return `dict[str, Any]`, `list[Any]`, or custom models.
+* **Strategy:** Check `src/core/schemas/` for da yun types. Functions may return `dict[str, Any]`, `list[Any]`, or custom models.
 * **Constraints:** Preserve all da yun calculation and period analysis logic.
 
 ### Ticket 8: Annotate `bazi_cache.py`
-**Target File:** `src2/engine/bazi_cache.py`
+**Target File:** `src/engine/bazi_cache.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in Bazi cache functions.
@@ -103,7 +103,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all caching logic and cache key generation.
 
 ### Ticket 9: Annotate `bd_config.py`
-**Target File:** `src2/core/tools/bd_config.py`
+**Target File:** `src/core/tools/bd_config.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in bd config tool functions.
@@ -112,7 +112,7 @@ For each agent, you must strictly instruct them to execute the following lifecyc
 * **Constraints:** Preserve all configuration parsing and tool initialization logic.
 
 ### Ticket 10: Annotate `bd_cli.py`
-**Target File:** `src2/core/tools/bd_cli.py`
+**Target File:** `src/core/tools/bd_cli.py`
 **Violation Count:** 2
 **Task Details:**
 * 2 missing type annotations in bd CLI command functions.

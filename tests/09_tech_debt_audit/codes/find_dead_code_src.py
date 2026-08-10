@@ -318,7 +318,7 @@ def main():
     print(f"AST scan complete. Found {total_candidates} candidate dead definitions in main src to audit.")
 
     report = AuditReport(scanned_files_count=len(files))
-    output_dir = Path("TEST/codes/20260626_SRC2")
+    output_dir = Path("TEST/codes/20260626_src")
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "dead_code_audit_main.json"
     md_path = output_dir / "dead_code_audit_main.md"

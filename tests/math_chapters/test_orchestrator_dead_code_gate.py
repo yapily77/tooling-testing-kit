@@ -14,10 +14,10 @@ Asserts:
 import ast
 from pathlib import Path
 
-from src2.core.schemas import ComboClashNetResult, EngineOutput
-from src2.core.schemas.unified import ChartProfile, Pillar
-from src2.engine.contradiction_resolver import calculate_combo_clash_net
-from src2.engine.orchestrator import run_full_engine
+from src.core.schemas import ComboClashNetResult, EngineOutput
+from src.core.schemas.unified import ChartProfile, Pillar
+from src.engine.contradiction_resolver import calculate_combo_clash_net
+from src.engine.orchestrator import run_full_engine
 from TEST.math.conftest import assert_key_format_convention
 
 
@@ -139,7 +139,7 @@ def test_traceability_combo_clash_net() -> None:
 
 def test_zero_dead_code_in_active_orchestrator_pipeline() -> None:
     """AST analysis gate: assert that all functions defined in orchestrator.py are called or registered."""
-    orchestrator_path = Path(__file__).resolve().parents[2] / "src2" / "engine" / "orchestrator.py"
+    orchestrator_path = Path(__file__).resolve().parents[2] / "src" / "engine" / "orchestrator.py"
     assert orchestrator_path.exists(), f"Orchestrator file not found at {orchestrator_path}"
 
     with open(orchestrator_path, encoding="utf-8") as f:

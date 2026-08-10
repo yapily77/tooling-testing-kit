@@ -4,13 +4,13 @@ The `/ask` invocation experiences severe blocking latency compared to standard i
 # Approach
 
 - **Method**: 
-  1. **Telemetry Injection**: Surgically inject `time.perf_counter()` wrappers into `src2/core/memory/mem0_store.py` around the core methods (`add_memory` and `search`). We will output distinct `MEM0_PERF` telemetry logs.
+  1. **Telemetry Injection**: Surgically inject `time.perf_counter()` wrappers into `src/core/memory/mem0_store.py` around the core methods (`add_memory` and `search`). We will output distinct `MEM0_PERF` telemetry logs.
   2. **Isolated Baseline Testing**: Inside `[my-repo-only: TEST/GOLD/14_mem0/ not in kit download]`, create a standalone script (`test_mem0_latency.py`) that strictly isolates and executes the `mem0_store.py` operations (simulating what `/ask` does) without firing the rest of the Telegram/Engine stack. 
   3. **Documentation**: Create a `README.md` or `UI.md` inside the gold folder capturing the latency baselines.
 
 - **Tool Use**:
   - `bash`: To execute `mkdir`, run `uv run python` test commands, and manage task tracking (`bd`).
-  - `/tools/replace_text.py`: To safely and surgically inject the timing logic into `src2/core/memory/mem0_store.py` without risking AST corruption.
+  - `/tools/replace_text.py`: To safely and surgically inject the timing logic into `src/core/memory/mem0_store.py` without risking AST corruption.
   - `/tools/write_file.py`: To scaffold the test script and documentation in `[my-repo-only: TEST/GOLD/14_mem0/ not in kit download]`.
 
 - **Use of Agents**:

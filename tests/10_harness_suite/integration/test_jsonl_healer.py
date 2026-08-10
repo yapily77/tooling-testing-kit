@@ -23,15 +23,15 @@ class DummyPlan(BaseModel):
 def test_jsonl_compiler_basic():
     raw_jsonl = """
     {"epic": {"title": "Test Epic"}}
-    {"subtasks": [{"id": "intern01", "file_paths": ["src2/a.py"]}]}
+    {"subtasks": [{"id": "intern01", "file_paths": ["src/a.py"]}]}
     """
     res = compile_jsonl_to_draft_plan_dict(raw_jsonl)
     assert res["epic"]["title"] == "Test Epic"
     assert len(res["subtasks"]) == 1
     assert res["subtasks"][0]["id"] == "intern01"
-    # Auto-healing should add evidence item for src2/a.py
+    # Auto-healing should add evidence item for src/a.py
     assert len(res["subtasks"][0]["evidence"]) == 1
-    assert res["subtasks"][0]["evidence"][0]["file_path"] == "src2/a.py"
+    assert res["subtasks"][0]["evidence"][0]["file_path"] == "src/a.py"
     assert "[Auto-Healed]" in res["subtasks"][0]["evidence"][0]["content"]
 
 

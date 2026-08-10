@@ -8,7 +8,7 @@ and spectrum tier scoring integration. Enforces English CapitalCase conventions
 import pytest
 from pydantic import ValidationError
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     ChartProfile,
     DMScoreWithOutput,
     GeJuOutput,
@@ -17,7 +17,7 @@ from src2.core.schemas.unified import (
     SpectrumInput,
     SpectrumOutput,
 )
-from src2.engine.module13_spectrum import (
+from src.engine.module13_spectrum import (
     _get_spectrum_tier,
     calculate_strength_profile,
 )

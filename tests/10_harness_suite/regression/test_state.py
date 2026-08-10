@@ -23,7 +23,7 @@ def _workplan():
         groups=[
             models.WorkGroup(
                 id="g1",
-                tasks=[models.ApprovedTask(id="intern01", title="t", file_paths=["src2/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit")],
+                tasks=[models.ApprovedTask(id="intern01", title="t", file_paths=["src/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit")],
             )
         ]
     )
@@ -37,7 +37,7 @@ def _draft():
         acceptance_criteria=["a"],
         rubric_cube=models.RubricCube(cells=[]),
         summary="s",
-        subtasks=[models.SubTaskBrief(id="s1", title="t", file_paths=["src2/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit", evidence=[{"file_path": "src2/x.py", "content": "verified"}])],
+        subtasks=[models.SubTaskBrief(id="s1", title="t", file_paths=["src/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit", evidence=[{"file_path": "src/x.py", "content": "verified"}])],
         risks=[],
         strategy=models.Strategy(how_to_fix="f", tool_preference=[{"task_id": "s1", "preference": "AST-edit"}], parallelisable_workplan=_workplan()),
     )
@@ -87,7 +87,7 @@ def test_append_tasks_and_handoffs(tmp_path):
     st.approved = models.ExecutablePlan(
         epic=st.draft.epic, user_stories=st.draft.user_stories, definition_of_done=["d"],
         acceptance_criteria=["a"], rubric_cube=models.RubricCube(cells=[]), summary="s",
-        tasks=[models.ApprovedTask(id="intern01", title="t", file_paths=["src2/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit")],
+        tasks=[models.ApprovedTask(id="intern01", title="t", file_paths=["src/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit")],
         alignment="a", workplan=_workplan(),
         strategy=st.draft.strategy,
     )

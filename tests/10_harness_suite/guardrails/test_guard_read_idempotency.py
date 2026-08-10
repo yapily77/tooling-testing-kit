@@ -198,16 +198,16 @@ async def test_path_normalization_deduplication() -> None:
     from factory.infra.tools import normalize_read_path
     # test normalize_read_path directly
     from factory.infra.control import REPO_ROOT
-    assert normalize_read_path(f"{REPO_ROOT}/src2/core/schemas/unified.py") == "src2/core/schemas/unified.py"
-    assert normalize_read_path("factory/temp/src2/core/schemas/unified.py") == "src2/core/schemas/unified.py"
-    assert normalize_read_path("src2/core/schemas/unified.py") == "src2/core/schemas/unified.py"
+    assert normalize_read_path(f"{REPO_ROOT}/src/core/schemas/unified.py") == "src/core/schemas/unified.py"
+    assert normalize_read_path("factory/temp/src/core/schemas/unified.py") == "src/core/schemas/unified.py"
+    assert normalize_read_path("src/core/schemas/unified.py") == "src/core/schemas/unified.py"
 
     # test that tools.py call_tool normalizes paths correctly for deduplication
     gt = _make_guard()
     # First call with staging prefix
-    await gt.call_tool("read_file", {"relative_path": "factory/temp/src2/foo.py"}, None, _FakeTool())
+    await gt.call_tool("read_file", {"relative_path": "factory/temp/src/foo.py"}, None, _FakeTool())
     # Second call with relative path should be REDUNDANT
-    res = await gt.call_tool("read_file", {"relative_path": "src2/foo.py"}, None, _FakeTool())
+    res = await gt.call_tool("read_file", {"relative_path": "src/foo.py"}, None, _FakeTool())
     assert _READ_REDUNDANT in res
 
 

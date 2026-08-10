@@ -2,7 +2,7 @@
 
 ## 1. 🔍 Context, Tooling & AST Strategy
 *Map out the codebase before writing a single line of code.*
-- **Target Files:** `src2/interfaces/telegram/chronomancer/oracle_coordinator.py`, `src2/interfaces/telegram/chronomancer/oracle_rewriter.py`, `src2/interfaces/telegram/chronomancer/oracle_gatherer.py`, `src2/interfaces/telegram/chronomancer/oracle_narrator.py`, `src2/core/schemas/unified.py`, `src2/interfaces/telegram/db.py`
+- **Target Files:** `src/interfaces/telegram/chronomancer/oracle_coordinator.py`, `src/interfaces/telegram/chronomancer/oracle_rewriter.py`, `src/interfaces/telegram/chronomancer/oracle_gatherer.py`, `src/interfaces/telegram/chronomancer/oracle_narrator.py`, `src/core/schemas/unified.py`, `src/interfaces/telegram/db.py`
 - **Exploration Tools:** 
   - `/investigate`: `handle_oracle`, `session_to_chart_profile`, `gather_oracle_deps`, `Stakeholder` DB model
   - `Codebase Indexing`: CONTROL_SHEET slots (`oracle_rewriter`, `oracle_narrator`, `oracle_rag`), DB preference tracking (`active_mode`, `oracle_query_count`)

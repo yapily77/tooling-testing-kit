@@ -3,7 +3,7 @@
 Codebase Hygiene Cleanup Automator (AST-First)
 ==============================================
 Runs purely locally (0 tokens) to:
-1. Auto-sync Environment Drift: Parses all os.getenv/os.environ usage in src2/
+1. Auto-sync Environment Drift: Parses all os.getenv/os.environ usage in src/
    and appends missing keys to .env.example.
 2. Auto-strip Confirmed Dead Code: Reads dead_code_audit.json and surgically
    removes functions/classes marked as 'CONFIRMED_DEAD' using indentation-based block parsing.
@@ -20,7 +20,7 @@ from pathlib import Path
 
 # Workspace root
 ROOT_DIR = Path(__file__).resolve().parents[1]
-SRC2_DIR = ROOT_DIR / "src2"
+src_DIR = ROOT_DIR / "src"
 ENV_EXAMPLE = ROOT_DIR / ".env.example"
 DEAD_CODE_JSON = ROOT_DIR / "kit-hygiene" / "reports" / "dead_code_audit.json"
 
@@ -29,7 +29,7 @@ DEAD_CODE_JSON = ROOT_DIR / "kit-hygiene" / "reports" / "dead_code_audit.json"
 # PART 1: ENVIRONMENT DRIFT AUTO-SYNC
 # =====================================================================
 def sync_environment_drift():
-    print("🔍 Scanning src2/ for environment variable usage...")
+    print("🔍 Scanning src/ for environment variable usage...")
     env_vars = set()
 
     # Regex patterns for getenv and environ
@@ -37,7 +37,7 @@ def sync_environment_drift():
     environ_pattern = re.compile(r"os\.environ\[\s*['\"]([A-Z0-9_]+)['\"]")
     environ_get_pattern = re.compile(r"os\.environ\.get\(\s*['\"]([A-Z0-9_]+)['\"]")
 
-    for py_file in SRC2_DIR.glob("**/*.py"):
+    for py_file in src_DIR.glob("**/*.py"):
         try:
             content = py_file.read_text(encoding="utf-8")
             # Find all matches
@@ -51,7 +51,7 @@ def sync_environment_drift():
             print(f"  Warning reading {py_file}: {e}")
 
     if not env_vars:
-        print("  No environment variables found in src2/.")
+        print("  No environment variables found in src/.")
         return
 
     print(f"  Found {len(env_vars)} environment variables in use.")

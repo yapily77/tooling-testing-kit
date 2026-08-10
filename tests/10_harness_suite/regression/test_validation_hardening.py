@@ -125,7 +125,7 @@ def test_draft_plan_validation_hardening():
             groups=[
                 WorkGroup(
                     id="g1",
-                    tasks=[ApprovedTask(id="intern01", title="t", file_paths=["src2/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit")],
+                    tasks=[ApprovedTask(id="intern01", title="t", file_paths=["src/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit")],
                 )
             ]
         )
@@ -136,7 +136,7 @@ def test_draft_plan_validation_hardening():
             acceptance_criteria=["a"],
             rubric_cube=RubricCube(cells=[]),
             summary="s",
-            subtasks=[SubTaskBrief(id="intern01", title="t", file_paths=["src2/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit", evidence=[EvidenceItem(file_path="src2/x.py", content="verified")])],
+            subtasks=[SubTaskBrief(id="intern01", title="t", file_paths=["src/x.py"], instruction="i", acceptance="a", tool_preference="AST-edit", evidence=[EvidenceItem(file_path="src/x.py", content="verified")])],
             risks=[],
             strategy=Strategy(
                 how_to_fix="f",
@@ -147,7 +147,7 @@ def test_draft_plan_validation_hardening():
 
     # 1. Valid DraftPlan passes
     draft = make_valid_draft()
-    assert draft.subtasks[0].evidence[0].file_path == "src2/x.py"
+    assert draft.subtasks[0].evidence[0].file_path == "src/x.py"
     assert draft.strategy.tool_preference_dict == {"intern01": "AST-edit"}
 
     # 2. Missing evidence fails
@@ -155,7 +155,7 @@ def test_draft_plan_validation_hardening():
     draft_invalid_ev.subtasks[0].evidence = []
     with pytest.raises(ValidationError) as excinfo:
         DraftPlan.model_validate(draft_invalid_ev.model_dump())
-    assert "references 'src2/x.py' but no evidence was provided" in str(excinfo.value)
+    assert "references 'src/x.py' but no evidence was provided" in str(excinfo.value)
 
     # 3. Missing tool preference for a task fails
     draft_invalid_pref = make_valid_draft()

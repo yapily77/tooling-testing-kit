@@ -27,7 +27,7 @@ def test_replace_text_raises_model_retry_on_error(monkeypatch):
     monkeypatch.setattr(factory.infra.tools_shell, "_run_tool", mock_run_tool)
     
     with pytest.raises(ModelRetry) as exc_info:
-        tools.replace_text("src2/a.py", "old", "new")
+        tools.replace_text("src/a.py", "old", "new")
     assert "Pattern not found" in str(exc_info.value)
 
 
@@ -45,5 +45,5 @@ def test_replace_text_raises_model_retry_on_no_change(monkeypatch):
     monkeypatch.setattr(factory.infra.tools_shell, "_run_tool", mock_run_tool)
     
     with pytest.raises(ModelRetry) as exc_info:
-        tools.replace_text("src2/a.py", "old", "new")
+        tools.replace_text("src/a.py", "old", "new")
     assert "No match found in the file" in str(exc_info.value)

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src2.core.database.models import PlatformAccount, User
+from src.core.database.models import PlatformAccount, User
 
 
 def seed_users():

@@ -24,8 +24,8 @@ system_prompt: |
   TARGET_REPO/engine/contradiction_resolver.py:1114 -> resolve_contradictions calls _apply_severe_clash_overrides which uses this pattern
 
   Module-level context (imports, constants, types this function uses):
-  from src2.core.schemas import ContradictionResolution
-  from src2.core.schemas.unified import ChartProfile
+  from src.core.schemas import ContradictionResolution
+  from src.core.schemas.unified import ChartProfile
   from .module7_shen_sha import _is_dm_weak, _get_dm_strength_tier
 
   === HOW TO WORK ===
@@ -174,8 +174,8 @@ upstream_callers: |
   TARGET_REPO/engine/__init__.py:1 -> def resolve_contradictions(*args, **kwargs):
 
 module_context: |
-  from src2.core.schemas import ContradictionResolution
-  from src2.core.schemas.unified import ChartProfile
+  from src.core.schemas import ContradictionResolution
+  from src.core.schemas.unified import ChartProfile
   _WEAK_TIERS = {"Mild Weak", "Weak", "Follower"}
 
 variables: {}

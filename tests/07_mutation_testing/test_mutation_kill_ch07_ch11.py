@@ -10,8 +10,8 @@ from typing import Any
 
 import pytest
 
-from src2.core.schemas.unified import BRANCHES, ZHI_HIDDEN
-from src2.engine.contradiction_resolver import (
+from src.core.schemas.unified import BRANCHES, ZHI_HIDDEN
+from src.engine.contradiction_resolver import (
     _count_element_hidden,
     _count_element_roots,
     _safe_get_pillar_attr,
@@ -30,7 +30,7 @@ from src2.engine.contradiction_resolver import (
 
 def test_has_high_friction_boundary_15_exactly() -> None:
     """Kill mutmut_1: >= 15.0 → > 15.0 (boundary value 15.0 must return True)."""
-    from src2.engine.module9_triggers import _has_high_friction
+    from src.engine.module9_triggers import _has_high_friction
 
     item = type("ImpactItem", (), {"key": "friction", "value": 15.0})()
     interaction = type("FakeInteraction", (), {
@@ -44,7 +44,7 @@ def test_has_high_friction_boundary_15_exactly() -> None:
 
 def test_has_high_friction_boundary_14_9() -> None:
     """Kill mutmut_5: >= 15.0 → <= 15.0 (value 14.9 must return False)."""
-    from src2.engine.module9_triggers import _has_high_friction
+    from src.engine.module9_triggers import _has_high_friction
 
     item = type("ImpactItem", (), {"key": "friction", "value": 14.9})()
     interaction = type("FakeInteraction", (), {
@@ -58,7 +58,7 @@ def test_has_high_friction_boundary_14_9() -> None:
 
 def test_has_high_friction_boundary_15_1() -> None:
     """Kill mutmut_6: >= 15.0 → < 15.0 (value 15.1 must return True)."""
-    from src2.engine.module9_triggers import _has_high_friction
+    from src.engine.module9_triggers import _has_high_friction
 
     item = type("ImpactItem", (), {"key": "friction", "value": 15.1})()
     interaction = type("FakeInteraction", (), {
@@ -72,7 +72,7 @@ def test_has_high_friction_boundary_15_1() -> None:
 
 def test_has_high_friction_no_friction_key() -> None:
     """Kill mutmut_8: >= 15.0 → == 15.0 (non-friction key must be ignored)."""
-    from src2.engine.module9_triggers import _has_high_friction
+    from src.engine.module9_triggers import _has_high_friction
 
     item = type("ImpactItem", (), {"key": "other", "value": 100.0})()
     interaction = type("FakeInteraction", (), {
@@ -86,7 +86,7 @@ def test_has_high_friction_no_friction_key() -> None:
 
 def test_has_high_friction_multiple_items() -> None:
     """Kill mutmut_5/6: multiple items with friction at boundary."""
-    from src2.engine.module9_triggers import _has_high_friction
+    from src.engine.module9_triggers import _has_high_friction
 
     items = [
         type("ImpactItem", (), {"key": "other", "value": 100.0})(),
@@ -107,7 +107,7 @@ def test_has_high_friction_multiple_items() -> None:
 
 def test_get_destroyed_pillars_chong_successful() -> None:
     """Kill mutmut_3: interaction.vector == 'Chong' and is_successful must both be True."""
-    from src2.engine.module9_triggers import _get_destroyed_pillars
+    from src.engine.module9_triggers import _get_destroyed_pillars
 
     item = type("ImpactItem", (), {"key": "friction", "value": 20.0})()
     interaction = type("FakeInteraction", (), {
@@ -124,7 +124,7 @@ def test_get_destroyed_pillars_chong_successful() -> None:
 
 def test_get_destroyed_pillars_chong_unsuccessful() -> None:
     """Kill mutant: is_successful=False must not add to destroyed."""
-    from src2.engine.module9_triggers import _get_destroyed_pillars
+    from src.engine.module9_triggers import _get_destroyed_pillars
 
     item = type("ImpactItem", (), {"key": "friction", "value": 20.0})()
     interaction = type("FakeInteraction", (), {
@@ -140,7 +140,7 @@ def test_get_destroyed_pillars_chong_unsuccessful() -> None:
 
 def test_get_destroyed_pillars_non_chong() -> None:
     """Kill mutant: vector != 'Chong' must not add to destroyed."""
-    from src2.engine.module9_triggers import _get_destroyed_pillars
+    from src.engine.module9_triggers import _get_destroyed_pillars
 
     item = type("ImpactItem", (), {"key": "friction", "value": 20.0})()
     interaction = type("FakeInteraction", (), {
@@ -156,7 +156,7 @@ def test_get_destroyed_pillars_non_chong() -> None:
 
 def test_get_destroyed_pillars_empty() -> None:
     """Kill mutant: empty interactions list must return empty results."""
-    from src2.engine.module9_triggers import _get_destroyed_pillars
+    from src.engine.module9_triggers import _get_destroyed_pillars
 
     destroyed, details = _get_destroyed_pillars([])
     assert destroyed == set()
@@ -169,7 +169,7 @@ def test_get_destroyed_pillars_empty() -> None:
 
 def test_build_clash_kvlist_all_destroyed() -> None:
     """Kill mutmut_2/3/4/5/6/7/11/12/13/21/23/24/28: all pillars destroyed."""
-    from src2.engine.module9_triggers import _build_clash_kvlist
+    from src.engine.module9_triggers import _build_clash_kvlist
 
     destroyed = {"Year", "Month", "Day", "Hour"}
     clash_details = {p: "Chong" for p in destroyed}
@@ -182,7 +182,7 @@ def test_build_clash_kvlist_all_destroyed() -> None:
 
 def test_build_clash_kvlist_none_destroyed() -> None:
     """Kill mutmut_2/3/4/5/6/7/11/12/13/21/23/24/28: no pillars destroyed."""
-    from src2.engine.module9_triggers import _build_clash_kvlist
+    from src.engine.module9_triggers import _build_clash_kvlist
 
     destroyed = set()
     clash_details = {}
@@ -194,7 +194,7 @@ def test_build_clash_kvlist_none_destroyed() -> None:
 
 def test_build_clash_kvlist_partial_destroyed() -> None:
     """Kill mutmut_2/3/4/5/6/7/11/12/13/21/23/24/28: partial destruction."""
-    from src2.engine.module9_triggers import _build_clash_kvlist
+    from src.engine.module9_triggers import _build_clash_kvlist
 
     destroyed = {"Day", "Hour"}
     clash_details = {"Day": "Chong", "Hour": "Chong"}
@@ -210,7 +210,7 @@ def test_build_clash_kvlist_partial_destroyed() -> None:
 
 def test_build_clash_kvlist_missing_clash_detail() -> None:
     """Kill mutant: destroyed pillar with missing clash detail."""
-    from src2.engine.module9_triggers import _build_clash_kvlist
+    from src.engine.module9_triggers import _build_clash_kvlist
 
     destroyed = {"Day"}
     clash_details = {}
@@ -221,7 +221,7 @@ def test_build_clash_kvlist_missing_clash_detail() -> None:
 
 def test_detect_clash_triggers_integration() -> None:
     """Kill mutants in detect_clash_triggers: full integration test."""
-    from src2.engine.module9_triggers import detect_clash_triggers
+    from src.engine.module9_triggers import detect_clash_triggers
 
     item = type("ImpactItem", (), {"key": "friction", "value": 20.0})()
     interaction = type("FakeInteraction", (), {

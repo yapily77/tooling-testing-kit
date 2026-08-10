@@ -375,7 +375,7 @@ def _virtual_live_path(staged: Path, edit_set) -> Path:
     Resolution order:
       1. If ``edit_set`` (live relative paths) is given and the staged path
          ends with one of them, return ``PROJECT_ROOT / that_rel``.
-      2. Otherwise find the ``/src2/`` or ``/src/`` marker and strip to the
+      2. Otherwise find the ``/src/`` or ``/src/`` marker and strip to the
          repo-relative part.
       3. Fallback: ``PROJECT_ROOT / staged.name``.
     """
@@ -468,7 +468,7 @@ def validate(file_path: str, edit_set: list[str] | None = None) -> dict:
     Defect B).
 
     ``file_path`` is the STAGED path (e.g.
-    ``admin/orchestrator/temp/src2/interfaces/telegram/session.py``). The live
+    ``admin/orchestrator/temp/src/interfaces/telegram/session.py``). The live
     original is recovered via ``_virtual_live_path``. Returns the structured dict
     consumed by runner.py.
     """
@@ -506,7 +506,7 @@ def validate(file_path: str, edit_set: list[str] | None = None) -> dict:
         smoke_ok = bool(smoke_ok)
 
         # Broadened union pyright (docs/01_fix.md Task 3, D4) — run inside the
-        # sandbox so the package context (incl. symlinked src2) is correct.
+        # sandbox so the package context (incl. symlinked src) is correct.
         deps = discover_dependencies(staged, set(edit_set) if edit_set else None)
         dep_sandbox: list[Path] = []
         for d in deps:

@@ -22,13 +22,13 @@ Expected Tier-1 invariants:
 
 from typing import Any
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     ChartProfile,
     DmStrengthTier1,
     Element,
     Pillar,
 )
-from src2.engine.module2_root import calculate_dm_strength_tier1
+from src.engine.module2_root import calculate_dm_strength_tier1
 
 
 def _build_profile() -> ChartProfile:
@@ -123,7 +123,7 @@ def test_anti_vibe_1_1_element_consistency(
     assert isinstance(result, DmStrengthTier1)
 
     # Metal (Geng, Xin stems; You, Shen branches) controls Wood (the DM element)
-    from src2.engine.classical_rules import get_control
+    from src.engine.classical_rules import get_control
     assert get_control(Element.METAL) == Element.WOOD
 
     assert_key_format_convention(result)

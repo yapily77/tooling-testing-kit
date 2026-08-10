@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     CONTROL,
     PRODUCTION,
     ChartProfile,
@@ -21,13 +21,13 @@ from src2.core.schemas.unified import (
     Element,
     Pillar,
 )
-from src2.engine.classical_rules import get_control, get_production, get_ten_god
-from src2.engine.module2_root import (
+from src.engine.classical_rules import get_control, get_production, get_ten_god
+from src.engine.module2_root import (
     calculate_clash_adjusted_dm_score,
     calculate_dm_strength_tier1,
     classify_dm_strength,
 )
-from src2.engine.module2_root import (
+from src.engine.module2_root import (
     test_anti_vibe_3_3 as engine_test_anti_vibe_3_3,
 )
 
@@ -55,7 +55,7 @@ def test_ten_gods_matrix_structure(
     assert_key_format_convention: Any,
 ) -> None:
     """Verify that TEN_GODS_MATRIX maps all 10 Heavenly Stems x 10 target stems in CapitalCase."""
-    from src2.core.schemas.unified import TEN_GODS_MATRIX
+    from src.core.schemas.unified import TEN_GODS_MATRIX
 
     assert len(TEN_GODS_MATRIX) == 10
     for dm in heavenly_stems:
@@ -75,7 +75,7 @@ def test_get_ten_god_function(
     assert_key_format_convention: Any,
 ) -> None:
     """Test get_ten_god() function for all 10 Heavenly Stems and canonical pairings."""
-    from src2.core.schemas.unified import TEN_GODS_MATRIX
+    from src.core.schemas.unified import TEN_GODS_MATRIX
 
     # Canonical Jia Wood DM pairings
     assert get_ten_god("Jia", "Jia") == "Friend"

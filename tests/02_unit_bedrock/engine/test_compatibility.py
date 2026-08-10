@@ -12,7 +12,7 @@ Tests cover:
 
 import pytest
 
-from src2.engine.module12_compatibility import analyze_compatibility
+from src.engine.module12_compatibility import analyze_compatibility
 
 
 def analyze_compatibility_from_dict(p1: dict, p2: dict, category: str = "friend") -> dict:

@@ -12,8 +12,8 @@ Tests cover:
 
 import pytest
 
-from src2.core.schemas import ChartProfile, Pillar
-from src2.engine.module12_compatibility import analyze_compatibility
+from src.core.schemas import ChartProfile, Pillar
+from src.engine.module12_compatibility import analyze_compatibility
 
 # ─────────────────────────────────────────────
 # Test Data Fixtures

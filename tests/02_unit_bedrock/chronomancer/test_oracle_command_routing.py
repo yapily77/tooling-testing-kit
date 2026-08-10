@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock, patch
-from src2.core.schemas.unified import ChartProfile, UserProfile, ValidatedPillar
-from src2.interfaces.telegram.chronomancer.coordinator import session_to_chart_profile
-from src2.interfaces.telegram.session import Session
+from src.core.schemas.unified import ChartProfile, UserProfile, ValidatedPillar
+from src.interfaces.telegram.chronomancer.coordinator import session_to_chart_profile
+from src.interfaces.telegram.session import Session
 
 
 def test_session_to_chart_profile():

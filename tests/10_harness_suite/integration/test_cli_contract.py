@@ -37,17 +37,17 @@ def test_path_normalization_deduplication():
     # absolute + staging prefix -> repo-relative
     from factory.infra.control import REPO_ROOT
     assert normalize_read_path(
-        f"{REPO_ROOT}/factory/temp/src2/foo.py"
-    ) == "src2/foo.py"
+        f"{REPO_ROOT}/factory/temp/src/foo.py"
+    ) == "src/foo.py"
     # staging-prefixed relative -> repo-relative
-    assert normalize_read_path("factory/temp/src2/foo.py") == "src2/foo.py"
+    assert normalize_read_path("factory/temp/src/foo.py") == "src/foo.py"
     # already repo-relative passes through unchanged
-    assert normalize_read_path("src2/foo.py") == "src2/foo.py"
+    assert normalize_read_path("src/foo.py") == "src/foo.py"
     # idempotent: re-normalizing a normalized path is a no-op
-    p = "factory/temp/src2/foo.py"
+    p = "factory/temp/src/foo.py"
     assert normalize_read_path(normalize_read_path(p)) == normalize_read_path(p)
     # windows separators normalized
-    assert normalize_read_path("factory\\temp\\src2\\foo.py") == "src2/foo.py"
+    assert normalize_read_path("factory\\temp\\src\\foo.py") == "src/foo.py"
 
 
 

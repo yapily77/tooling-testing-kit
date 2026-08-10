@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 
-from src2.interfaces.telegram.report_utils import (
+from src.interfaces.telegram.report_utils import (
     _format_date_range,
     _format_english_month_header,
     get_report_menu_text,
@@ -13,7 +13,7 @@ def test_format_date_range_with_none_start_iso_returns_unknown(caplog):
     """
     After fix: _format_date_range(None) returns "Unknown date" instead of crashing.
     """
-    caplog.set_level("ERROR", logger="src2.interfaces.telegram.report_utils")
+    caplog.set_level("ERROR", logger="src.interfaces.telegram.report_utils")
     result = _format_date_range(None, None)
     assert result == "Unknown date"
 
@@ -22,7 +22,7 @@ def test_format_date_range_with_valid_start_iso(caplog):
     """
     Sanity check: _format_date_range works correctly with valid dates.
     """
-    caplog.set_level("ERROR", logger="src2.interfaces.telegram.report_utils")
+    caplog.set_level("ERROR", logger="src.interfaces.telegram.report_utils")
     result = _format_date_range("2026-02-04T04:02:00+08:00")
     assert result != "Unknown date"
     assert "Feb" in result or "04 Feb" in result

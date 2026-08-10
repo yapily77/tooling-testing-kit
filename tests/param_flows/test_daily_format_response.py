@@ -9,7 +9,7 @@ Pathway under test:
         -> if sifu_mode ON:  plain-text narrative -> footer "💡 Chronomancer Mode Active (Cached)._"
 
 The unit under test is ``_handle_daily_format_response`` itself (in
-``src2.interfaces.telegram.chronomancer.coordinator``). It RETURNS a
+``src.interfaces.telegram.chronomancer.coordinator``). It RETURNS a
 ``ChronomancerReply`` (the sendable message); the actual dispatch happens in the
 app consumer ``_handle_daily_command`` (app.py), which we deliberately do NOT
 import here. app.py performs a top-level ``import sentry_sdk`` (app.py:9), which
@@ -33,8 +33,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src2.core.schemas.unified import DailyForecastRecord, Event
-from src2.interfaces.telegram.utils import ChronomancerReply
+from src.core.schemas.unified import DailyForecastRecord, Event
+from src.interfaces.telegram.utils import ChronomancerReply
 
 today = date(2026, 8, 5)
 user_id = 123456789
@@ -99,17 +99,17 @@ async def test_handle_daily_format_response(
     scored = _make_scored(has_events, narrative_has_split)
     prefs = {"language": "English", "sifu_mode": sifu_mode}
 
-    with patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+    with patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock) as mock_send, \
          patch(
-             "src2.interfaces.telegram.chronomancer.coordinator.save_session",
+             "src.interfaces.telegram.chronomancer.coordinator.save_session",
          ) as mock_save, \
          patch(
-             "src2.interfaces.telegram.chronomancer.coordinator._format_monthly_block",
+             "src.interfaces.telegram.chronomancer.coordinator._format_monthly_block",
              new_callable=AsyncMock,
              return_value="",
          ) as mock_monthly:
 
-        from src2.interfaces.telegram.chronomancer.coordinator import (
+        from src.interfaces.telegram.chronomancer.coordinator import (
             _handle_daily_format_response,
         )
 

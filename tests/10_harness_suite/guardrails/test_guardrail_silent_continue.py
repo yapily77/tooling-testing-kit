@@ -20,11 +20,11 @@ from tests.test_gates import _plan
 
 def _setup_staging(tmp_path):
     """Create dummy live + staged files as test_harness_gates does."""
-    live = tmp_path / "src2" / "a.py"
+    live = tmp_path / "src" / "a.py"
     live.parent.mkdir(parents=True, exist_ok=True)
     live.write_text("x = 1")
 
-    staged = tmp_path / "admin" / "orchestrator" / "temp" / "src2" / "a.py"
+    staged = tmp_path / "admin" / "orchestrator" / "temp" / "src" / "a.py"
     staged.parent.mkdir(parents=True, exist_ok=True)
     staged.write_text("x = 2")
     return live, staged
@@ -33,7 +33,7 @@ def _setup_staging(tmp_path):
 async def _intern_done(brief: str, task_id: str | None = None) -> str:
     from factory.infra.context import stage_path
     try:
-        sp = Path(stage_path("src2/a.py"))
+        sp = Path(stage_path("src/a.py"))
         if sp.exists():
             sp.write_text("x = 3")
     except Exception:
@@ -42,7 +42,7 @@ async def _intern_done(brief: str, task_id: str | None = None) -> str:
     return json.dumps({
         "status": "done",
         "task_id": "intern01",
-        "files_changed": ["src2/a.py"],
+        "files_changed": ["src/a.py"],
         "diff_summary": "changed",
         "notes": "Done",
     })
@@ -68,7 +68,7 @@ def test_guardrail_crash_blocks_task(tmp_path, monkeypatch):
     monkeypatch.setattr("subprocess.run", _mock_run)
 
     plan = _plan()
-    plan.workplan.groups[0].tasks[0].file_paths = ["src2/a.py"]
+    plan.workplan.groups[0].tasks[0].file_paths = ["src/a.py"]
     with pytest.raises(RuntimeError, match="EXECUTE phase incomplete"):
         asyncio.run(run_execute_phase(
             plan, tmp_path / "run", asyncio.Semaphore(20), _intern_done
@@ -97,7 +97,7 @@ def test_guardrail_unparseable_output_blocks_task(tmp_path, monkeypatch):
     monkeypatch.setattr("subprocess.run", _mock_run)
 
     plan = _plan()
-    plan.workplan.groups[0].tasks[0].file_paths = ["src2/a.py"]
+    plan.workplan.groups[0].tasks[0].file_paths = ["src/a.py"]
     with pytest.raises(RuntimeError, match="EXECUTE phase incomplete"):
         asyncio.run(run_execute_phase(
             plan, tmp_path / "run", asyncio.Semaphore(20), _intern_done
@@ -124,7 +124,7 @@ def test_runtime_load_gate_crash_logged(tmp_path, monkeypatch):
     monkeypatch.setattr("subprocess.run", _mock_run)
 
     plan = _plan()
-    plan.workplan.groups[0].tasks[0].file_paths = ["src2/a.py"]
+    plan.workplan.groups[0].tasks[0].file_paths = ["src/a.py"]
     with pytest.raises(RuntimeError, match="EXECUTE phase incomplete"):
         asyncio.run(run_execute_phase(
             plan, tmp_path / "run", asyncio.Semaphore(20), _intern_done

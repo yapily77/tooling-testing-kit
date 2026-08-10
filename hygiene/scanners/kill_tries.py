@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Kill-Tries Scanner & Refactorer: Flat Control Flow & Anti-Pattern Eliminator.
-Scans Python files in src2/ for:
+Scans Python files in src/ for:
 1. Priority 1: Try Pyramids / Try-Else-If Anti-Patterns.
 2. Priority 2: Deep Nesting (Depth > 3).
 3. Priority 3: Cyclomatic Complexity (CC > 5).
@@ -84,7 +84,7 @@ except Exception as err:
 
 CHECKPOINT_FILE = pkg_root / "reports" / "kill_tries_checkpoint.jsonl"
 REPORT_FILE = pkg_root / "reports" / "kill_tries.json"
-SRC2_DIR = pkg_root.parent / "src2"
+src_DIR = pkg_root.parent / "src"
 PROMPT_TEMPLATE_PATH = pkg_root / "scanners" / "kill_tries_prompt.yaml"
 PROMPT_RETRY_PATH = pkg_root / "scanners" / "kill_tries_prompt_retry.yaml"
 LIST_FILE = pkg_root / "scanners" / "kill_tries_list.txt"
@@ -376,13 +376,13 @@ class RefactoringVerdict(BaseModel):
             if stripped.startswith(("import ", "from ")):
                 parts = stripped.split()
                 mod = parts[1].split(".")[0] if len(parts) > 1 else ""
-                if mod not in safe_modules and not mod.startswith("src2"):
+                if mod not in safe_modules and not mod.startswith("src"):
                     unauthorized_imports.append(stripped)
 
         if unauthorized_imports:
             raise ModelRetry(
                 f"CRITICAL: Unauthorized imports included: {unauthorized_imports}. "
-                f"You may ONLY import from {safe_modules} or internal `src2` modules."
+                f"You may ONLY import from {safe_modules} or internal `src` modules."
             )
 
         class_lines = [line for line in lines if line.strip().startswith("class ")]
@@ -1550,10 +1550,10 @@ def verify_refactored_ast(
             module_name = getattr(node, "module", None)
             if not module_name and isinstance(node, ast.Import):
                 module_name = node.names[0].name.split(".")[0]
-            if module_name and module_name not in safe_modules and not module_name.startswith("src2"):
+            if module_name and module_name not in safe_modules and not module_name.startswith("src"):
                 violations.append(
                     f"unauthorized_import: Added an import for `{module_name}` | "
-                    f"Suggestion: You may ONLY import from {safe_modules} or internal `src2` modules."
+                    f"Suggestion: You may ONLY import from {safe_modules} or internal `src` modules."
                 )
 
     # 2. Namespace sandbox: harvest original file namespace
@@ -2104,7 +2104,7 @@ def scan_all_candidates(target_files: set[str] | None = None) -> list[FunctionCa
             elif p.is_dir():
                 files_to_scan.extend(sorted(p.rglob("*.py")))
     else:
-        files_to_scan = sorted(SRC2_DIR.rglob("*.py"))
+        files_to_scan = sorted(src_DIR.rglob("*.py"))
 
     for py_file in files_to_scan:
         if py_file.is_file():

@@ -181,4 +181,4 @@ def is_binary_file(file_path: Path) -> bool:
         return False
 
 
-get_src2_files = get_src_files
+get_src_files = get_src_files

@@ -1,7 +1,7 @@
 import os
 
-from src2.core.schemas.unified import ChartProfile, Pillar, UserProfile, ValidatedPillar
-from src2.engine.transformer import to_chart_profile, to_user_profile
+from src.core.schemas.unified import ChartProfile, Pillar, UserProfile, ValidatedPillar
+from src.engine.transformer import to_chart_profile, to_user_profile
 
 # Bypass Mem0 initialization error
 os.environ["MEM0_MODEL"] = "dummy"

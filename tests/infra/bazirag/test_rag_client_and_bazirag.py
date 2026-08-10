@@ -128,11 +128,11 @@ class TestSyncQueryExecution:
         db.write_text("fake")
         monkeypatch.setenv("BGEM3_URL", "http://localhost:8002/v1/embeddings")
         monkeypatch.setenv("BGEM3_TOKEN", "test-token")
-        with patch("src2.core.memory.constants.TURBOVEC_INDEX_PATH", tv):
-            with patch("src2.core.memory.constants.BAZI_SQLITE_PATH", db):
-                if "src2.engine.rag_client" in sys.modules:
-                    del sys.modules["src2.engine.rag_client"]
-                from src2.engine.rag_client import query_classical_text
+        with patch("src.core.memory.constants.TURBOVEC_INDEX_PATH", tv):
+            with patch("src.core.memory.constants.BAZI_SQLITE_PATH", db):
+                if "src.engine.rag_client" in sys.modules:
+                    del sys.modules["src.engine.rag_client"]
+                from src.engine.rag_client import query_classical_text
                 with pytest.raises(TypeError, match="query must be a string"):
                     query_classical_text(123)  # type: ignore[arg-type]
 
@@ -156,11 +156,11 @@ class TestAsyncQueryExecution:
         mock_conn.execute.return_value = mock_cursor
         mock_conn.row_factory = aiosqlite.Row
 
-        with patch("src2.core.memory.constants.TURBOVEC_INDEX_PATH", tv):
-            with patch("src2.core.memory.constants.BAZI_SQLITE_PATH", db):
-                if "src2.engine.rag_client" in sys.modules:
-                    del sys.modules["src2.engine.rag_client"]
-                from src2.engine.rag_client import _query_turbovec
+        with patch("src.core.memory.constants.TURBOVEC_INDEX_PATH", tv):
+            with patch("src.core.memory.constants.BAZI_SQLITE_PATH", db):
+                if "src.engine.rag_client" in sys.modules:
+                    del sys.modules["src.engine.rag_client"]
+                from src.engine.rag_client import _query_turbovec
                 index = turbovec.IdMapIndex(dim=VECTOR_SIZE, bit_width=4)
                 vectors = np.random.rand(3, VECTOR_SIZE).astype(np.float32)
                 ids = np.array([10, 20, 30], dtype=np.uint64)
@@ -178,29 +178,29 @@ class TestAsyncQueryExecution:
         db.write_text("fake")
         monkeypatch.setenv("BGEM3_URL", "http://localhost:8002/v1/embeddings")
         monkeypatch.setenv("BGEM3_TOKEN", "test-token")
-        with patch("src2.core.memory.constants.TURBOVEC_INDEX_PATH", tv):
-            with patch("src2.core.memory.constants.BAZI_SQLITE_PATH", db):
-                if "src2.engine.rag_client" in sys.modules:
-                    del sys.modules["src2.engine.rag_client"]
-                from src2.engine.rag_client import query_classical_text_async
+        with patch("src.core.memory.constants.TURBOVEC_INDEX_PATH", tv):
+            with patch("src.core.memory.constants.BAZI_SQLITE_PATH", db):
+                if "src.engine.rag_client" in sys.modules:
+                    del sys.modules["src.engine.rag_client"]
+                from src.engine.rag_client import query_classical_text_async
                 with pytest.raises(TypeError, match="query must be a string"):
                     await query_classical_text_async(42)  # type: ignore[arg-type]
 
 
 class TestHardFailHandling:
     def test_load_turbovec_index_raises_on_missing_file(self):
-        from src2.engine.rag_client import _load_turbovec_index_sync
+        from src.engine.rag_client import _load_turbovec_index_sync
         with patch(
-            "src2.core.memory.constants.TURBOVEC_INDEX_PATH",
+            "src.core.memory.constants.TURBOVEC_INDEX_PATH",
             Path("/nonexistent/bazi_index.tv"),
         ):
             with pytest.raises((FileNotFoundError, OSError)):
                 _load_turbovec_index_sync()
 
     def test_get_sqlite_connection_raises_on_missing_db(self):
-        from src2.engine.rag_client import _get_sqlite_connection_readonly
+        from src.engine.rag_client import _get_sqlite_connection_readonly
         with patch(
-            "src2.core.memory.constants.BAZI_SQLITE_PATH",
+            "src.core.memory.constants.BAZI_SQLITE_PATH",
             Path("/nonexistent/bazi_metadata.db"),
         ):
             # sqlite3.connect creates a new DB for non-existent paths,

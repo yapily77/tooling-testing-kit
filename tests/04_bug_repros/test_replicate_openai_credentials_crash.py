@@ -4,8 +4,8 @@ import pytest
 # Ensure no environment key is masking the bug
 os.environ.pop("OPENAI_API_KEY", None)
 
-from src2.interfaces.telegram.conductor import run_conductor
-from src2.interfaces.telegram.session import Session, SessionMetadata
+from src.interfaces.telegram.conductor import run_conductor
+from src.interfaces.telegram.session import Session, SessionMetadata
 import openai
 
 @pytest.mark.asyncio

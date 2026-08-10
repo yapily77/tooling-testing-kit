@@ -2,7 +2,7 @@ import numpy as np
 from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
-from src2.engine.rag_client import query_classical_text, query_classical_text_async
+from src.engine.rag_client import query_classical_text, query_classical_text_async
 
 
 class MockRow(dict):
@@ -13,9 +13,9 @@ class MockRow(dict):
         return super().__getitem__(item)
 
 
-@patch("src2.engine.rag_client.turbovec.IdMapIndex.load")
-@patch("src2.engine.rag_client.sqlite3.connect")
-@patch("src2.engine.rag_client.httpx.Client")
+@patch("src.engine.rag_client.turbovec.IdMapIndex.load")
+@patch("src.engine.rag_client.sqlite3.connect")
+@patch("src.engine.rag_client.httpx.Client")
 def test_query_classical_text_json_serialization(mock_client, mock_sqlite, mock_turbovec):
     mock_post_response = MagicMock()
     mock_post_response.text = '{"data": [{"embedding": [0.1, 0.2]}]}'
@@ -35,8 +35,8 @@ def test_query_classical_text_json_serialization(mock_client, mock_sqlite, mock_
     ]
     mock_sqlite.return_value = mock_conn
 
-    with patch("src2.engine.rag_client.BGEM3_URL", "http://test/v1/embeddings"), \
-         patch("src2.engine.rag_client.BGEM3_TOKEN", "token"):
+    with patch("src.engine.rag_client.BGEM3_URL", "http://test/v1/embeddings"), \
+         patch("src.engine.rag_client.BGEM3_TOKEN", "token"):
 
         query_classical_text("test query")
 
@@ -47,9 +47,9 @@ def test_query_classical_text_json_serialization(mock_client, mock_sqlite, mock_
 
 
 @pytest.mark.asyncio
-@patch("src2.engine.rag_client.turbovec.IdMapIndex.load")
-@patch("src2.engine.rag_client.aiosqlite.connect")
-@patch("src2.engine.rag_client.httpx.AsyncClient")
+@patch("src.engine.rag_client.turbovec.IdMapIndex.load")
+@patch("src.engine.rag_client.aiosqlite.connect")
+@patch("src.engine.rag_client.httpx.AsyncClient")
 async def test_query_classical_text_async_json_serialization(mock_client, mock_sqlite, mock_turbovec):
     mock_post_response = MagicMock()
     mock_post_response.text = '{"data": [{"embedding": [0.1, 0.2]}]}'
@@ -71,8 +71,8 @@ async def test_query_classical_text_async_json_serialization(mock_client, mock_s
     mock_conn.execute.return_value = mock_cursor
     mock_sqlite.side_effect = AsyncMock(return_value=mock_conn)
 
-    with patch("src2.engine.rag_client.BGEM3_URL", "http://test/v1/embeddings"), \
-         patch("src2.engine.rag_client.BGEM3_TOKEN", "token"):
+    with patch("src.engine.rag_client.BGEM3_URL", "http://test/v1/embeddings"), \
+         patch("src.engine.rag_client.BGEM3_TOKEN", "token"):
 
         await query_classical_text_async("test query async")
 

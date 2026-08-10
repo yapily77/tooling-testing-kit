@@ -1,10 +1,10 @@
 import pytest
-from src2.core.schemas.unified import ChartProfile, Pillar
-from src2.interfaces.telegram.chronomancer.oracle_gatherer import (
+from src.core.schemas.unified import ChartProfile, Pillar
+from src.interfaces.telegram.chronomancer.oracle_gatherer import (
     _gather_transits,
     format_transit_pillar,
 )
-from src2.interfaces.telegram.chronomancer.oracle_narrator import (
+from src.interfaces.telegram.chronomancer.oracle_narrator import (
     ORACLE_NARRATOR_SYSTEM_PROMPT,
     get_oracle_narrator_agent,
     resolve_liu_nian,

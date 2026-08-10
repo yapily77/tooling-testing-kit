@@ -14,8 +14,8 @@ import math
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src2.engine.module3_interaction import calculate_clash_integrated_severity
-from src2.engine.module9_triggers import calculate_trigger_potency
+from src.engine.module3_interaction import calculate_clash_integrated_severity
+from src.engine.module9_triggers import calculate_trigger_potency
 
 
 @given(

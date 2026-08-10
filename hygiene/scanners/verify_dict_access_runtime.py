@@ -113,7 +113,7 @@ def get_src_files() -> list[Path]:
     return list(src_dir.rglob("*.py"))
 
 
-get_src2_files = get_src_files
+get_src_files = get_src_files
 
 
 def discover_models(files: list[Path]) -> dict[str, str]:

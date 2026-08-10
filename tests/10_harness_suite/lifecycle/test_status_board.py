@@ -88,8 +88,8 @@ def test_run_start_shows_senior_and_clears_stale_intern(status_board):
     # Seed a leftover board from a crashed prior run.
     status_board.write_text(
         "# Orchestrator Status — bd:  (updated: 2026-07-20 22:40:59 UTC)\n\n"
-        "## ▶ LIVE — intern01 → src2/a.py\n"
-        "- [~] intern01 → src2/a.py\n"
+        "## ▶ LIVE — intern01 → src/a.py\n"
+        "- [~] intern01 → src/a.py\n"
         "- [ ] intern\n- [ ] engineer_plan\n- [ ] intern\n"
         "- [ ] engineer_review\n- [ ] senior\n",
         encoding="utf-8",
@@ -99,7 +99,7 @@ def test_run_start_shows_senior_and_clears_stale_intern(status_board):
     text = _read(status_board)
     # Stale intern row gone, fresh timestamp applied.
     assert "intern01" not in text
-    assert "intern → src2" not in text
+    assert "intern → src" not in text
     # Intern is the live/in-progress role from the moment the run starts.
     assert "intern" in text
     assert "LIVE — intern" in text
@@ -113,7 +113,7 @@ def test_run_start_with_from_phase(status_board):
     stale intern/intern row from a prior run."""
     status_board.write_text(
         "# Orchestrator Status — bd:  (updated: 2026-07-20 22:40:59 UTC)\n\n"
-        "## ▶ LIVE — intern99 → src2/zzz.py\n- [~] intern99 → src2/zzz.py\n",
+        "## ▶ LIVE — intern99 → src/zzz.py\n- [~] intern99 → src/zzz.py\n",
         encoding="utf-8",
     )
     update_status_board([], "intern", "bd1")

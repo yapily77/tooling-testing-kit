@@ -128,7 +128,7 @@ channel entirely.
 
 ## 5. Exact Code Changes Required (setup only)
 
-### A. `src2/interfaces/telegram/app.py`
+### A. `src/interfaces/telegram/app.py`
 1. New route mirroring `telegram_webhook`:
    ```python
    @app.post("/webhook/test")
@@ -142,7 +142,7 @@ channel entirely.
 3. `_process_webhook_logic_inner(data, platform="telegram")` → pass `platform` to both
    `handle_intake(chat_id, text_val, platform=platform)` call sites.
 
-### B. `src2/interfaces/telegram/db.py`
+### B. `src/interfaces/telegram/db.py`
 Add `platform="telegram"` (default, zero regression) to:
 - `_get_or_create_uuid(self, chat_id, platform="telegram")` → use in the
   `filter_by(platform=platform, ...)` lookup and `PlatformAccount(platform=platform, ...)` create.
@@ -152,14 +152,14 @@ Add `platform="telegram"` (default, zero regression) to:
 - `get_semantic_id` / `ensure_semantic_id`
 - (other ~40 internal callers keep default `"telegram"` → unchanged)
 
-### C. `src2/interfaces/telegram/session.py`
+### C. `src/interfaces/telegram/session.py`
 - `get_session(chat_id, platform="telegram")` → `db.get_session(chat_id, platform)`
 - `save_session(session, platform="telegram")` → `db.update_session(..., platform)`
 - `delete_session(chat_id, platform="telegram")`
 - Surface `is_new` + `User.tier` on the returned `Session` (new optional fields) so intake
   can read them.
 
-### D. `src2/interfaces/telegram/intake/intake.py`
+### D. `src/interfaces/telegram/intake/intake.py`
 - `handle_intake(chat_id, text, platform="telegram")` → thread `platform` into
   `get_session` / `save_session`; read `is_new` + `User.tier` for branching.
 

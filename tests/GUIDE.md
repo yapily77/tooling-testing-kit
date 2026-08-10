@@ -87,6 +87,6 @@ Each file in `examples/` illustrates a specific test design pattern:
 
 | Symptom | Cause | Solution |
 |---|---|---|
-| `ModuleNotFoundError: No module named 'src2'` | Attempting to run internal benchmark layers without target source tree | Stick to `examples/` or set `KIT_PATH` to target codebase in `.env` |
+| `ModuleNotFoundError: No module named 'src'` | Attempting to run internal benchmark layers without target source tree | Stick to `examples/` or set `KIT_PATH` to target codebase in `.env` |
 | `RuntimeError: KIT_LIVE=true but missing required env` | Live mode enabled with missing credentials | Complete missing `KIT_*` variables in `tests/.env` |
 | Pytest skips `01_` through `10_` layers | Intentionally excluded from default collection | Run specific paths explicitly: `uv run pytest 01_gold_snapshots/` |

@@ -1,6 +1,6 @@
 """AST scanner: detects Context Managers that silently swallow exceptions in ``__exit__``.
 
-Targets ``src2/``. Walks the AST to find ``ast.FunctionDef`` (and
+Targets ``src/``. Walks the AST to find ``ast.FunctionDef`` (and
 ``ast.AsyncFunctionDef``) nodes named ``__exit__`` / ``__aexit__``. If such a
 method contains an ``ast.Return`` node whose value is an ``ast.Constant`` with
 value ``True``, Python interprets this as an explicit instruction to suppress
@@ -34,8 +34,8 @@ def find_exit_swallows(tree: ast.Module) -> list[tuple[int, str]]:
 
 def main() -> None:
     root = Path(__file__).resolve().parent.parent.parent
-    src2 = root / "src2"
-    all_violations = scan_tree(src2, find_exit_swallows)
+    src = root / "src"
+    all_violations = scan_tree(src, find_exit_swallows)
     if all_violations:
         print("=== Context Manager Swallow Violations ===")
         for filepath, lineno, msg in all_violations:
@@ -43,7 +43,7 @@ def main() -> None:
         print(f"\nTotal violations: {len(all_violations)}")
         sys.exit(1)
     else:
-        print("No context-manager swallow violations found in src2/")
+        print("No context-manager swallow violations found in src/")
         sys.exit(0)
 
 

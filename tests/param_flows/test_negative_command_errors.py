@@ -39,16 +39,16 @@ def mock_session():
 async def test_invalid_forecast_category_passes_category_through(mock_db, mock_session, invalid_cmd):
     chat_id = 123456789
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.chronomancer.handle_forecast_category", new_callable=AsyncMock) as mock_handle:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.chronomancer.handle_forecast_category", new_callable=AsyncMock) as mock_handle:
 
         mock_handle.return_value = "Invalid category handled gracefully"
         expected_category = invalid_cmd.replace("/forecast_", "")
 
-        from src2.interfaces.telegram.app import _handle_forecast_command
+        from src.interfaces.telegram.app import _handle_forecast_command
         await _handle_forecast_command(invalid_cmd, chat_id, mock_session, "telegram")
 
         mock_handle.assert_called_once_with(chat_id, expected_category, None, None)
@@ -58,15 +58,15 @@ async def test_invalid_forecast_category_passes_category_through(mock_db, mock_s
 async def test_handle_forecast_raises_propagates(mock_db, mock_session):
     chat_id = 123456789
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.chronomancer.handle_forecast", new_callable=AsyncMock) as mock_handle:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.chronomancer.handle_forecast", new_callable=AsyncMock) as mock_handle:
 
         mock_handle.side_effect = RuntimeError("Forecast engine OOM during /30")
 
-        from src2.interfaces.telegram.app import _handle_forecast_command
+        from src.interfaces.telegram.app import _handle_forecast_command
         with pytest.raises(RuntimeError, match="Forecast engine OOM"):
             await _handle_forecast_command("/30", chat_id, mock_session, "telegram")
 
@@ -77,15 +77,15 @@ async def test_handle_forecast_raises_propagates(mock_db, mock_session):
 async def test_handle_daily_raises_propagates(mock_db, mock_session):
     chat_id = 123456789
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.chronomancer.handle_daily", new_callable=AsyncMock) as mock_handle:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.chronomancer.handle_daily", new_callable=AsyncMock) as mock_handle:
 
         mock_handle.side_effect = ValueError("No profile set for user during /daily")
 
-        from src2.interfaces.telegram.app import _handle_daily_command
+        from src.interfaces.telegram.app import _handle_daily_command
         with pytest.raises(ValueError, match="No profile set"):
             await _handle_daily_command("/daily", chat_id, mock_session, "telegram")
 
@@ -97,14 +97,14 @@ async def test_month_number_command_db_prefs_none_raises(mock_db, mock_session):
     chat_id = 123456789
     text = "/6"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.security.can_generate_report", return_value=True):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.security.can_generate_report", return_value=True):
 
         mock_db.get_user_prefs.return_value = None
         mock_db.get_all_reports_for_user.return_value = [{"master_json_path": "/fake/path.json"}]
 
-        from src2.interfaces.telegram.app import _handle_month_number_command
+        from src.interfaces.telegram.app import _handle_month_number_command
         with pytest.raises(AttributeError):
             await _handle_month_number_command(chat_id, text)
 
@@ -121,13 +121,13 @@ async def test_add_command_unknown_relation_shows_keyboard(mock_db, mock_session
     chat_id = 123456789
     text = f"/add {unknown_relation}"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.ui_components.get_stakeholder_category_keyboard") as mock_keyboard:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.ui_components.get_stakeholder_category_keyboard") as mock_keyboard:
 
         mock_keyboard.return_value = {"inline_keyboard": []}
 
-        from src2.interfaces.telegram.app import _handle_add_command
+        from src.interfaces.telegram.app import _handle_add_command
         await _handle_add_command(text, chat_id, mock_session, "telegram")
 
         mock_keyboard.assert_called_once()
@@ -140,16 +140,16 @@ async def test_add_command_unknown_relation_shows_keyboard(mock_db, mock_session
 async def test_week_chart_handle_raises_propagates(mock_db, mock_session):
     chat_id = 123456789
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.utils.send_telegram_photo", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.chronomancer.handle_week_chart", new_callable=AsyncMock) as mock_handle:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.utils.send_telegram_photo", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.chronomancer.handle_week_chart", new_callable=AsyncMock) as mock_handle:
 
         mock_handle.side_effect = FileNotFoundError("Weekly chart data file corrupted")
 
-        from src2.interfaces.telegram.app import _handle_week_chart_command
+        from src.interfaces.telegram.app import _handle_week_chart_command
         with pytest.raises(FileNotFoundError, match="Weekly chart data file corrupted"):
             await _handle_week_chart_command("/week", chat_id, mock_session, "telegram")
 
@@ -166,24 +166,24 @@ async def test_daily_rag_failure_propagates(mock_db, mock_session):
     mock_session.profile = MagicMock()
     mock_session.profile.day_pillar = MagicMock()
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.chronomancer.coordinator.db", mock_db), \
-         patch("src2.interfaces.telegram.chronomancer.coordinator._handle_daily_ensure_profile", return_value=mock_session), \
-         patch("src2.interfaces.telegram.chronomancer.coordinator._session_to_profile", return_value={"alias": "TestUser"}), \
-         patch("src2.interfaces.telegram.chronomancer.coordinator.session_to_chart_profile", return_value=MagicMock()), \
-         patch("src2.interfaces.telegram.chronomancer.forecast_store.db", mock_db), \
-         patch("src2.interfaces.telegram.db.Database") as mock_db_class, \
-         patch("src2.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qct, \
-         patch("src2.interfaces.telegram.chronomancer.agents.compute_structural_map", return_value=""), \
-         patch("src2.interfaces.telegram.chronomancer.agents.compute_shen_sha_context", return_value=""):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.chronomancer.coordinator.db", mock_db), \
+         patch("src.interfaces.telegram.chronomancer.coordinator._handle_daily_ensure_profile", return_value=mock_session), \
+         patch("src.interfaces.telegram.chronomancer.coordinator._session_to_profile", return_value={"alias": "TestUser"}), \
+         patch("src.interfaces.telegram.chronomancer.coordinator.session_to_chart_profile", return_value=MagicMock()), \
+         patch("src.interfaces.telegram.chronomancer.forecast_store.db", mock_db), \
+         patch("src.interfaces.telegram.db.Database") as mock_db_class, \
+         patch("src.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qct, \
+         patch("src.interfaces.telegram.chronomancer.agents.compute_structural_map", return_value=""), \
+         patch("src.interfaces.telegram.chronomancer.agents.compute_shen_sha_context", return_value=""):
 
         mock_db_class.return_value.get_user_prefs.return_value = {"language": "English", "sifu_mode": 0}
         mock_db_class.return_value.get_daily_forecast.return_value = None
-        mock_qct.side_effect = FileNotFoundError("TurboVec index not found at src2/infrastructure/rag/bazi_index.tv")
+        mock_qct.side_effect = FileNotFoundError("TurboVec index not found at src/infrastructure/rag/bazi_index.tv")
 
-        from src2.interfaces.telegram.app import _handle_daily_command
+        from src.interfaces.telegram.app import _handle_daily_command
         with pytest.raises(FileNotFoundError, match="TurboVec index not found"):
             await _handle_daily_command("/daily", chat_id, mock_session, "telegram")

@@ -2,7 +2,7 @@
 
 Ticket: my-repo-6pnz
 Goal: throw randomized and adversarial data at the SQLite persistence layer
-(`Database` in src2/interfaces/telegram/db.py) to prove the following
+(`Database` in src/interfaces/telegram/db.py) to prove the following
 invariants hold:
 
   1. SQLite Session Round-Trip -- a valid session state dump saved via
@@ -32,7 +32,7 @@ Rules enforced (per SKILL.md):
 
 from __future__ import annotations
 
-# ── Isolate DB + disable side-effects BEFORE importing src2 modules. ─────────
+# ── Isolate DB + disable side-effects BEFORE importing src modules. ─────────
 # DATABASE_URL must be empty at import time so the module-level PostgreSQL
 # async engine creation is skipped (_pg_url == "" → _async_engine = None).
 # We patch DATABASE_URL to sqlite:///:memory: inside the `db` fixture.
@@ -55,9 +55,9 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-from src2.core.schemas import SessionStep
-from src2.interfaces.telegram import db as db_mod
-from src2.interfaces.telegram.db import Database
+from src.core.schemas import SessionStep
+from src.interfaces.telegram import db as db_mod
+from src.interfaces.telegram.db import Database
 
 _VALID_STEPS = list(SessionStep.__args__)
 
@@ -96,7 +96,7 @@ def db() -> Database:
 @pytest.fixture()
 def cache_file(tmp_path):
     """Yield a writable .jsonl cache path, then restore CACHE_FILE global."""
-    import src2.engine.bazi_cache as bc
+    import src.engine.bazi_cache as bc
     fpath = tmp_path / "bazi_cache.jsonl"
     original = bc.CACHE_FILE
     bc.CACHE_FILE = fpath
@@ -108,7 +108,7 @@ def cache_file(tmp_path):
 
 def _safe_session_dump(step: str = "START") -> dict:
     """Build a minimal but valid Telegram Session model dump."""
-    from src2.interfaces.telegram.session import Session as TelegramSession
+    from src.interfaces.telegram.session import Session as TelegramSession
     s = TelegramSession(chat_id=1, step=step)
     dump = s.model_dump()
     dump.pop("version", None)
@@ -141,8 +141,8 @@ _MESSAGE_STRAT = st.one_of(
 )
 @settings(max_examples=100)
 def test_session_round_trip(db: Database, step: str, messages: list[str]):
-    from src2.interfaces.telegram.session import ChatMessage
-    from src2.interfaces.telegram.session import Session as TelegramSession
+    from src.interfaces.telegram.session import ChatMessage
+    from src.interfaces.telegram.session import Session as TelegramSession
 
     chat_msgs = [ChatMessage(role="user", content=m) for m in messages if m]
     s = TelegramSession(chat_id=1, step=step, conversation_history=chat_msgs)
@@ -165,8 +165,8 @@ def test_session_round_trip(db: Database, step: str, messages: list[str]):
 @settings(max_examples=10)
 def test_session_round_trip_large_conversation(db: Database, messages: list[str]):
     """1200 messages / ~14 MB must round-trip without truncation or crash."""
-    from src2.interfaces.telegram.session import ChatMessage
-    from src2.interfaces.telegram.session import Session as TelegramSession
+    from src.interfaces.telegram.session import ChatMessage
+    from src.interfaces.telegram.session import Session as TelegramSession
 
     chat_msgs = [ChatMessage(role="user", content=m) for m in messages if m]
     total_bytes = sum(len(m.encode("utf-8")) for m in messages)
@@ -211,7 +211,7 @@ def test_session_round_trip_large_conversation(db: Database, messages: list[str]
 @settings(max_examples=50)
 def test_cache_file_skips_corrupt_lines(cache_file, valid_entries, corrupt_lines):
     """Mix valid + corrupt lines in arbitrary order; all valid entries survive."""
-    import src2.engine.bazi_cache as bc
+    import src.engine.bazi_cache as bc
 
     lines: list[str] = []
 

@@ -2,10 +2,10 @@ import re
 from pathlib import Path
 
 files_to_clean = [
-    "src2/engine/prompt_maker.py",
-    "src2/engine/prompt_stitcher.py",
-    "src2/engine/prompt_checker.py",
-    "src2/engine/monthly_generator.py"
+    "src/engine/prompt_maker.py",
+    "src/engine/prompt_stitcher.py",
+    "src/engine/prompt_checker.py",
+    "src/engine/monthly_generator.py"
 ]
 
 for file in files_to_clean:

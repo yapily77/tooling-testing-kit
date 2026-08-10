@@ -29,7 +29,7 @@ tests/
 1. **Read-only source of truth**: all content derives from `_source/` (a staging
    mirror of `my-repo/TEST/`). `my-repo/` is **never modified**.
 2. **Drop silently** from every layer: `__pycache__/`, `.pytest_cache/`, `*.pyc`,
-   `*.db`, and the heavy audit blob `codes/20260626_SRC2/` (already excluded from
+   `*.db`, and the heavy audit blob `codes/20260626_src/` (already excluded from
    `_source/`).
 3. **Keep always**: every `SKILL.md`, `prompts/`, `conftest.py`, `pytest.ini`,
    and the `*.MD` narrative notes — they *are* the philosophy content.

@@ -4,7 +4,7 @@ import os
 import sys
 from pathlib import Path
 
-# Annot: my-repo-only (src2.* imports). Honour KIT_PATH / TARGET_REPO override.
+# Annot: my-repo-only (src.* imports). Honour KIT_PATH / TARGET_REPO override.
 _kit_root = os.getenv("KIT_PATH", "") or os.getenv("TARGET_REPO", "")
 PROJECT_ROOT = Path(_kit_root) if _kit_root else Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -39,16 +39,16 @@ async def run_test(verbose=False, chat_id_override=None):
     user_id = chat_id_override or 998
     logger.info(f"Starting Chronomancer conversational simulation for user {user_id}...")
 
-    # Lazy imports from src2
+    # Lazy imports from src
     from unittest.mock import AsyncMock, MagicMock
 
-    from src2.core.memory.memory_manager import memory_manager
-    from src2.core.schemas import UserProfile
-    from src2.core.schemas import ValidatedPillar as Pillar
-    from src2.interfaces.telegram.chronomancer import coordinator
-    from src2.interfaces.telegram.chronomancer.coordinator import handle_ask, handle_daily
-    from src2.interfaces.telegram.db import Database
-    from src2.interfaces.telegram.session import get_session, save_session
+    from src.core.memory.memory_manager import memory_manager
+    from src.core.schemas import UserProfile
+    from src.core.schemas import ValidatedPillar as Pillar
+    from src.interfaces.telegram.chronomancer import coordinator
+    from src.interfaces.telegram.chronomancer.coordinator import handle_ask, handle_daily
+    from src.interfaces.telegram.db import Database
+    from src.interfaces.telegram.session import get_session, save_session
 
     db = Database("bot.db")
 
@@ -123,7 +123,7 @@ async def run_test(verbose=False, chat_id_override=None):
 
     # Clean up Valkey/cache db values for today's forecast
     try:
-        from src2.interfaces.telegram.chronomancer.coordinator import get_sg_today
+        from src.interfaces.telegram.chronomancer.coordinator import get_sg_today
         today_str = get_sg_today().isoformat()
         db.delete_chrono_cache_for_user_date(user_id, today_str)
     except Exception as e:
@@ -213,7 +213,7 @@ async def run_test(verbose=False, chat_id_override=None):
     cache_record = db.get_chrono_cache(user_id, today_str)
     assert cache_record is not None, "Daily forecast was not saved to DB cache"
     cache_val = cache_record.get("narrative")
-    from src2.interfaces.telegram.utils import markdown_to_tg_html
+    from src.interfaces.telegram.utils import markdown_to_tg_html
     if getattr(daily_res, "parse_mode", "Markdown") == "HTML":
         if "---" in cache_val:
             parts = cache_val.split("---", 1)

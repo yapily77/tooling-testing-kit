@@ -11,7 +11,7 @@ Shen hidden = Geng(Metal,5), Ren(Water,2), Wu(Earth,1); therefore Water/Shen yie
 [Geng w5, Ren w2] (Wu Earth excluded because Earth controls Water).
 """
 
-from src2.engine.module2_root import (
+from src.engine.module2_root import (
     CONTROL_SUPPRESSION_FACTOR,
     get_dormancy_multiplier,
     selective_hidden_extraction,

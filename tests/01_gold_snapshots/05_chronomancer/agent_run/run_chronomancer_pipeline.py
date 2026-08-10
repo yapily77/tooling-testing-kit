@@ -13,11 +13,11 @@ from dotenv import load_dotenv
 load_dotenv()
 sys.path.insert(0, os.path.abspath('.'))
 
-from src2.core.memory.memory_manager import memory_manager
-from src2.core.schemas.unified import UserProfile, ValidatedPillar
-from src2.engine.narrative_simplifier import advisory_simplifier_agent
-from src2.interfaces.telegram.app import _process_webhook_logic_inner
-from src2.interfaces.telegram.db import Database
+from src.core.memory.memory_manager import memory_manager
+from src.core.schemas.unified import UserProfile, ValidatedPillar
+from src.engine.narrative_simplifier import advisory_simplifier_agent
+from src.interfaces.telegram.app import _process_webhook_logic_inner
+from src.interfaces.telegram.db import Database
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -25,10 +25,10 @@ logger = logging.getLogger(__name__)
 
 def mock_francis_session(user_id: int):
     # Mock Tester' profile directly into the database
-    from src2.interfaces.telegram.db import Database
+    from src.interfaces.telegram.db import Database
     db = Database("bot.db")
 
-    from src2.interfaces.telegram.session import get_session, save_session
+    from src.interfaces.telegram.session import get_session, save_session
 
     profile = UserProfile(
         profile_id="francis_123",
@@ -69,9 +69,9 @@ async def run_command_via_app(user_id: int, command: str):
         }
     }
 
-    with patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message):
-        with patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message):
-            with patch("src2.interfaces.telegram.security.can_use_chronomancer", return_value=True):
+    with patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message):
+        with patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message):
+            with patch("src.interfaces.telegram.security.can_use_chronomancer", return_value=True):
                 await _process_webhook_logic_inner(data)
 
     if not captured_replies:
@@ -153,7 +153,7 @@ async def phase3_session_amnesia():
     # 1. Setup minimal db linkages to allow resolution and report lookup
     import uuid
 
-    from src2.core.database.models import PlatformAccount, Report, User
+    from src.core.database.models import PlatformAccount, Report, User
     session = db.Session()
 
     # Generate UUID for the database
@@ -179,7 +179,7 @@ async def phase3_session_amnesia():
     # 2. Create mock report on disk
     import json
 
-    from src2.core.memory.memory_manager import MemoryManager
+    from src.core.memory.memory_manager import MemoryManager
     logger.info("2.0: Init MemoryManager")
     mm = MemoryManager()
     logger.info("2.1: MemoryManager init done")
@@ -224,7 +224,7 @@ async def phase3_session_amnesia():
 
     # 3. Ensure no DB session state exists
     logger.info("3.2: Deleting DB session state")
-    from src2.interfaces.telegram.session import delete_session
+    from src.interfaces.telegram.session import delete_session
     delete_session(tg_user_id, "telegram")
     logger.info("3.3: Delete session successful")
 
@@ -305,7 +305,7 @@ async def main():
         await phase3_session_amnesia()
         logger.info("✅ E2E Pipeline Passed!")
 
-        from src2.interfaces.telegram.chronomancer.coordinator import background_tasks
+        from src.interfaces.telegram.chronomancer.coordinator import background_tasks
         if background_tasks:
             logger.info(f"Awaiting {len(background_tasks)} background tasks to drain...")
             await asyncio.gather(*background_tasks, return_exceptions=True)

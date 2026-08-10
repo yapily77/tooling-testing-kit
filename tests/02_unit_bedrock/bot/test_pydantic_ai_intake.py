@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pydantic_ai.models.test import TestModel
 
-from src2.interfaces.telegram.conductor import _parse_manual_template, run_conductor
-from src2.interfaces.telegram.session import Session, SessionMetadata
+from src.interfaces.telegram.conductor import _parse_manual_template, run_conductor
+from src.interfaces.telegram.session import Session, SessionMetadata
 
 
 def test_parse_manual_template_success():
@@ -42,13 +42,13 @@ def test_parse_manual_template_invalid():
     assert extracted is None
 
 @pytest.mark.asyncio
-@patch("src2.interfaces.telegram.conductor.Agent.run")
+@patch("src.interfaces.telegram.conductor.Agent.run")
 @patch("pydantic_ai.models.openai.OpenAIChatModel", return_value=TestModel())
 @patch("pydantic_ai.providers.openai.OpenAIProvider")
 async def test_conductor_agent_call(mock_provider, mock_model, mock_run):
     """Test run_conductor initiates Agent.run and updates session."""
 
-    from src2.interfaces.telegram.intake.input_agent import InputResult
+    from src.interfaces.telegram.intake.input_agent import InputResult
 
     # Setup mock session
     session = Session(chat_id=123)

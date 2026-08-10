@@ -61,7 +61,7 @@ def test_revert_state_restores_checkpoint(tmp_path):
     chkpt = tmp_path / "checkpoint_state.json"
     payload = {
         "locked_functions": ["foo", "bar"],
-        "staged_path": "src2/foo.py",
+        "staged_path": "src/foo.py",
         "function_name": "foo",
     }
     chkpt.write_text(json.dumps(payload), encoding="utf-8")

@@ -2,7 +2,7 @@
 """
 Phase 3: Validator Silencer — AST scanner for Pydantic validators that mutate input data.
 
-Targets ``src2/``. Walks the AST for ``ast.FunctionDef`` and
+Targets ``src/``. Walks the AST for ``ast.FunctionDef`` and
 ``ast.AsyncFunctionDef`` nodes decorated with ``@model_validator`` or
 ``@field_validator``. Within the validator body, flags:
 
@@ -148,8 +148,8 @@ def find_validator_mutations(tree: ast.Module) -> list[tuple[int, str]]:
 
 def main() -> None:
     root = Path(__file__).resolve().parent.parent.parent
-    src2 = root / "src2"
-    all_violations = scan_tree(src2, find_validator_mutations)
+    src = root / "src"
+    all_violations = scan_tree(src, find_validator_mutations)
 
     if all_violations:
         print("=== Validator Mutation Violations ===")
@@ -158,7 +158,7 @@ def main() -> None:
         print(f"\nTotal violations: {len(all_violations)}")
         sys.exit(1)
     else:
-        print("No validator mutation violations found in src2/")
+        print("No validator mutation violations found in src/")
         sys.exit(0)
 
 

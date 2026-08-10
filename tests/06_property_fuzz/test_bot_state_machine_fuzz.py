@@ -23,7 +23,7 @@ from contextlib import ExitStack
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# --- Isolate DB + disable side-effects BEFORE importing src2 modules. ----------
+# --- Isolate DB + disable side-effects BEFORE importing src modules. ----------
 _DB_PATH = os.path.join(os.path.dirname(__file__), ".fuzz_bot_state.db")
 os.environ.setdefault("DISABLE_SENTRY", "1")
 os.environ.setdefault("TELEGRAM_BOT_TOKEN", "test-token")
@@ -32,28 +32,28 @@ os.environ.setdefault("TELEGRAM_ADMIN_ID", "999999999")
 os.environ.setdefault("BOT_DB_PATH", _DB_PATH)
 os.environ.setdefault("TELEGRAM_WEBHOOK_SECRET", "")
 
-# ruff: noqa: E402  (env vars must be set before importing src2 modules)
+# ruff: noqa: E402  (env vars must be set before importing src modules)
 from typing import get_args as _get_args
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-import src2.interfaces.telegram.app as app_mod
-import src2.interfaces.telegram.chronomancer.coordinator as coordinator_mod
-import src2.interfaces.telegram.conductor as conductor_mod
-import src2.interfaces.telegram.intake.intake as intake_mod
-import src2.interfaces.telegram.pipeline as pipeline_mod
-import src2.interfaces.telegram.report_utils as report_utils
-import src2.interfaces.telegram.security as security_mod
-import src2.interfaces.telegram.session as session_mod
-import src2.interfaces.telegram.stakeholder_intake as stakeholder_intake_mod
-import src2.interfaces.telegram.ui_components as ui_components_mod
-import src2.interfaces.telegram.utils as utils_mod
-from src2.core.schemas import Pillar, SessionStep, UserProfile
-from src2.interfaces.telegram.app import _route_callback_query, _route_message_data
-from src2.interfaces.telegram.db import Database
-from src2.interfaces.telegram.session import delete_session, get_session
-from src2.interfaces.telegram.utils import ChronomancerReply
+import src.interfaces.telegram.app as app_mod
+import src.interfaces.telegram.chronomancer.coordinator as coordinator_mod
+import src.interfaces.telegram.conductor as conductor_mod
+import src.interfaces.telegram.intake.intake as intake_mod
+import src.interfaces.telegram.pipeline as pipeline_mod
+import src.interfaces.telegram.report_utils as report_utils
+import src.interfaces.telegram.security as security_mod
+import src.interfaces.telegram.session as session_mod
+import src.interfaces.telegram.stakeholder_intake as stakeholder_intake_mod
+import src.interfaces.telegram.ui_components as ui_components_mod
+import src.interfaces.telegram.utils as utils_mod
+from src.core.schemas import Pillar, SessionStep, UserProfile
+from src.interfaces.telegram.app import _route_callback_query, _route_message_data
+from src.interfaces.telegram.db import Database
+from src.interfaces.telegram.session import delete_session, get_session
+from src.interfaces.telegram.utils import ChronomancerReply
 
 CHAT_ID = 999999999
 PLATFORM = "telegram"
@@ -162,31 +162,31 @@ def _patch_llm(stack: ExitStack):
     canned = ChronomancerReply("canned reply", parse_mode="Markdown")
     stack.enter_context(patch.object(conductor_mod, "run_conductor", new=AsyncMock(side_effect=_fake_conductor)))
     stack.enter_context(patch.object(intake_mod, "run_calendar_node", new=AsyncMock(side_effect=_fake_calendar)))
-    stack.enter_context(patch("src2.interfaces.telegram.chronomancer.handle_ask", new=AsyncMock(return_value=canned)))
+    stack.enter_context(patch("src.interfaces.telegram.chronomancer.handle_ask", new=AsyncMock(return_value=canned)))
     stack.enter_context(
-        patch("src2.interfaces.telegram.chronomancer.handle_daily", new=AsyncMock(return_value="canned daily"))
+        patch("src.interfaces.telegram.chronomancer.handle_daily", new=AsyncMock(return_value="canned daily"))
     )
     stack.enter_context(
         patch(
-            "src2.interfaces.telegram.chronomancer.handle_week_chart",
+            "src.interfaces.telegram.chronomancer.handle_week_chart",
             new=AsyncMock(return_value=("", "canned 7day sparkline")),
         )
     )
     stack.enter_context(
-        patch("src2.interfaces.telegram.chronomancer.handle_forecast", new=AsyncMock(return_value=canned))
+        patch("src.interfaces.telegram.chronomancer.handle_forecast", new=AsyncMock(return_value=canned))
     )
     stack.enter_context(
-        patch("src2.interfaces.telegram.chronomancer.handle_forecast_menu", new=MagicMock(return_value="canned menu"))
+        patch("src.interfaces.telegram.chronomancer.handle_forecast_menu", new=MagicMock(return_value="canned menu"))
     )
     stack.enter_context(
         patch(
-            "src2.interfaces.telegram.chronomancer.handle_forecast_category",
+            "src.interfaces.telegram.chronomancer.handle_forecast_category",
             new=AsyncMock(return_value="canned category"),
         )
     )
     stack.enter_context(
         patch(
-            "src2.interfaces.telegram.chronomancer.oracle_coordinator.handle_oracle", new=AsyncMock(return_value=canned)
+            "src.interfaces.telegram.chronomancer.oracle_coordinator.handle_oracle", new=AsyncMock(return_value=canned)
         )
     )
     stack.enter_context(

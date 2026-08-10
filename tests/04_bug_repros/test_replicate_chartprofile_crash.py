@@ -1,7 +1,7 @@
 import pytest
 import json
-from src2.core.schemas.unified import UserProfile, ChartProfile
-from src2.interfaces.telegram.bridge import map_profile_to_k3
+from src.core.schemas.unified import UserProfile, ChartProfile
+from src.interfaces.telegram.bridge import map_profile_to_k3
 
 def test_replicate_chartprofile_crash():
     """

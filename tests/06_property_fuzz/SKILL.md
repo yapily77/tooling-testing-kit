@@ -9,7 +9,7 @@ description: Enforces property-based fuzzing (Hypothesis) and mutation testing (
 Before writing fuzzing tests or running mutation audits:
 1. **NaN/Infinity Guard Check**: Verify that any test validating floating-point outputs explicitly imports `math` and asserts `not math.isnan(val)` and `not math.isinf(val)`. `isinstance(val, float)` is NOT sufficient.
 2. **Strategy Alignment**: Ensure you are using native Hypothesis strategies (e.g., `st.dates()`, `st.floats(allow_nan=False)`) rather than generating raw integers and manually filtering them with `try/except` or `assume()`.
-3. **Mutation Scoping Check**: Verify that `mutmut` is strictly scoped to the target module via `pyproject.toml` (e.g., `source_paths = ["src2/engine/"]`). NEVER run an unscoped `mutmut run` on the entire repository.
+3. **Mutation Scoping Check**: Verify that `mutmut` is strictly scoped to the target module via `pyproject.toml` (e.g., `source_paths = ["src/engine/"]`). NEVER run an unscoped `mutmut run` on the entire repository.
 4. **Boundary Expansion**: Ensure fuzzing boundaries for numerical limits allow for edge cases like `0.0`, negative numbers, and infinity (`allow_infinity=True` for inputs, but blocked for outputs).
 
 ## 🏗️ Design Mindsets

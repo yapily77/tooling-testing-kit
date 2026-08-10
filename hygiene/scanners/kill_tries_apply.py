@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Kill-Tries Apply Script: Applies approved refactorings from checkpoint to src2/.
+Kill-Tries Apply Script: Applies approved refactorings from checkpoint to src/.
 
 Reads kit-hygiene/reports/kill_tries_checkpoint.jsonl and applies
 APPROVED refactorings atomically (per-function with ruff validation).
@@ -24,7 +24,7 @@ from virtual_ast_buffer import (  # noqa: E402
 )
 
 CHECKPOINT_FILE = pkg_root / "reports" / "kill_tries_checkpoint.jsonl"
-SRC2_DIR = pkg_root.parent / "src2"
+src_DIR = pkg_root.parent / "src"
 
 def _deduplicate_top_level(source: str) -> str:
     try:
@@ -201,7 +201,7 @@ def test_suite_with_pytest(rel_path: str | None = None) -> bool:
 
 
 def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = False, skip_pytest: bool = False) -> int:
-    """Apply a specific list of APPROVED refactorings to source files in src2/."""
+    """Apply a specific list of APPROVED refactorings to source files in src/."""
     if not approved_items:
         return 0
 
@@ -211,7 +211,7 @@ def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = F
 
     applied_count = 0
     for rel_path, items in by_file.items():
-        if not allow_engine and (rel_path.startswith("src2/engine/") or "src2/engine/" in rel_path):
+        if not allow_engine and (rel_path.startswith("src/engine/") or "src/engine/" in rel_path):
             logger.info(f"🛡️ Engine read-only policy: Skipping apply to {rel_path} (use --allow-engine to override)")
             continue
         file_path = pkg_root / rel_path
@@ -332,18 +332,18 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Apply approved kill-tries refactorings to src2/ with per-function ruff validation."
+        description="Apply approved kill-tries refactorings to src/ with per-function ruff validation."
     )
     parser.add_argument(
         "--file",
         type=str,
         default=None,
-        help="Filter for a specific file path (e.g. src2/engine/coordinator.py)",
+        help="Filter for a specific file path (e.g. src/engine/coordinator.py)",
     )
     parser.add_argument(
         "--allow-engine",
         action="store_true",
-        help="Allow applying approved refactorings to src2/engine/ files",
+        help="Allow applying approved refactorings to src/engine/ files",
     )
     parser.add_argument(
         "--skip-pytest",
@@ -366,7 +366,7 @@ def main():
         logger.info(f"No APPROVED refactorings found for filter: {filter_rel_path}")
         return
 
-    logger.info(f"Applying {len(display)} approved refactorings to src2/...")
+    logger.info(f"Applying {len(display)} approved refactorings to src/...")
     applied_count = apply_checkpoint_to_files(display, allow_engine=args.allow_engine, skip_pytest=args.skip_pytest)
     logger.info(f"Done. Applied {applied_count} refactoring(s).")
 

@@ -87,8 +87,8 @@ upstream_callers: |
 
 module_context: |
   from typing import Any
-  from src2.core.schemas import ChartProfile, ComboClashNetResult, ContradictionClassification, ContradictionMatchResult, ContradictionResolution, ContradictionResult, ContradictionSignal, ContradictionSynthesis, EngineOutput, SpecificityRuleResult, TemporalContextWindow
-  from src2.core.schemas.unified import AllianceImprovementDetails, ContradictionEntry
+  from src.core.schemas import ChartProfile, ComboClashNetResult, ContradictionClassification, ContradictionMatchResult, ContradictionResolution, ContradictionResult, ContradictionSignal, ContradictionSynthesis, EngineOutput, SpecificityRuleResult, TemporalContextWindow
+  from src.core.schemas.unified import AllianceImprovementDetails, ContradictionEntry
   from .bazi_math import get_spectrum_tier
   from .module3_interaction import calculate_combination_strength, calculate_harmony_strength
   SAN_HE_PEAK = (("Water", "Zi"), ("Wood", "Mao"), ("Fire", "Wu"), ("Metal", "You"))

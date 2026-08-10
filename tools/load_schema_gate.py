@@ -34,7 +34,7 @@ def main():
 
     # Load the staged file directly by path (no package __init__.py required).
     # A synthetic dot-free name avoids importlib's package-discovery requirement
-    # while keeping internal `from src2...` imports resolvable via sys.path above.
+    # while keeping internal `from src...` imports resolvable via sys.path above.
     module_name = "schema_gate_" + str(rel.with_suffix("")).replace(os.sep, "_").replace(".", "_")
 
     try:

@@ -14,15 +14,15 @@ from factory.infra import models, runner, tools
 
 # ── SA1 Security (ACL) ───────────────────────────────────────────────────────
 def test_acl_normpath_escape_blocked():
-    assert tools._acl_allows("src2/../.env", ["src2/"]) is False
+    assert tools._acl_allows("src/../.env", ["src/"]) is False
 
 
 def test_acl_empty_value_rejected():
-    assert tools._acl_allows("", ["src2/"]) is False
+    assert tools._acl_allows("", ["src/"]) is False
 
 
 def test_acl_confined_prefix_allowed():
-    assert tools._acl_allows("src2/x.py", ["src2/"]) is True
+    assert tools._acl_allows("src/x.py", ["src/"]) is True
 
 
 def test_acl_empty_allowed_path_denies_everything():
@@ -36,18 +36,18 @@ def test_acl_wrap_with_acl_stub():
     def stub(relative_path):
         return relative_path
 
-    wrapped = tools.wrap_with_acl(stub, ["src2/"])
+    wrapped = tools.wrap_with_acl(stub, ["src/"])
     # audit R5: denials are returned as a graceful error string (never an
     # unhandled exception) and logged, not raised.
-    denied = wrapped("src2/../.env")
+    denied = wrapped("src/../.env")
     assert isinstance(denied, str) and denied.startswith("ACL DENIED")
-    assert wrapped("src2/ok.py") == "src2/ok.py"
+    assert wrapped("src/ok.py") == "src/ok.py"
 
 
 def test_is_secret_path():
     assert tools._is_secret_path(".env") is True
     assert tools._is_secret_path("admin/controls/controls.py") is True
-    assert tools._is_secret_path("src2/foo.py") is False
+    assert tools._is_secret_path("src/foo.py") is False
 
 
 # ── SA2 Stability ─────────────────────────────────────────────────────────────
@@ -71,15 +71,15 @@ def _rubric_cube():
 
 def _subtask():
     return models.SubTaskBrief(
-        id="s1", title="t", file_paths=["src2/x.py"],
+        id="s1", title="t", file_paths=["src/x.py"],
         instruction="i", acceptance="a", tool_preference="AST-edit",
-        evidence=[{"file_path": "src2/x.py", "content": "verified"}],
+        evidence=[{"file_path": "src/x.py", "content": "verified"}],
     )
 
 
 def _approved_task():
     return models.ApprovedTask(
-        id="intern01", title="t", file_paths=["src2/x.py"],
+        id="intern01", title="t", file_paths=["src/x.py"],
         instruction="i", acceptance="a", tool_preference="AST-edit",
     )
 

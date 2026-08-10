@@ -2,13 +2,13 @@
 
 ## What This Folder Does
 
-Contains pytest test suites that validate **Telegram bot user pathways** in `src2/interfaces/telegram/app.py` using **combinatorial parametrization** (`@pytest.mark.parametrize`). Each test mocks the database, session, and Telegram API layer — no live bot, no Sentry, no Logfire.
+Contains pytest test suites that validate **Telegram bot user pathways** in `src/interfaces/telegram/app.py` using **combinatorial parametrization** (`@pytest.mark.parametrize`). Each test mocks the database, session, and Telegram API layer — no live bot, no Sentry, no Logfire.
 
 The suite is organized into three waves (see `orchestrator.md`):
 
 | Wave | Category | Strategy |
 |---|---|---|
-| 1 | Fast unit tests | Top-level imports from `src2.*`, no `app.py` deferred-import complexity |
+| 1 | Fast unit tests | Top-level imports from `src.*`, no `app.py` deferred-import complexity |
 | 2 | Bot pathway tests | Deferred imports inside `patch()` context to skip `app.py`'s top-level `sentry_sdk` |
 | 3 | Negative / access-control / pipeline | Error propagation, guard-clause failures, multi-stage report pipeline |
 
@@ -33,13 +33,13 @@ The suite is organized into three waves (see `orchestrator.md`):
 ## Categorization by Test Type
 
 ### Fast Unit Tests (top-level imports)
-These files import directly from `src2.interfaces.telegram.chronomancer.coordinator`, `src2.interfaces.telegram.chronomancer.forecast_store`, or `src2.interfaces.telegram.utils` — modules that do **not** perform top-level `sentry_sdk` initialization. Safe to import at module scope.
+These files import directly from `src.interfaces.telegram.chronomancer.coordinator`, `src.interfaces.telegram.chronomancer.forecast_store`, or `src.interfaces.telegram.utils` — modules that do **not** perform top-level `sentry_sdk` initialization. Safe to import at module scope.
 
 - `test_forecast_event_banner.py` — pure functions, sync
 - `test_trigger_keyword_extraction.py` — pure functions + AST guard, sync
 
 ### Deferred-Import Bot Pathway Tests
-These files test handlers in `src2.interfaces.telegram.app.py`, which does `import sentry_sdk` at line 9. All `from src2.interfaces.telegram.app import ...` statements are **deferred inside `with patch(...)` blocks** to avoid triggering Sentry initialization during collection.
+These files test handlers in `src.interfaces.telegram.app.py`, which does `import sentry_sdk` at line 9. All `from src.interfaces.telegram.app import ...` statements are **deferred inside `with patch(...)` blocks** to avoid triggering Sentry initialization during collection.
 
 - `test_callback_routing.py`
 - `test_chronomancer_flow.py`
@@ -59,7 +59,7 @@ These files test handlers in `src2.interfaces.telegram.app.py`, which does `impo
 
 - **Combinatorial stacking**: Multiple `@pytest.mark.parametrize` decorators multiply into a Cartesian product (e.g. `test_tailoring_step_navigation` = 3 × 6 = 18 cases; `test_trigger_extraction_pipeline` = 4 × 2 × 2 = 16 cases).
 - **Shared fixtures**: Every file defines `mock_db` (returns `sifu_mode=0`, `language="English"`) and `mock_session` (MagicMock with `.metadata` attributes stubbed). Variations exist per file (e.g. `test_monthly_report_pipeline.py` adds `get_user_tier`, `has_monthly_code`, `get_active_jobs`).
-- **Patch targets**: Patches target the *consuming module* path (e.g. `src2.interfaces.telegram.app.db`, not `src2.interfaces.telegram.db.db`), ensuring the mock is active where the import is used.
+- **Patch targets**: Patches target the *consuming module* path (e.g. `src.interfaces.telegram.app.db`, not `src.interfaces.telegram.db.db`), ensuring the mock is active where the import is used.
 - **Sentry/Logfire isolation**: No `sentry_sdk`, `logfire`, or live LLM calls — all agents and handlers are mocked via `AsyncMock`. The `test_trigger_keyword_extraction.py` file includes an explicit AST guard (`test_sentry_free_fixture_and_constraint`) that programmatically verifies no forbidden imports exist.
 
 ## Running

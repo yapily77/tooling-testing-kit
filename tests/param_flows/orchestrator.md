@@ -15,7 +15,7 @@ Verify environment before launching waves:
 ```bash
 cd kit-tests
 # Confirm we can import the lightest test module without hanging
-timeout 10 uv run python -c "from src2.interfaces.telegram.chronomancer.coordinator import _build_event_banner; print('OK')"
+timeout 10 uv run python -c "from src.interfaces.telegram.chronomancer.coordinator import _build_event_banner; print('OK')"
 ```
 
 If that hangs, the Sentry sidecar is down. Fix: `export SENTRY_DSN=""` before running pytest.
@@ -25,7 +25,7 @@ If that hangs, the Sentry sidecar is down. Fix: `export SENTRY_DSN=""` before ru
 - Create tickets via `bd create` → Spawn agents → collect reports → summarize.
 - If an agent reports `FIXED`, acknowledge and move on.
 - If an agent reports `ESCALATE`, record and escalate.
-- **Do not** personally edit `src2/` files, `test_*.py` files, or `conftest.py` in a loop. That is the agent's job.
+- **Do not** personally edit `src/` files, `test_*.py` files, or `conftest.py` in a loop. That is the agent's job.
 
 ---
 
@@ -41,7 +41,7 @@ For each subagent, you must strictly instruct them to execute the following life
 3. **Execute test:** Run `timeout 120 uv run pytest <TEST_FILE> -v --tb=short 2>&1`.
 4. **Fix Phase (if failed/hung):**
    - Diagnose traceback using `TEST/param/SKILL.md#troubleshooting`.
-   - Make minimal fixes to test file or `src2/`. **Never edit `src/`**.
+   - Make minimal fixes to test file or `src/`. **Never edit `src/`**.
    - Re-run `timeout 60 uv run pytest <TEST_FILE> -v --tb=short` until green or escalate.
 5. **Capture decisions:** Record progress and fixes via `bd remember "Param test <TEST_FILE>: <summary of result/fixes>"`.
 6. **Close the ticket:** `bd close <id>`.

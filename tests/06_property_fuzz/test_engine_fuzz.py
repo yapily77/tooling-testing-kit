@@ -12,10 +12,10 @@ from datetime import date
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src2.core.schemas.unified import QiInteraction
-from src2.engine.bazi_math import calculate_gated_score
-from src2.engine.daily_pillar import BRANCH_ORDER, STEM_ORDER, get_pillar_for_date
-from src2.engine.module8_scoring import calculate_composite_score
+from src.core.schemas.unified import QiInteraction
+from src.engine.bazi_math import calculate_gated_score
+from src.engine.daily_pillar import BRANCH_ORDER, STEM_ORDER, get_pillar_for_date
+from src.engine.module8_scoring import calculate_composite_score
 
 STEM_STRATEGY = st.sampled_from(STEM_ORDER)
 BRANCH_STRATEGY = st.sampled_from(BRANCH_ORDER)

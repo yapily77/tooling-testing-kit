@@ -1,4 +1,4 @@
-from src2.interfaces.telegram.gatekeeper import Gatekeeper, IngressPayload
+from src.interfaces.telegram.gatekeeper import Gatekeeper, IngressPayload
 
 
 def test_gatekeeper_ingress_payload_validation_success():

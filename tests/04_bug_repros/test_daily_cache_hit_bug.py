@@ -9,9 +9,9 @@ from datetime import date
 
 import pytest
 
-from src2.core.schemas.unified import ActivityDayResult, DailyActivities, Pillar
-from src2.interfaces.telegram.chronomancer.agents import DailyDeps
-from src2.interfaces.telegram.chronomancer.forecast_store import (
+from src.core.schemas.unified import ActivityDayResult, DailyActivities, Pillar
+from src.interfaces.telegram.chronomancer.agents import DailyDeps
+from src.interfaces.telegram.chronomancer.forecast_store import (
     get_daily_forecast,
     hash_profile,
 )
@@ -92,7 +92,7 @@ def test_get_daily_forecast_accepts_sifu_mode_parameter():
 
 def test_daily_orchestrator_has_zero_tools():
     """get_daily_orchestrator must have zero tools registered (all data injected via @agent.instructions)."""
-    from src2.interfaces.telegram.chronomancer.agents import get_daily_orchestrator
+    from src.interfaces.telegram.chronomancer.agents import get_daily_orchestrator
 
     agent = get_daily_orchestrator()
     tool_count = len(agent._function_toolset.tools)
@@ -101,7 +101,7 @@ def test_daily_orchestrator_has_zero_tools():
 
 def test_extract_trigger_labels_from_events():
     """_extract_trigger_labels should extract unique trigger labels from scored events."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _extract_trigger_labels
+    from src.interfaces.telegram.chronomancer.forecast_store import _extract_trigger_labels
 
     scored = {
         "events": [
@@ -119,7 +119,7 @@ def test_extract_trigger_labels_from_events():
 
 def test_extract_trigger_labels_empty():
     """_extract_trigger_labels should return empty list when no events or triggers."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _extract_trigger_labels
+    from src.interfaces.telegram.chronomancer.forecast_store import _extract_trigger_labels
 
     assert _extract_trigger_labels({"events": []}) == []
     assert _extract_trigger_labels({}) == []
@@ -127,7 +127,7 @@ def test_extract_trigger_labels_empty():
 
 def test_trigger_keyword_map():
     """TRIGGER_KEYWORD_MAP should map English trigger labels to Chinese keywords."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import TRIGGER_KEYWORD_MAP
+    from src.interfaces.telegram.chronomancer.forecast_store import TRIGGER_KEYWORD_MAP
 
     assert "yang_ren" in TRIGGER_KEYWORD_MAP
     assert "lu_clash" in TRIGGER_KEYWORD_MAP
@@ -137,7 +137,7 @@ def test_trigger_keyword_map():
 
 def test_get_trigger_rag_keywords():
     """_get_trigger_rag_keywords should map trigger labels to Chinese keywords, capped at 5."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
+    from src.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
 
     keywords = _get_trigger_rag_keywords(["yang_ren", "lu_clash", "tian_de"])
     assert len(keywords) == 3
@@ -148,7 +148,7 @@ def test_get_trigger_rag_keywords():
 
 def test_get_trigger_rag_keywords_capped():
     """_get_trigger_rag_keywords should cap at 5 keywords."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
+    from src.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
 
     labels = ["yang_ren", "lu_clash", "tian_de", "wen_chang", "lu", "day_clash"]
     keywords = _get_trigger_rag_keywords(labels)
@@ -157,7 +157,7 @@ def test_get_trigger_rag_keywords_capped():
 
 def test_get_trigger_rag_keywords_unknown_labels():
     """_get_trigger_rag_keywords should skip labels not in the mapping."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
+    from src.interfaces.telegram.chronomancer.forecast_store import _get_trigger_rag_keywords
 
     keywords = _get_trigger_rag_keywords(["unknown_trigger", "yang_ren"])
     assert keywords == ["杨仁"]
@@ -165,7 +165,7 @@ def test_get_trigger_rag_keywords_unknown_labels():
 
 def test_build_trigger_context():
     """_build_trigger_context should format trigger labels with Chinese names."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _build_trigger_context
+    from src.interfaces.telegram.chronomancer.forecast_store import _build_trigger_context
 
     context = _build_trigger_context(["yang_ren", "lu_clash"], "")
     assert "TRIGGER EVENTS" in context
@@ -175,7 +175,7 @@ def test_build_trigger_context():
 
 def test_build_trigger_context_empty():
     """_build_trigger_context should return empty string when no triggers."""
-    from src2.interfaces.telegram.chronomancer.forecast_store import _build_trigger_context
+    from src.interfaces.telegram.chronomancer.forecast_store import _build_trigger_context
 
     assert _build_trigger_context([], "") == ""
 
@@ -184,7 +184,7 @@ def test_daily_deps_has_trigger_context_field():
     """DailyDeps must have trigger_context field for trigger event context."""
     from datetime import date
 
-    from src2.interfaces.telegram.chronomancer.agents import DailyDeps
+    from src.interfaces.telegram.chronomancer.agents import DailyDeps
 
     deps = DailyDeps(
         user_id=12345,
@@ -198,7 +198,7 @@ def test_daily_deps_trigger_context_defaults_to_empty():
     """DailyDeps.trigger_context defaults to empty string."""
     from datetime import date
 
-    from src2.interfaces.telegram.chronomancer.agents import DailyDeps
+    from src.interfaces.telegram.chronomancer.agents import DailyDeps
 
     deps = DailyDeps(
         user_id=12345,
@@ -224,7 +224,7 @@ def _make_scored_result(date_str: str = "2026-08-04", stem: str = "Jia", branch:
 
 def test_format_day_scores_accepts_single_activity_day_result_model():
     """format_day_scores must accept a single ActivityDayResult model (not a flat dict)."""
-    from src2.interfaces.telegram.chronomancer.agents import format_day_scores
+    from src.interfaces.telegram.chronomancer.agents import format_day_scores
 
     res = _make_scored_result("2026-08-04")
     output = format_day_scores(res)
@@ -235,7 +235,7 @@ def test_format_day_scores_accepts_single_activity_day_result_model():
 
 def test_format_day_scores_accepts_list_of_activity_day_result_models():
     """format_day_scores must accept a list of ActivityDayResult models."""
-    from src2.interfaces.telegram.chronomancer.agents import format_day_scores
+    from src.interfaces.telegram.chronomancer.agents import format_day_scores
 
     results = [_make_scored_result("2026-08-04"), _make_scored_result("2026-08-05")]
     output = format_day_scores(results)
@@ -251,7 +251,7 @@ def test_format_day_scores_rejects_flat_model_dump_dict():
     Iterating a dict yields its keys (strings); accessing .date on a str raises
     AttributeError. This test confirms the crash path is blocked.
     """
-    from src2.interfaces.telegram.chronomancer.agents import format_day_scores
+    from src.interfaces.telegram.chronomancer.agents import format_day_scores
 
     res = _make_scored_result("2026-08-04")
     flat_dict = res.model_dump()
@@ -269,7 +269,7 @@ def test_score_day_for_profile_returns_raw_model_not_dict():
     """
     import inspect
 
-    from src2.interfaces.telegram.chronomancer.forecast_store import _score_day_for_profile
+    from src.interfaces.telegram.chronomancer.forecast_store import _score_day_for_profile
 
     sig = inspect.signature(_score_day_for_profile)
     assert sig.return_annotation is not None

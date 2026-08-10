@@ -35,7 +35,7 @@ def _build_strategy() -> Strategy:
         tool_preference=[ToolPreferenceItem(task_id="intern01", preference="AST-edit")],
         parallelisable_workplan=ParallelisableWorkplan(
             groups=[WorkGroup(id="g1", tasks=[ApprovedTask(id="intern01", title="t",
-                file_paths=["src2/a.py"], instruction="i", acceptance="a",
+                file_paths=["src/a.py"], instruction="i", acceptance="a",
                 tool_preference="AST-edit")])]
         ),
     )
@@ -49,9 +49,9 @@ def _build_draft_plan(strategy: Strategy) -> DraftPlan:
         rubric_cube=RubricCube(cells=[RubricCell(dimension="pydantic", criterion="c",
             severity="blocker", passed=True)]),
         summary="sum",
-        subtasks=[SubTaskBrief(id="intern01", title="t", file_paths=["src2/a.py"],
+        subtasks=[SubTaskBrief(id="intern01", title="t", file_paths=["src/a.py"],
             instruction="i", acceptance="a", tool_preference="AST-edit",
-            evidence=[EvidenceItem(file_path="src2/a.py", content="c")])],
+            evidence=[EvidenceItem(file_path="src/a.py", content="c")])],
         risks=[],
         strategy=strategy,
     )
@@ -65,11 +65,11 @@ def _build_executable_plan(strategy: Strategy) -> ExecutablePlan:
         rubric_cube=RubricCube(cells=[RubricCell(dimension="pydantic", criterion="c",
             severity="blocker", passed=True)]),
         summary="sum",
-        tasks=[ApprovedTask(id="intern01", title="t", file_paths=["src2/a.py"],
+        tasks=[ApprovedTask(id="intern01", title="t", file_paths=["src/a.py"],
             instruction="i", acceptance="a", tool_preference="AST-edit")],
         alignment="aligned",
         workplan=ParallelisableWorkplan(groups=[WorkGroup(id="g1",
-            tasks=[ApprovedTask(id="intern01", title="t", file_paths=["src2/a.py"],
+            tasks=[ApprovedTask(id="intern01", title="t", file_paths=["src/a.py"],
                 instruction="i", acceptance="a", tool_preference="AST-edit")])]),
         strategy=strategy,
     )

@@ -27,7 +27,7 @@ def _clear_captured_values(snapshot: dict) -> None:
 def _clear_engine_session(chat_id: int) -> None:
     """Reset the engine session."""
     try:
-        from src2.interfaces.telegram.db import Database
+        from src.interfaces.telegram.db import Database
 
         db = Database()
         db.delete_session(chat_id, platform=PLATFORM)
@@ -68,7 +68,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
 
         # One-time DB cleanup for test users at the start of the test script
         try:
-            from src2.interfaces.telegram.db import Database
+            from src.interfaces.telegram.db import Database
 
             db = Database()
             db.delete_all_user_data(999123490, platform=PLATFORM)
@@ -76,7 +76,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
             uuid_val = db._get_or_create_uuid(999123489, platform=PLATFORM)
             session = db.Session()
             try:
-                from src2.core.database.models import (
+                from src.core.database.models import (
                     ChatLog,
                     DailyForecast,
                     JobQueue,

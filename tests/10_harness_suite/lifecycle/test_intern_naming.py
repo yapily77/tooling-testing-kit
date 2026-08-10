@@ -33,11 +33,11 @@ def _task(tid: str) -> ApprovedTask:
     return ApprovedTask(
         id=tid,
         title="t",
-        file_paths=["src2/engine/foo.py"],
+        file_paths=["src/engine/foo.py"],
         instruction="do",
         acceptance="done",
         tool_preference="AST-edit",
-        evidence=[{"file_path": "src2/engine/foo.py", "content": "x"}],
+        evidence=[{"file_path": "src/engine/foo.py", "content": "x"}],
     )
 
 

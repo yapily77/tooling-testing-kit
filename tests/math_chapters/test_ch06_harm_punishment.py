@@ -12,22 +12,22 @@ Validates:
 
 import pytest
 
-from src2.core.schemas.unified import DamageInputItem, PillarMap
-from src2.engine.classical_rules import (
+from src.core.schemas.unified import DamageInputItem, PillarMap
+from src.engine.classical_rules import (
     get_hai,
     get_hai_damage_type,
     get_hai_severity,
     get_xing_branches,
     get_xing_severity,
 )
-from src2.engine.module3_interaction import (
+from src.engine.module3_interaction import (
     _check_seasonal_weakening,
     _check_single_self_punished,
     calculate_interactions,
     get_seasonal_combination_suppression,
     populate_self_punished_branches,
 )
-from src2.engine.stealth_damage import calculate_accumulated_damage, get_time_factor
+from src.engine.stealth_damage import calculate_accumulated_damage, get_time_factor
 from TEST.math.conftest import assert_key_format_convention
 
 # ============================================================================

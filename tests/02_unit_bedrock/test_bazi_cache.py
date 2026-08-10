@@ -9,7 +9,7 @@ os.environ.setdefault("BGEM3_URL", "http://test/v1/embeddings")
 os.environ.setdefault("BGEM3_TOKEN", "test-token")
 os.environ.setdefault("QDRANT_URL", "http://test")
 
-from src2.engine.bazi_cache import (
+from src.engine.bazi_cache import (
     _is_valid_keyword,
     _load_cache,
     _sanitize_keywords,
@@ -78,7 +78,7 @@ class TestLoadCache:
             + json.dumps({"keywords": "劫财", "text": "Rob wealth"}) + "\n",
             encoding="utf-8",
         )
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file):
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file):
             cache = _load_cache()
         assert cache["乙木"] == "Wood element"
         assert cache["劫财"] == "Rob wealth"
@@ -88,14 +88,14 @@ class TestLoadCache:
             json.dumps({"keywords": "G庚|Stem|Xin辛", "text": "Garbage"}) + "\n",
             encoding="utf-8",
         )
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file):
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file):
             cache = _load_cache()
         assert "G庚" not in cache
         assert "Stem" not in cache
 
     def test_load_cache_missing_file_returns_empty(self, temp_cache_file: Path):
         missing = temp_cache_file.parent / "missing.jsonl"
-        with patch("src2.engine.bazi_cache.CACHE_FILE", missing):
+        with patch("src.engine.bazi_cache.CACHE_FILE", missing):
             cache = _load_cache()
         assert cache == {}
 
@@ -104,7 +104,7 @@ class TestSaveToCache:
     def test_save_writes_single_keywords_per_line(self, temp_cache_file: Path):
         import asyncio
         async def run():
-            with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file):
+            with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file):
                 await _save_to_cache(["乙木", "劫财"], "Combined wood and rob wealth text")
         asyncio.run(run())
 
@@ -119,7 +119,7 @@ class TestSaveToCache:
     def test_save_writes_separate_text_per_keyword(self, temp_cache_file: Path):
         import asyncio
         async def run():
-            with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file):
+            with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file):
                 await _save_to_cache(["乙木", "劫财"], "Some text")
         asyncio.run(run())
 
@@ -131,7 +131,7 @@ class TestSaveToCache:
     def test_save_filters_all_non_chinese_keywords(self, temp_cache_file: Path):
         import asyncio
         async def run():
-            with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file):
+            with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file):
                 await _save_to_cache(["乙木", "G庚", "Stem", "劫财"], "Text")
         asyncio.run(run())
 
@@ -151,8 +151,8 @@ class TestGetOrFetchClassicalText:
             json.dumps({"keywords": "乙木", "text": "Cached wood text"}) + "\n",
             encoding="utf-8",
         )
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp), \
-             patch("src2.engine.bazi_cache.query_classical_text_async") as mock_qdrant:
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp), \
+             patch("src.engine.bazi_cache.query_classical_text_async") as mock_qdrant:
             result = await get_or_fetch_classical_text(["乙木"])
         assert "Cached wood text" in result
         mock_qdrant.assert_not_awaited()
@@ -161,8 +161,8 @@ class TestGetOrFetchClassicalText:
     async def test_falls_back_to_qdrant_when_no_cache_hit(self):
         temp = Path("/tmp/test_bazi_cache_miss.jsonl")
         temp.write_text("", encoding="utf-8")
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp), \
-             patch("src2.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qdrant:
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp), \
+             patch("src.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qdrant:
             mock_qdrant.return_value = "Qdrant result for 乙木"
             result = await get_or_fetch_classical_text(["乙木"])
         assert "Qdrant result" in result
@@ -176,8 +176,8 @@ class TestGetOrFetchClassicalText:
             + json.dumps({"keywords": "劫财", "text": "Rob wealth text"}) + "\n",
             encoding="utf-8",
         )
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp), \
-             patch("src2.engine.bazi_cache.query_classical_text_async") as mock_qdrant:
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp), \
+             patch("src.engine.bazi_cache.query_classical_text_async") as mock_qdrant:
             result = await get_or_fetch_classical_text(["乙木", "劫财"])
         assert "Wood text" in result
         assert "Rob wealth text" in result
@@ -194,8 +194,8 @@ class TestGetOrFetchClassicalText:
             json.dumps({"keywords": "乙木", "text": "Cached wood text"}) + "\n",
             encoding="utf-8",
         )
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file), \
-             patch("src2.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qdrant:
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file), \
+             patch("src.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qdrant:
             mock_qdrant.return_value = "Qdrant result for 劫财"
             result = await get_or_fetch_classical_text(["乙木", "劫财"])
         assert "Cached wood text" in result
@@ -205,8 +205,8 @@ class TestGetOrFetchClassicalText:
     @pytest.mark.asyncio
     async def test_no_cache_contamination_after_multi_keyword_miss(self, temp_cache_file: Path):
         temp_cache_file.write_text("", encoding="utf-8")
-        with patch("src2.engine.bazi_cache.CACHE_FILE", temp_cache_file), \
-             patch("src2.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qdrant:
+        with patch("src.engine.bazi_cache.CACHE_FILE", temp_cache_file), \
+             patch("src.engine.bazi_cache.query_classical_text_async", new_callable=AsyncMock) as mock_qdrant:
             mock_qdrant.side_effect = ["Wood result for 乙木", "Rob wealth result for 劫财"]
             result = await get_or_fetch_classical_text(["乙木", "劫财"])
 

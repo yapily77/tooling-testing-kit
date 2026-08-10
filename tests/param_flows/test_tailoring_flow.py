@@ -36,18 +36,18 @@ async def test_tailoring_step_navigation(mock_db, mock_session, step, option):
     chat_id = 123456789
     platform = "telegram"
 
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.utils.answer_telegram_callback", new_callable=AsyncMock) as mock_answer, \
-         patch("src2.interfaces.telegram.tailoring.get_tailoring_keyboard", return_value=None), \
-         patch("src2.interfaces.telegram.tailoring.get_tailoring_state", return_value={"step": step, "skipped": False}), \
-         patch("src2.interfaces.telegram.tailoring.handle_tailor_input") as mock_handler:
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock), \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.utils.answer_telegram_callback", new_callable=AsyncMock) as mock_answer, \
+         patch("src.interfaces.telegram.tailoring.get_tailoring_keyboard", return_value=None), \
+         patch("src.interfaces.telegram.tailoring.get_tailoring_state", return_value={"step": step, "skipped": False}), \
+         patch("src.interfaces.telegram.tailoring.handle_tailor_input") as mock_handler:
 
         mock_handler.return_value = ("Next prompt text", mock_session, False)
 
-        from src2.interfaces.telegram.app import _handle_tailor_choice_callback
+        from src.interfaces.telegram.app import _handle_tailor_choice_callback
         callback_data = f"tailor_choice_{option}"
         await _handle_tailor_choice_callback(callback_query_id, chat_id, callback_data, mock_session, platform)
 

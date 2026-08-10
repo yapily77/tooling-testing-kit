@@ -11,9 +11,9 @@ Validates:
 
 import pytest
 
-from src2.core.schemas.unified import ZHI_HIDDEN, HiddenStemEntry
-from src2.engine.classical_rules import get_zhi_hidden
-from src2.engine.module2_root import (
+from src.core.schemas.unified import ZHI_HIDDEN, HiddenStemEntry
+from src.engine.classical_rules import get_zhi_hidden
+from src.engine.module2_root import (
     CONTROL_SUPPRESSION_FACTOR,
     calculate_root_score,
     get_dormancy_multiplier,

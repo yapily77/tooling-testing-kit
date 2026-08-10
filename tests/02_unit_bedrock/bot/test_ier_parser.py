@@ -3,12 +3,12 @@ from datetime import date, timedelta
 import pytest
 from pydantic_ai.models.test import TestModel
 
-from src2.interfaces.telegram.ier_parser import (
+from src.interfaces.telegram.ier_parser import (
     generate_reference_calendar,
     ier_agent,
     parse_question,
 )
-from src2.interfaces.telegram.session import ChatMessage
+from src.interfaces.telegram.session import ChatMessage
 
 
 def test_generate_reference_calendar():

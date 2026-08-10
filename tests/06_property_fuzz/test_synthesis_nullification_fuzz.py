@@ -11,8 +11,8 @@ import math
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from src2.core.schemas.unified import QiInteraction
-from src2.engine.contradiction_resolver import (
+from src.core.schemas.unified import QiInteraction
+from src.engine.contradiction_resolver import (
     apply_san_hui_nullification,
     calculate_combo_clash_net,
     resolve_combination_override,

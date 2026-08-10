@@ -28,7 +28,7 @@ def scan_file(filepath):
 
 
 def main():
-    engine_dir = Path(__file__).resolve().parent.parent.parent / "src2" / "engine"
+    engine_dir = Path(__file__).resolve().parent.parent.parent / "src" / "engine"
     all_violations = []
     for py_file in sorted(engine_dir.rglob("*.py")):
         violations = scan_file(py_file)
@@ -40,7 +40,7 @@ def main():
         print(f"\nTotal violations: {len(all_violations)}")
         sys.exit(1)
     else:
-        print("No silent swallow violations found in src2/engine/")
+        print("No silent swallow violations found in src/engine/")
         sys.exit(0)
 
 

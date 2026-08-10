@@ -13,7 +13,7 @@ _scanners_dir = Path(__file__).resolve().parent
 _pkg_root = _scanners_dir.parent          # kit-hygiene/
 _repo_root = _pkg_root.parent            # repo root (e.g. ai-factory/)
 _env_target = os.environ.get("TARGET_ROOT")
-# PORTABILITY: the repo being scanned (contains src2/ or the user's own code).
+# PORTABILITY: the repo being scanned (contains src/ or the user's own code).
 # A downloader sets TARGET_ROOT to point kit-hygiene at their repo; default = repo root.
 target_root = Path(_env_target) if _env_target else _repo_root
 

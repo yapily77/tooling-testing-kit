@@ -1,6 +1,6 @@
 import pytest
-from src2.engine.classical_rules import get_ten_god, get_zhi_hidden
-from src2.core.schemas.unified import StemInfo
+from src.engine.classical_rules import get_ten_god, get_zhi_hidden
+from src.core.schemas.unified import StemInfo
 
 def test_replicate_steminfo_lower_crash():
     """

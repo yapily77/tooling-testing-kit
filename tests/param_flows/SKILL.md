@@ -10,7 +10,7 @@ description: Teaches the LLM how to run, debug, and troubleshoot the combinatori
 ## 🎯 Core Directive
 
 **Your objective is to run, debug, and maintain the combinatorial pytest suites in `TEST/param/`**
-that validate the Telegram bot user pathways in `src2/interfaces/telegram/app.py`.
+that validate the Telegram bot user pathways in `src/interfaces/telegram/app.py`.
 
 ---
 
@@ -28,7 +28,7 @@ Before running a single test:
    ```
 3. **Sentry Boundary**: Verify that `sentry_sdk` / `logfire` are **NEVER** imported in any `test_*.py` under this directory. If you see `import sentry_sdk` at the top of a test file, **remove it** — the observability skill forbids it.
 4. **Test Selection**: Know what you are running. This folder contains **two categories** of tests:
-   - **Fast, isolated unit tests** (`test_forecast_event_banner.py`, `test_trigger_keyword_extraction.py`) — top-level imports from `src2.*`, no live systems.
+   - **Fast, isolated unit tests** (`test_forecast_event_banner.py`, `test_trigger_keyword_extraction.py`) — top-level imports from `src.*`, no live systems.
    - **Bot pathway tests** (`test_callback_routing.py`, `test_chronomancer_flow.py`, `test_start_pathways.py`, etc.) — **deferred imports inside `patch()` context** to skip heavy module-level Sentry initialization.
 5. **No Live Systems**: No live Telegram bot, no Sentry DSN, no Logfire endpoint, no live LLM. All handlers are `AsyncMock`/`MagicMock`.
 
@@ -54,16 +54,16 @@ async def test_tailoring_step_navigation(mock_db, mock_session, step, option):
 
 ### 2. Patch Target Discipline (The Consuming-Module Rule)
 
-**Why**: Patching the *definition* site (e.g. `src2.interfaces.telegram.db.db`) silently fails because the consumer already bound the symbol at import time. You **must** patch where the symbol is **used**.
+**Why**: Patching the *definition* site (e.g. `src.interfaces.telegram.db.db`) silently fails because the consumer already bound the symbol at import time. You **must** patch where the symbol is **used**.
 
 **Action**: Always patch at the consuming module:
 
 ```python
 # ✅ Correct — patches where app.py imports and uses `db`
-with patch("src2.interfaces.telegram.app.db", mock_db):
+with patch("src.interfaces.telegram.app.db", mock_db):
 
 # ❌ Wrong — patches the source, but app.py already imported its own reference
-with patch("src2.interfaces.telegram.db.db", mock_db):
+with patch("src.interfaces.telegram.db.db", mock_db):
 ```
 
 Pattern: `patch("<consuming_module>.<symbol>", mock)`.
@@ -76,7 +76,7 @@ Pattern: `patch("<consuming_module>.<symbol>", mock)`.
 
 | Fixture | Purpose | Standard Stubs |
 |---|---|---|
-| `mock_db` | MagicMock simulating `src2.interfaces.telegram.db.Database` | `get_user_prefs → {"language":"English","sifu_mode":0}`, `set_user_prefs → None`, `log_chat → None`, `is_admin → False`, `get_stakeholders → []` |
+| `mock_db` | MagicMock simulating `src.interfaces.telegram.db.Database` | `get_user_prefs → {"language":"English","sifu_mode":0}`, `set_user_prefs → None`, `log_chat → None`, `is_admin → False`, `get_stakeholders → []` |
 | `mock_session` | MagicMock simulating a user session | `.step = "START"`, `.profile = None`, `.metadata.tailoring = None`, `.metadata.intake_mode = None`, `.metadata.location = "SG"` |
 
 **Variations**: 
@@ -87,14 +87,14 @@ Pattern: `patch("<consuming_module>.<symbol>", mock)`.
 
 ### 4. Deferred Import Inside Patch Context
 
-**Why**: `src2/interfaces/telegram/app.py` has a top-level `import sentry_sdk` at line 9. Importing `app` at module top-level in a test triggers Sentry initialization, which can hang or raise if the Sentry sidecar is unreachable. The `test_trigger_keyword_extraction.py` compliance guard explicitly AST-checks the file for forbidden imports.
+**Why**: `src/interfaces/telegram/app.py` has a top-level `import sentry_sdk` at line 9. Importing `app` at module top-level in a test triggers Sentry initialization, which can hang or raise if the Sentry sidecar is unreachable. The `test_trigger_keyword_extraction.py` compliance guard explicitly AST-checks the file for forbidden imports.
 
 **Action**: For tests that touch `app.py` functions, **always import inside the `with patch(...)` block**:
 
 ```python
-with patch("src2.interfaces.telegram.app.db", mock_db), \
-     patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock):
-    from src2.interfaces.telegram.app import _handle_lang_callback  # ✅ deferred
+with patch("src.interfaces.telegram.app.db", mock_db), \
+     patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock):
+    from src.interfaces.telegram.app import _handle_lang_callback  # ✅ deferred
     await _handle_lang_callback(callback_query_id, chat_id, callback_data, mock_session, platform)
 ```
 
@@ -147,7 +147,7 @@ timeout 60 uv run pytest TEST/param/test_monthly_report_pipeline.py -v
 
 ### Problem 1: Tests hang at `collecting ...` (collection never completes)
 
-**Cause**: Importing a `src2.*` module at the top level of a test file triggers heavy initialization (Sentry sidecar socket check, Logfire setup, or a blocking network call at import time). The `TEST/pytest.ini` `asyncio_mode = auto` can also cause collection to hang if the import itself deadlocks on an async loop.
+**Cause**: Importing a `src.*` module at the top level of a test file triggers heavy initialization (Sentry sidecar socket check, Logfire setup, or a blocking network call at import time). The `TEST/pytest.ini` `asyncio_mode = auto` can also cause collection to hang if the import itself deadlocks on an async loop.
 
 **Solutions** (try in order):
 
@@ -158,21 +158,21 @@ timeout 60 uv run pytest TEST/param/test_monthly_report_pipeline.py -v
 
 2. **Check if the import hangs standalone** — this isolates from pytest internals:
    ```bash
-   timeout 10 uv run python -c "from src2.interfaces.telegram.app import _handle_lang_callback" 2>&1
+   timeout 10 uv run python -c "from src.interfaces.telegram.app import _handle_lang_callback" 2>&1
    ```
-   - If this hangs, the problem is in the `src2` module import chain, **not** in the test.
-   - Two common culprits: (1) `src2/interfaces/telegram/app.py:9` does `import sentry_sdk` which may block on a socket check to `localhost:8969` if the Spotlight sidecar is unreachable. (2) `src2/core/memory/memory_manager.py:26` executes `_db = Database("bot.db")` at module load — `Database.__init__` calls `_run_pg_migrations()` which tries a live PostgreSQL connection to `localhost:5432` → hang.
-   - **Fix**: Ensure `TEST/param/conftest.py` sets `SENTRY_DSN=""`, `LOGFIRE_NO_PLACEHOLDER="true"`, `LOGFIRE_IGNORE_MISSING_DATA_KEYS="true"` at the top (before any src2 import), and starts a module-level `patch("src2.interfaces.telegram.db.Database._run_pg_migrations", lambda self: None)`.
+   - If this hangs, the problem is in the `src` module import chain, **not** in the test.
+   - Two common culprits: (1) `src/interfaces/telegram/app.py:9` does `import sentry_sdk` which may block on a socket check to `localhost:8969` if the Spotlight sidecar is unreachable. (2) `src/core/memory/memory_manager.py:26` executes `_db = Database("bot.db")` at module load — `Database.__init__` calls `_run_pg_migrations()` which tries a live PostgreSQL connection to `localhost:5432` → hang.
+   - **Fix**: Ensure `TEST/param/conftest.py` sets `SENTRY_DSN=""`, `LOGFIRE_NO_PLACEHOLDER="true"`, `LOGFIRE_IGNORE_MISSING_DATA_KEYS="true"` at the top (before any src import), and starts a module-level `patch("src.interfaces.telegram.db.Database._run_pg_migrations", lambda self: None)`.
    ```
 
-4. **Force deferred import** if the test file imports at top-level: Move the `from src2...` import inside the `with patch(...)` block. This is the pattern used by `test_callback_routing.py`, `test_start_pathways.py`, etc.
+4. **Force deferred import** if the test file imports at top-level: Move the `from src...` import inside the `with patch(...)` block. This is the pattern used by `test_callback_routing.py`, `test_start_pathways.py`, etc.
 
 5. **Use `--import-mode=importlib`** to avoid stale `.pyc` cache issues:
    ```bash
    uv run pytest TEST/param/ -v --import-mode=importlib
    ```
 
-### Problem 2: `ModuleNotFoundError: No module named 'src2'`
+### Problem 2: `ModuleNotFoundError: No module named 'src'`
 
 **Cause**: Not running from the repo root, or `pythonpath` not configured.
 
@@ -203,7 +203,7 @@ Ensure `pytest-asyncio >= 0.24` (it is, per `pyproject.toml`).
 
 ### Problem 5: Tests pass locally but fail in CI / different environment
 
-**Cause**: A test imports a `src2` module that has conditional Sentry/Logfire initialization based on environment variables.
+**Cause**: A test imports a `src` module that has conditional Sentry/Logfire initialization based on environment variables.
 
 **Fix**:
 ```bash
@@ -258,13 +258,13 @@ def mock_session():
 
 @pytest.mark.asyncio  # optional under auto mode, but harmless and explicit
 async def test_my_new_callback(mock_db, mock_session):
-    with patch("src2.interfaces.telegram.app.db", mock_db), \
-         patch("src2.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
-         patch("src2.interfaces.telegram.session.get_session", return_value=mock_session), \
-         patch("src2.interfaces.telegram.session.save_session"), \
-         patch("src2.interfaces.telegram.utils.answer_telegram_callback", new_callable=AsyncMock):
+    with patch("src.interfaces.telegram.app.db", mock_db), \
+         patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock) as mock_send, \
+         patch("src.interfaces.telegram.session.get_session", return_value=mock_session), \
+         patch("src.interfaces.telegram.session.save_session"), \
+         patch("src.interfaces.telegram.utils.answer_telegram_callback", new_callable=AsyncMock):
 
-        from src2.interfaces.telegram.app import _handle_my_callback  # deferred import
+        from src.interfaces.telegram.app import _handle_my_callback  # deferred import
         await _handle_my_callback("query_id", 123456789, "my_callback", mock_session, "telegram")
 
         mock_send.assert_called_once()

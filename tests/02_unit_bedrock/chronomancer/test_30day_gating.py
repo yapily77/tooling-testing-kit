@@ -3,8 +3,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from src2.interfaces.telegram.chronomancer.coordinator import _handle_ask_is_date_outside, handle_ask
-from src2.interfaces.telegram.utils import ChronomancerReply
+from src.interfaces.telegram.chronomancer.coordinator import _handle_ask_is_date_outside, handle_ask
+from src.interfaces.telegram.utils import ChronomancerReply
 
 
 def test_is_date_outside_window():
@@ -35,9 +35,9 @@ async def test_handle_ask_30day_gating_rejects_past_date():
     }
 
     with (
-        patch("src2.interfaces.telegram.chronomancer.coordinator.get_session", return_value=mock_session),
-        patch("src2.interfaces.telegram.chronomancer.coordinator.parse_question", new_callable=AsyncMock, return_value=parsed_mock),
-        patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock),
+        patch("src.interfaces.telegram.chronomancer.coordinator.get_session", return_value=mock_session),
+        patch("src.interfaces.telegram.chronomancer.coordinator.parse_question", new_callable=AsyncMock, return_value=parsed_mock),
+        patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock),
     ):
         reply = await handle_ask(12345, "What happened on August 6 2024?")
         assert isinstance(reply, ChronomancerReply)
@@ -60,9 +60,9 @@ async def test_handle_ask_30day_gating_rejects_far_future_date():
     }
 
     with (
-        patch("src2.interfaces.telegram.chronomancer.coordinator.get_session", return_value=mock_session),
-        patch("src2.interfaces.telegram.chronomancer.coordinator.parse_question", new_callable=AsyncMock, return_value=parsed_mock),
-        patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock),
+        patch("src.interfaces.telegram.chronomancer.coordinator.get_session", return_value=mock_session),
+        patch("src.interfaces.telegram.chronomancer.coordinator.parse_question", new_callable=AsyncMock, return_value=parsed_mock),
+        patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock),
     ):
         reply = await handle_ask(12345, "Forecast for 45 days ahead")
         assert isinstance(reply, ChronomancerReply)
@@ -84,10 +84,10 @@ async def test_handle_ask_30day_gating_handles_datetime_objects():
     }
 
     with (
-        patch("src2.interfaces.telegram.chronomancer.coordinator.get_session", return_value=mock_session),
-        patch("src2.interfaces.telegram.chronomancer.coordinator.parse_question", new_callable=AsyncMock, return_value=parsed_mock),
-        patch("src2.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock),
-        patch("src2.interfaces.telegram.chronomancer.coordinator._get_monthly_context", new_callable=AsyncMock, return_value=None),
+        patch("src.interfaces.telegram.chronomancer.coordinator.get_session", return_value=mock_session),
+        patch("src.interfaces.telegram.chronomancer.coordinator.parse_question", new_callable=AsyncMock, return_value=parsed_mock),
+        patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock),
+        patch("src.interfaces.telegram.chronomancer.coordinator._get_monthly_context", new_callable=AsyncMock, return_value=None),
     ):
         reply = await handle_ask(12345, "Forecast for today with datetime object")
         assert isinstance(reply, ChronomancerReply)

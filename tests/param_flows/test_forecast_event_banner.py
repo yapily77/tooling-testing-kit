@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src2.interfaces.telegram.chronomancer.coordinator import (
+from src.interfaces.telegram.chronomancer.coordinator import (
     _build_event_banner,
     _get_event_alert_line,
     _split_response,
@@ -124,7 +124,7 @@ def test_build_event_banner_with_critical_events(mock_db, mock_session):
         "🔴 *EVENT ALERT: Physical Injury*\n"
         "⚠️ *EVENT ALERT: Career Collapse*\n"
     )
-    with patch("src2.interfaces.telegram.utils.markdown_to_tg_html") as mock_html:
+    with patch("src.interfaces.telegram.utils.markdown_to_tg_html") as mock_html:
         mock_html.side_effect = lambda x: x
         result = _build_event_banner(events)
     mock_html.assert_called_once_with(expected_banner)
@@ -137,7 +137,7 @@ def test_build_event_banner_dict_events(mock_db, mock_session):
         {"severity": "medium", "type": "travel_relocation"},
     ]
     expected_banner = "🔴 *EVENT ALERT: Legal Dispute*\n"
-    with patch("src2.interfaces.telegram.utils.markdown_to_tg_html") as mock_html:
+    with patch("src.interfaces.telegram.utils.markdown_to_tg_html") as mock_html:
         mock_html.side_effect = lambda x: x
         result = _build_event_banner(events)
     mock_html.assert_called_once_with(expected_banner)

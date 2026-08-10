@@ -13,11 +13,11 @@ from typing import Any
 
 import pytest
 
-from src2.core.schemas import ChartProfile, Pillar
-from src2.core.schemas.unified import Gender
-from src2.engine.da_yun import _next_pillar, calculate_da_yun, get_current_da_yun
-from src2.engine.module8_scoring import get_dm_luck_label
-from src2.engine.module9_triggers import calculate_trigger_potency, detect_same_pillar_trigger
+from src.core.schemas import ChartProfile, Pillar
+from src.core.schemas.unified import Gender
+from src.engine.da_yun import _next_pillar, calculate_da_yun, get_current_da_yun
+from src.engine.module8_scoring import get_dm_luck_label
+from src.engine.module9_triggers import calculate_trigger_potency, detect_same_pillar_trigger
 
 # ============================================================================
 # 1. 60-JIAZI CYCLE & DA YUN DIRECTION TESTS

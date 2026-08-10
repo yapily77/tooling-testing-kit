@@ -1,7 +1,7 @@
 """Property-based fuzzing tests for Pydantic API boundary ingestion models.
 
 Throws massive, malformed, and edge-case data at the Pydantic ingestion models
-in src2/core/schemas/ to prove the ingestion layer never crashes with unhandled
+in src/core/schemas/ to prove the ingestion layer never crashes with unhandled
 raw exceptions.
 
 Rules enforced:
@@ -18,7 +18,7 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
-from src2.core.schemas import (
+from src.core.schemas import (
     ChartProfile,
     CongGeValidationResult,
     DailyForecastRecord,
@@ -41,7 +41,7 @@ from src2.core.schemas import (
     UserProfile,
     ValidatedPillar,
 )
-from src2.core.schemas.unified import PeriodFavorability
+from src.core.schemas.unified import PeriodFavorability
 
 YANG_STEMS = ["Jia", "Bing", "Wu", "Geng", "Ren"]
 YIN_STEMS = ["Yi", "Ding", "Ji", "Xin", "Gui"]

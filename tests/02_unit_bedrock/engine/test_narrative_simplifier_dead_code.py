@@ -17,7 +17,7 @@ os.environ.setdefault("QDRANT_URL", "http://mock")
 
 import inspect  # noqa: E402
 
-from src2.engine import narrative_simplifier  # noqa: E402
+from src.engine import narrative_simplifier  # noqa: E402
 
 
 def test_get_month_simplifier_agent_removed():

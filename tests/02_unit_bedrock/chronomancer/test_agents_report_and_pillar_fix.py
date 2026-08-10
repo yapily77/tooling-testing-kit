@@ -4,15 +4,15 @@ from datetime import date
 
 import pytest
 
-from src2.core.schemas.unified import ChartProfile, DailyActivities, Pillar, RankedDay, UserProfile, ValidatedPillar
-from src2.engine.activity_oracle import score_day
-from src2.interfaces.telegram.chronomancer.agents import (
+from src.core.schemas.unified import ChartProfile, DailyActivities, Pillar, RankedDay, UserProfile, ValidatedPillar
+from src.engine.activity_oracle import score_day
+from src.interfaces.telegram.chronomancer.agents import (
     MonthlyReportMonthItem,
     _extract_month_from_master,
     _get_composite_score,
 )
-from src2.interfaces.telegram.chronomancer.coordinator import _format_forecast_output, session_to_chart_profile
-from src2.interfaces.telegram.session import Session
+from src.interfaces.telegram.chronomancer.coordinator import _format_forecast_output, session_to_chart_profile
+from src.interfaces.telegram.session import Session
 
 
 def test_monthly_report_month_item_str_advisory():
@@ -121,7 +121,7 @@ def test_session_to_chart_profile_and_score_day_integration():
 
 
 def test_get_composite_score_computes_from_individual_activities():
-    from src2.core.schemas.unified import ActivityScore
+    from src.core.schemas.unified import ActivityScore
 
     acts = DailyActivities(
         job_interview=ActivityScore(score=10, reason="", verdict="Fair"),
@@ -154,7 +154,7 @@ def test_get_composite_score_returns_zero_when_empty():
 
 
 def test_format_forecast_output_uses_pydantic_attributes():
-    from src2.core.schemas.unified import ActivityScore
+    from src.core.schemas.unified import ActivityScore
 
     acts = DailyActivities(
         job_interview=ActivityScore(score=12, reason="", verdict="Good"),
@@ -178,7 +178,7 @@ def test_format_forecast_output_uses_pydantic_attributes():
 
 
 def test_format_forecast_output_sorts_by_composite_score():
-    from src2.core.schemas.unified import ActivityScore
+    from src.core.schemas.unified import ActivityScore
 
     acts_high = DailyActivities(
         job_interview=ActivityScore(score=18, reason="", verdict="Excellent"),
@@ -213,7 +213,7 @@ def test_format_forecast_output_sorts_by_composite_score():
 
 
 def test_format_category_forecast():
-    from src2.interfaces.telegram.chronomancer.coordinator import _format_category_forecast
+    from src.interfaces.telegram.chronomancer.coordinator import _format_category_forecast
 
     ranked = [
         RankedDay(date="2026-08-01", score=18, verdict="Excellent", reason="Strong career alignment", stem="甲", branch="子"),

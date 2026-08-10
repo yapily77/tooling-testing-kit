@@ -14,7 +14,7 @@ dependencies = [
 
 # mutmut configuration (see 07_mutation_testing/). Run: `uv run mutmut run`
 [tool.mutmut]
-source_paths = ["src2/engine/"]
+source_paths = ["src/engine/"]
 tests_dir = ["07_mutation_testing"]
 
 [tool.uv]

@@ -1,4 +1,4 @@
-from src2.engine.classical_rules import get_chong_base_severity, get_element_phase_multiplier, get_ge_ju_pattern, get_xing_branches, get_hai_severity
+from src.engine.classical_rules import get_chong_base_severity, get_element_phase_multiplier, get_ge_ju_pattern, get_xing_branches, get_hai_severity
 """V30 → V31 Upgrade Verification Tests."""
 
 from src.engine.contradiction_resolver import calculate_combo_clash_net, calculate_temporal_weight

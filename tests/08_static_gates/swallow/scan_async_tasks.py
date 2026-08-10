@@ -3,7 +3,7 @@
 Phase 2: Async Fire-and-Forget Swallow Scanner
 ==============================================
 
-Detects unhandled ``asyncio.create_task()`` calls in ``src2/interfaces/``
+Detects unhandled ``asyncio.create_task()`` calls in ``src/interfaces/``
 (and async orchestration layers) that silently swallow task exceptions.
 
 Rules
@@ -35,7 +35,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-TARGET_DIR = Path(__file__).resolve().parent.parent.parent / "src2" / "interfaces"
+TARGET_DIR = Path(__file__).resolve().parent.parent.parent / "src" / "interfaces"
 
 # Method names that indicate a *silent* callback — the task's exception
 # is never inspected, so it is silently swallowed.

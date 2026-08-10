@@ -52,14 +52,14 @@ def _plan() -> ExecutablePlan:
     epic = Epic(title="e", deliverables=["d"], must_be_pydantic=True)
     g1 = WorkGroup(
         id="g1",
-        tasks=[ApprovedTask(id="intern01", title="t1", file_paths=["src2/a.py"],
+        tasks=[ApprovedTask(id="intern01", title="t1", file_paths=["src/a.py"],
                             instruction="implement intern_1", acceptance="intern_1 ok",
                             tool_preference="CLI-wrapper")],
     )
     g2 = WorkGroup(
         id="g2",
         depends_on=["g1"],
-        tasks=[ApprovedTask(id=f"intern{i:02d}", title=f"t{i}", file_paths=[f"src2/{i}.py"],
+        tasks=[ApprovedTask(id=f"intern{i:02d}", title=f"t{i}", file_paths=[f"src/{i}.py"],
                             instruction=f"implement intern_{i}", acceptance=f"intern_{i} ok",
                             tool_preference="CLI-wrapper") for i in range(2, 7)],
     )

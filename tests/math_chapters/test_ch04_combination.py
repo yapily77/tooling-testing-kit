@@ -11,14 +11,14 @@ from typing import Any
 
 import pytest
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     CombinationStrength,
     CombinationWeakeningResult,
     Element,
     HarmonyStrength,
     SiShenHarmonyStability,
 )
-from src2.engine.module3_interaction import (
+from src.engine.module3_interaction import (
     calculate_combination_strength,
     calculate_combination_weakening,
     calculate_harmony_strength,

@@ -10,11 +10,11 @@ from dotenv import load_dotenv
 load_dotenv()
 sys.path.insert(0, os.path.abspath('.'))
 
-from src2.core.schemas.unified import UserProfile, ValidatedPillar
-from src2.interfaces.telegram.chronomancer.coordinator import session_to_chart_profile
-from src2.interfaces.telegram.chronomancer.oracle_coordinator import handle_oracle
-from src2.interfaces.telegram.db import Database
-from src2.interfaces.telegram.session import get_session, save_session
+from src.core.schemas.unified import UserProfile, ValidatedPillar
+from src.interfaces.telegram.chronomancer.coordinator import session_to_chart_profile
+from src.interfaces.telegram.chronomancer.oracle_coordinator import handle_oracle
+from src.interfaces.telegram.db import Database
+from src.interfaces.telegram.session import get_session, save_session
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

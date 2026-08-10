@@ -1,6 +1,6 @@
 """AST scanner: detects dictionary ``get()`` calls with default fallback values in math engines.
 
-Targets ``src2/engine/``. Walks the AST to find ``ast.Call`` nodes whose function
+Targets ``src/engine/``. Walks the AST to find ``ast.Call`` nodes whose function
 is an ``ast.Attribute`` named ``get``. If such a call carries a second positional
 argument (or a ``default`` keyword), it supplies a fallback value — e.g.
 ``data.get("multiplier", 1.0)``. In a deterministic engine this masks a missing
@@ -55,7 +55,7 @@ def find_get_defaults(tree: ast.Module) -> list[tuple[int, str]]:
 
 
 def main() -> None:
-    engine_dir = Path(__file__).resolve().parent.parent.parent / "src2" / "engine"
+    engine_dir = Path(__file__).resolve().parent.parent.parent / "src" / "engine"
     all_violations = scan_tree(engine_dir, find_get_defaults)
     if all_violations:
         print("=== Dictionary .get() Fallback Trap Violations ===")
@@ -64,7 +64,7 @@ def main() -> None:
         print(f"\nTotal violations: {len(all_violations)}")
         sys.exit(1)
     else:
-        print("No dictionary .get() fallback violations found in src2/engine/")
+        print("No dictionary .get() fallback violations found in src/engine/")
         sys.exit(0)
 
 

@@ -11,20 +11,20 @@ Validates:
 
 import pytest
 
-from src2.core.schemas.unified import (
+from src.core.schemas.unified import (
     ElementMap,
     GeJuClassificationResult,
     PillarMap,
     SpecialStructureResult,
 )
-from src2.engine.module0_geju_detection import (
+from src.engine.module0_geju_detection import (
     _build_cong_ge_result,
     _check_cong_ge_counters_season,
     _count_non_dominant_hidden_roots,
     _detect_cong_ge,
     _detect_zhuan_wang_ge,
 )
-from src2.engine.module0_geju_utils import (
+from src.engine.module0_geju_utils import (
     _calculate_dominance_pct,
     _check_vibrant_requirements,
     get_shattering_branches,
@@ -33,7 +33,7 @@ from src2.engine.module0_geju_utils import (
     get_vibrant_requirements,
     special_structure_determination_protocol,
 )
-from src2.engine.module2_root import get_element_phase
+from src.engine.module2_root import get_element_phase
 from TEST.math.conftest import assert_key_format_convention
 
 # ============================================================================

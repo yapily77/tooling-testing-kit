@@ -12,8 +12,8 @@ Validates:
 
 import pytest
 
-from src2.engine.classical_rules import get_chong, get_chong_base_severity
-from src2.engine.module3_interaction import (
+from src.engine.classical_rules import get_chong, get_chong_base_severity
+from src.engine.module3_interaction import (
     calculate_clash_integrated_severity,
     get_clash_dm_strength_modifier,
     get_clash_mediation_factor,

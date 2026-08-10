@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from src2.interfaces.telegram.chronomancer.agents import (
+from src.interfaces.telegram.chronomancer.agents import (
     _pillar_to_dict_helper,
     _profile_to_dict,
     _session_to_profile,

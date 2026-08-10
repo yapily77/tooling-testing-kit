@@ -427,7 +427,7 @@ async def check_and_acquire_channel_lock(user_id: int, channel: str) -> tuple[bo
 
 async def _get_valkey_client() -> Any | None:
     try:
-        from src2.core.valkey import get_valkey_client
+        from src.core.valkey import get_valkey_client
     except ImportError:
         return None
 

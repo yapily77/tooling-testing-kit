@@ -1,6 +1,6 @@
 import pytest
 
-from src2.interfaces.telegram.session import ChatMessage, Session, SessionMetadata
+from src.interfaces.telegram.session import ChatMessage, Session, SessionMetadata
 
 
 def test_session_metadata_fields():

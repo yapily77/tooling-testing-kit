@@ -1,20 +1,20 @@
 """TEST/math/test_ch02_unstable_sentinel.py — Bazi Chapter 02 UNSTABLE Sentinel Robustness.
 
 Validates the UNSTABLE sentinel handling inside _has_meaningful_root
-(src2/engine/module0_geju_utils.py), which delegates to _check_trans_root
+(src/engine/module0_geju_utils.py), which delegates to _check_trans_root
 -> _check_unstable_root. This re-USES the weight>=2 ROOT_STRENGTH_THRESHOLD
 (hiding hidden stems). The UNSTABLE sentinel does NOT lift residual weight-1
 energy to a surface root; it only re-applies the hidden-stem threshold scan.
 
 Also validates the dormancy 0.3/1.0 math via get_dormancy_multiplier
-+ _is_dormant in src2/engine/module2_root.py.
++ _is_dormant in src/engine/module2_root.py.
 """
 
 import pytest
 
-from src2.core.schemas.unified import PillarMap
-from src2.engine.module0_geju_utils import _has_meaningful_root
-from src2.engine.module2_root import get_dormancy_multiplier
+from src.core.schemas.unified import PillarMap
+from src.engine.module0_geju_utils import _has_meaningful_root
+from src.engine.module2_root import get_dormancy_multiplier
 from TEST.math.conftest import assert_key_format_convention
 
 DM_ELEMENTS = ["Fire", "Metal", "Earth"]
