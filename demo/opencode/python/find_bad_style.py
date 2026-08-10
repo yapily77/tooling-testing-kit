@@ -181,7 +181,7 @@ def main() -> int:
         )
     )
     parser.add_argument(
-        "--files", nargs="+", required=True, help="Python files to analyze"
+        "files", nargs="+", help="Python files to analyze"
     )
     args = parser.parse_args()
 

@@ -160,8 +160,8 @@ def main():
                             f"{RED}🚨 BLOCKING VIOLATION: Circular Dependency chain detected: {' -> '.join(involved_files)}{RESET}"
                         )
                         failed = True
-            except Exception:
-                pass
+            except (KeyError, TypeError, json.JSONDecodeError):
+                print("DEBUG: malformed circular_dep entry skipped", file=sys.stderr)
 
         # Check secrets report
         secrets_report = reports_dir / "secrets_audit.json"
@@ -175,10 +175,8 @@ def main():
                             f"{RED}🚨 BLOCKING VIOLATION: Potential Secret/Credentials leaked in {item.get('file_path')}:{item.get('line')}{RESET}"
                         )
                         failed = True
-            except Exception:
-                pass
-
-        # Check env drift report
+            except (json.JSONDecodeError, KeyError, TypeError):
+                print("DEBUG: malformed secrets report entry skipped", file=sys.stderr)
         env_report = reports_dir / "env_drift_audit.json"
         if env_report.exists():
             try:

@@ -166,7 +166,7 @@ def _get_normalized_pyright_errors(file_content: str) -> set[str]:
                 if norm:
                     errors.add(norm)
         return errors
-    except Exception:
+    except (ValueError, SyntaxError, TypeError):
         return set()
     finally:
         try:
@@ -200,7 +200,7 @@ def _get_ruff_errors(file_content: str) -> set[str]:
                 if norm:
                     errors.add(norm)
         return errors
-    except Exception:
+    except (ValueError, SyntaxError, TypeError):
         return set()
     finally:
         try:
@@ -251,7 +251,7 @@ def extract_header_symbol_contract(source: str) -> HeaderSymbolContract:
         return HeaderSymbolContract()
     try:
         tree = ast.parse(source)
-    except Exception:
+    except (ValueError, SyntaxError, TypeError):
         return HeaderSymbolContract()
 
     imported_modules: set[str] = set()
@@ -842,7 +842,7 @@ def _get_module_context(src_path: str, root_dir: Path) -> str:
     try:
         source = file_path.read_text(encoding="utf-8")
         tree = ast.parse(source)
-    except Exception:
+    except (ValueError, SyntaxError, TypeError):
         return "Could not parse module."
 
     contract = extract_header_symbol_contract(source)
@@ -947,7 +947,7 @@ def enforce_return_shape(ctx: RunContext[RefactorDeps], result: RefactoringVerdi
         orig_tree = ast.parse(ctx.deps.orig_code)
         comp_vis.visit(orig_tree)
         orig_cc = comp_vis.complexity
-    except Exception:
+    except (ValueError, SyntaxError, TypeError):
         orig_cc = 0
 
     passed_ast, _, _, ast_msg = verify_refactored_ast(
@@ -1734,7 +1734,7 @@ def verify_refactored_ast(
                     f"hallucinated_fields: You invented attributes that do not exist on the original objects: {hallucinated} | "
                     f"Suggestion: {VIOLATION_SUGGESTIONS['hallucinated_fields']}"
                 )
-        except Exception:
+        except (AttributeError, TypeError, SyntaxError):
             pass
 
     # 5. Call signature sandbox: detect argument swaps
@@ -1769,7 +1769,7 @@ def verify_refactored_ast(
                         f"You passed {new_args}. | "
                         f"Suggestion: {VIOLATION_SUGGESTIONS['argument_swap']}"
                     )
-        except Exception:
+        except (AttributeError, TypeError, SyntaxError):
             pass
 
     # 6. Signature parity check
@@ -1819,7 +1819,7 @@ def verify_refactored_ast(
                                 param_violation, "Restore the original signature for this parameter."
                             )
                             violations.append(f"signature_mismatch:{candidate_name}:{diff} | Suggestion: {suggestion}")
-        except Exception:
+        except (AttributeError, TypeError, SyntaxError):
             pass
 
     # 7. Contract preservation: cleanup calls from upstream callers

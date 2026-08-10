@@ -146,14 +146,14 @@ def get_context_lines(path: Path, line_num: int, window: int = 5) -> list[str]:
         start = max(0, line_num - window - 1)
         end = min(len(lines), line_num + window)
         return lines[start:end]
-    except Exception:
+    except (OSError, UnicodeDecodeError):
         return []
 
 
 def base_source(node: ast.AST) -> str:
     try:
         return ast.unparse(node)
-    except Exception:
+    except (OSError, UnicodeDecodeError):
         if isinstance(node, ast.Name):
             return node.id
         if isinstance(node, ast.Attribute):
@@ -355,7 +355,7 @@ def runtime_verify_pre(site, import_map) -> str:
             import importlib
             mod = importlib.import_module(site.source_module)
             obj = getattr(mod, orig_name, None)
-        except Exception:
+        except ImportError:
             pass
 
     # 2. Try the file where the CallSite lives (if it was defined locally)
@@ -365,7 +365,7 @@ def runtime_verify_pre(site, import_map) -> str:
             local_mod_path = site.file_path.replace(".py", "").replace("/", ".")
             mod = importlib.import_module(local_mod_path)
             obj = getattr(mod, orig_name, None)
-        except Exception:
+        except ImportError:
             pass
 
     # 3. Fallback to unified
@@ -373,7 +373,7 @@ def runtime_verify_pre(site, import_map) -> str:
         try:
             from src.core.schemas import unified
             obj = getattr(unified, orig_name, None)
-        except Exception:
+        except ImportError:
             pass
 
     if obj is None:
@@ -393,7 +393,7 @@ def runtime_verify_pre(site, import_map) -> str:
                 return "SAFE"
             else:
                 return "CONFIRMED_CRASH"
-    except Exception:
+    except (OSError, UnicodeDecodeError):
         return "UNVERIFIED"
 
 # LAYER 4: RUNTIME VERIFICATION

@@ -7,6 +7,7 @@ and transactional rollback stack without mutating live files on disk.
 
 import ast
 import copy
+from typing import Callable
 
 __all__ = [
     "FunctionReplacer",
@@ -173,112 +174,115 @@ def verify_class_structure_intact(original_code: str, modified_code: str) -> boo
             if (cls_name, method_name) not in mod_methods:
                 return False
         return True
-    except Exception:
-        return False
+    except (AttributeError, TypeError, SyntaxError):
+        return False  # introspection failure — assume non-conformance
 
 
-def ensure_pydantic_imports(source: str, ref_code: str) -> str:
-    """
-    Ensures BaseModel, Field, and Any imports exist in source if ref_code uses them.
-    Intelligently places new imports after __future__ imports or module docstrings.
-    """
-    has_basemodel = False
-    has_field = False
-    has_any = False
+_NEEDED_MODULES: dict[str, str] = {
+    "BaseModel": "pydantic",
+    "Field": "pydantic",
+    "Any": "typing",
+}
+
+
+def _safe_parse(source: str, parser: Callable[[ast.Module, set[str]], set[str]], symbols: set[str]) -> dict[str, bool]:
+    """Parse source and run `parser`; return dict[str,bool] or all-False on SyntaxError."""
     try:
-        source_tree = ast.parse(source)
-        for node in ast.walk(source_tree):
-            if isinstance(node, ast.ImportFrom) and node.module == "pydantic":
-                for alias in node.names:
-                    name = alias.asname or alias.name
-                    if name == "BaseModel":
-                        has_basemodel = True
-                    elif name == "Field":
-                        has_field = True
-                    elif name == "Any":
-                        has_any = True
-            elif isinstance(node, ast.ImportFrom) and node.module == "typing":
-                for alias in node.names:
-                    name = alias.asname or alias.name
-                    if name == "Any":
-                        has_any = True
-            elif isinstance(node, ast.Import):
-                for alias in node.names:
-                    if alias.name == "pydantic":
-                        has_basemodel = True
-                        has_field = True
-                    elif alias.name == "typing":
-                        has_any = True
-    except Exception:
-        pass
+        tree = ast.parse(source)
+        found = parser(tree, symbols)
+        return {s: (s in found) for s in symbols}
+    except SyntaxError:
+        return {s: False for s in symbols}
 
-    uses_basemodel = False
-    uses_field = False
-    uses_any = False
-    try:
-        ref_tree = ast.parse(ref_code)
-        for node in ast.walk(ref_tree):
-            if isinstance(node, ast.Name):
-                if node.id == "BaseModel":
-                    uses_basemodel = True
-                elif node.id == "Field":
-                    uses_field = True
-                elif node.id == "Any":
-                    uses_any = True
-    except Exception:
-        pass
 
-    needed = []
-    if uses_basemodel and not has_basemodel:
-        needed.append("BaseModel")
-    if uses_field and not has_field:
-        needed.append("Field")
-    if uses_any and not has_any:
-        needed.append("Any")
-    if not needed:
-        return source
+def _parse_has_imports(tree: ast.Module, symbols: set[str]) -> set[str]:
+    """Set of imported symbol names (honoring asname)."""
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            mod_map = {"pydantic": ("BaseModel", "Field"), "typing": ("Any",)}
+            needed_mods = mod_map.get(node.module or "", ())
+            for alias in node.names:
+                name = alias.asname or alias.name
+                if name in needed_mods and name in symbols:
+                    found.add(name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == "pydantic":
+                    found.update(s for s in ("BaseModel", "Field") if s in symbols)
+                elif alias.name == "typing":
+                    if "Any" in symbols:
+                        found.add("Any")
+    return found
 
-    import_lines = [
-        f"from {mod} import {', '.join(mod_needed)}"
-        for mod, mod_needed in (
-            ("pydantic", [n for n in needed if n in ("BaseModel", "Field")]),
-            ("typing", [n for n in needed if n == "Any"]),
-        )
-        if mod_needed
-    ]
-    import_block = "\n".join(import_lines) + "\n"
 
-    lines = source.splitlines(keepends=True)
+def _parse_uses_symbols(tree: ast.Module, symbols: set[str]) -> set[str]:
+    """Set of symbol names referenced as Name nodes."""
+    return {node.id for node in ast.walk(tree) if isinstance(node, ast.Name) and node.id in symbols}
 
-    last_future_idx = -1
+
+def _find_insert_after_future(lines: list[str]) -> int | None:
+    last_idx = -1
     for idx, line in enumerate(lines):
         if line.strip().startswith("from __future__ import"):
-            last_future_idx = idx
+            last_idx = idx
+    return last_idx + 1 if last_idx != -1 else None
 
-    if last_future_idx != -1:
-        lines.insert(last_future_idx + 1, import_block)
-        return "".join(lines)
 
-    insert_idx = 0
+def _find_insert_after_docstring(lines: list[str]) -> int | None:
     in_docstring = False
     for idx, line in enumerate(lines):
         stripped = line.strip()
         if idx == 0 and (stripped.startswith('"""') or stripped.startswith("'''")):
-            if stripped.count('"""') == 2 or stripped.count("'''") == 2:
-                insert_idx = 1
-                break
+            quote = '"""' if stripped.startswith('"""') else "'''"
+            if stripped.count(quote) == 2:
+                return 1
             in_docstring = True
             continue
-        if in_docstring:
-            if '"""' in stripped or "'''" in stripped:
-                insert_idx = idx + 1
-                break
-            continue
-        if stripped.startswith("#") or not stripped:
-            continue
-        insert_idx = idx
-        break
+        if in_docstring and ('"""' in stripped or "'''" in stripped):
+            return idx + 1
+    return None
 
+
+def _insert_imports(source: str, needed: list[str]) -> str:
+    """Insert `from <module> import ...` lines after __future__/docstring."""
+    import_lines = [
+        f"from {mod} import {sym}"
+        for sym in needed
+        if (mod := _NEEDED_MODULES.get(sym))
+    ]
+    import_block = "\n".join(import_lines) + "\n"
+    lines = source.splitlines(keepends=True)
+
+    after_future = _find_insert_after_future(lines)
+    if after_future is not None:
+        lines.insert(after_future, import_block)
+        return "".join(lines)
+
+    after_doc = _find_insert_after_docstring(lines)
+    if after_doc is not None:
+        lines.insert(after_doc, import_block)
+        return "".join(lines)
+
+    insert_idx = 0
+    for idx, line in enumerate(lines):
+        if line.strip() and not line.strip().startswith("#"):
+            insert_idx = idx
+            break
     lines.insert(insert_idx, import_block)
     return "".join(lines)
+
+
+def ensure_pydantic_imports(source: str, ref_code: str) -> str:
+    """Ensures BaseModel, Field, and Any imports exist in source if ref_code uses them.
+    Intelligently places new imports after __future__ imports or module docstrings."""
+    target_symbols = {"BaseModel", "Field", "Any"}
+
+    has_imports = _safe_parse(source, _parse_has_imports, target_symbols)
+    uses_symbols = _safe_parse(ref_code, _parse_uses_symbols, target_symbols)
+
+    needed = [s for s in target_symbols if uses_symbols.get(s, False) and not has_imports.get(s, False)]
+    if not needed:
+        return source
+    return _insert_imports(source, needed)
 

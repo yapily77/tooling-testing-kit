@@ -54,8 +54,8 @@ def scan_live_cc(target_dir: str = "src") -> dict[str, dict[str, int]]:
                                 all_violations.setdefault(filepath, {})[
                                     node.name
                                 ] = cc
-                except Exception:
-                    pass
+                except (AttributeError, TypeError, SyntaxError):
+                    pass  # AST node shape mismatch; skip this file's CC scan
     return all_violations
 
 

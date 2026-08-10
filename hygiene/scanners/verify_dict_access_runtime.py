@@ -145,6 +145,27 @@ def module_path_for_file(file_path: str) -> str | None:
     return ".".join(rel.parts)
 
 
+def _find_enclosing_func(tree: ast.Module, line: int) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
+    """Return the function node whose body spans `line`."""
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if hasattr(node, "lineno") and hasattr(node, "end_lineno"):
+                if node.lineno <= line <= node.end_lineno:
+                    return node
+    return None
+
+
+def _resolve_func_arg_model_class(enclosing_func: ast.FunctionDef | ast.AsyncFunctionDef, variable: str) -> tuple[str | None, str | None]:
+    """If `variable` is an annotated function arg, return (annotation, 'model_class')."""
+    all_args = enclosing_func.args.args + enclosing_func.args.kwonlyargs
+    for arg in all_args:
+        if arg.arg == variable:
+            if arg.annotation and isinstance(arg.annotation, ast.Name):
+                return arg.annotation.id, "model_class"
+            return None, None
+    return None, None
+
+
 def resolve_producing_function(file_path: str, line: int, variable: str) -> tuple[str | None, str | None]:
     """
     Finds the function that produced `variable` near `line`.
@@ -162,35 +183,25 @@ def resolve_producing_function(file_path: str, line: int, variable: str) -> tupl
     except Exception:
         return None, None
 
-    enclosing_func = None
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            if hasattr(node, "lineno") and hasattr(node, "end_lineno"):
-                if node.lineno <= line <= node.end_lineno:
-                    enclosing_func = node
-                    break
-
+    enclosing_func = _find_enclosing_func(tree, line)
     if not enclosing_func:
         return None, None
 
-    # Is it an argument to the enclosing function?
-    for arg in enclosing_func.args.args + enclosing_func.args.kwonlyargs:
-        if arg.arg == variable:
-            if arg.annotation and isinstance(arg.annotation, ast.Name):
-                return arg.annotation.id, "model_class"
-            return None, None
+    model_class = _resolve_func_arg_model_class(enclosing_func, variable)
+    if model_class != (None, None):
+        return model_class
+    return _resolve_last_call_in_func(enclosing_func, variable, line)
 
-    # Walk body to find the last assignment to `variable` that is a Call.
-    last_call_name = None
+
+def _resolve_last_call_in_func(enclosing_func: ast.FunctionDef | ast.AsyncFunctionDef, variable: str, line: int) -> tuple[str | None, str | None]:
+    """Walk func body to find last Call-assign to `variable` before `line`."""
+    last_call_name: str | None = None
     for node in ast.walk(enclosing_func):
-        if hasattr(node, "lineno") and node.lineno <= line:
-            if isinstance(node, ast.Assign):
-                targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
-                if variable in targets and isinstance(node.value, ast.Call):
-                    if isinstance(node.value.func, ast.Name):
-                        last_call_name = node.value.func.id
-                    elif isinstance(node.value.func, ast.Attribute):
-                        last_call_name = node.value.func.attr
+        if hasattr(node, "lineno") and node.lineno <= line and isinstance(node, ast.Assign):
+            targets = [t.id for t in node.targets if isinstance(t, ast.Name)]
+            if variable in targets and isinstance(node.value, ast.Call):
+                call = node.value.func
+                last_call_name = call.id if isinstance(call, ast.Name) else getattr(call, "attr", None)
     return last_call_name, "function"
 
 
@@ -264,6 +275,27 @@ def instantiate_model(class_name: str, mod_path: str) -> BaseModel | None:
         return None
 
 
+_SAMPLES: dict[str, Any] = {
+    "chartprofile": build_sample_profile,
+    "pillar": lambda: Pillar(stem="Jia", branch="Zi"),
+    "dict": lambda: {},
+    "str": lambda: "",
+    "int": lambda: 0,
+    "bool": lambda: False,
+    "list": lambda: [],
+}
+
+
+def _sample_value_for_annotation(ann: str, param: inspect.Parameter) -> Any:
+    ann_lower = ann.lower()
+    for key, factory in _SAMPLES.items():
+        if key in ann_lower:
+            return factory()
+    if param.default != inspect.Parameter.empty:
+        return param.default
+    return None
+
+
 def execute_and_verify(func_name: str, mod_path: str, candidate: dict[str, Any]) -> str:
     """Executes `func_name` in `mod_path` and probes the returned object."""
     try:
@@ -276,25 +308,7 @@ def execute_and_verify(func_name: str, mod_path: str, candidate: dict[str, Any])
     try:
         sig = inspect.signature(func)
         for name, param in sig.parameters.items():
-            ann = str(param.annotation)
-            if "ChartProfile" in ann:
-                kwargs[name] = build_sample_profile()
-            elif "Pillar" in ann:
-                kwargs[name] = Pillar(stem="Jia", branch="Zi")
-            elif "dict" in ann.lower() or "Dict" in ann:
-                kwargs[name] = {}
-            elif "str" in ann.lower():
-                kwargs[name] = ""
-            elif "int" in ann.lower():
-                kwargs[name] = 0
-            elif "bool" in ann.lower():
-                kwargs[name] = False
-            elif "list" in ann.lower() or "List" in ann:
-                kwargs[name] = []
-            elif param.default != inspect.Parameter.empty:
-                kwargs[name] = param.default
-            else:
-                kwargs[name] = None
+            kwargs[name] = _sample_value_for_annotation(str(param.annotation), param)
     except Exception:
         return "UNVERIFIABLE"
 

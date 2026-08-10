@@ -51,8 +51,8 @@ from control import CONTROL_SHEET  # noqa: E402
 try:
     logfire.configure(send_to_logfire=False)
     logfire.instrument_pydantic_ai()
-except Exception:
-    pass
+except ImportError:
+    pass  # logfire is optional observability
 
 CHECKPOINT_FILE = pkg_root / "reports" / "kill_tries_checkpoint.jsonl"
 REPORT_FILE = pkg_root / "reports" / "kill_tries.json"
@@ -469,63 +469,71 @@ class FunctionCandidateScanner(ast.NodeVisitor):
 
         self.generic_visit(node)
 
+    def _collect_nested_try_issues(self, stmt: ast.Try) -> list[tuple[int, str]]:
+        issues: list[tuple[int, str]] = []
+        for inner_stmt in stmt.body:
+            if isinstance(inner_stmt, ast.Try):
+                issues.append((inner_stmt.lineno, "Nested Try block inside Try body"))
+        for handler in stmt.handlers:
+            for h_stmt in handler.body:
+                if isinstance(h_stmt, ast.Try):
+                    issues.append((h_stmt.lineno, "Try block inside Except handler"))
+        if stmt.orelse:
+            for el_stmt in stmt.orelse:
+                if isinstance(el_stmt, (ast.If, ast.Try)):
+                    issues.append((el_stmt.lineno, f"{el_stmt.__class__.__name__} inside Try-Else block"))
+        return issues
+
+    def _try_sub_bodies(self, stmt: ast.Try, depth: int) -> list[tuple[list[ast.stmt], int]]:
+        bodies: list[tuple[list[ast.stmt], int]] = [(stmt.body, depth + 1)]
+        for h in stmt.handlers:
+            bodies.append((h.body, depth + 1))
+        bodies.append((stmt.orelse, depth + 1))
+        bodies.append((stmt.finalbody, depth + 1))
+        return bodies
+
+    def _collect_sub_bodies(self, stmt: ast.stmt, depth: int) -> list[tuple[list[ast.stmt], int]]:
+        if isinstance(stmt, ast.Try):
+            return self._try_sub_bodies(stmt, depth)
+        # Map control-flow node type → depth adjustment for its body
+        if isinstance(stmt, ast.If) and len(stmt.orelse) == 1 and isinstance(stmt.orelse[0], ast.If):
+            return [(stmt.body, depth + 1), (stmt.orelse, depth)]
+        simple_bodies = {
+            ast.If: (stmt.body, stmt.orelse),
+            ast.For: (stmt.body, stmt.orelse),
+            ast.While: (stmt.body, stmt.orelse),
+            ast.With: (stmt.body, []),
+        }
+        for cls, (body, orelse) in simple_bodies.items():
+            if isinstance(stmt, cls):
+                return [(body, depth + 1), (orelse, depth + 1)]
+        return []
+
     def _check_body_nesting(
         self, statements: list[ast.stmt], depth: int
     ) -> tuple[int, int, list[tuple[int, str]]]:
         max_d = depth
         max_line = 0
-        try_issues = []
+        try_issues: list[tuple[int, str]] = []
 
         for stmt in statements:
-            if isinstance(stmt, self.CONTROL_NODES):
-                current_depth = depth + 1
-                if current_depth > max_d:
-                    max_d = current_depth
-                    max_line = stmt.lineno
+            if not isinstance(stmt, self.CONTROL_NODES):
+                continue
 
-                if isinstance(stmt, ast.Try):
-                    for inner_stmt in stmt.body:
-                        if isinstance(inner_stmt, ast.Try):
-                            try_issues.append((inner_stmt.lineno, "Nested Try block inside Try body"))
+            if depth + 1 > max_d:
+                max_d = depth + 1
+                max_line = stmt.lineno
 
-                    for handler in stmt.handlers:
-                        for h_stmt in handler.body:
-                            if isinstance(h_stmt, ast.Try):
-                                try_issues.append((h_stmt.lineno, "Try block inside Except handler"))
+            if isinstance(stmt, ast.Try):
+                try_issues.extend(self._collect_nested_try_issues(stmt))
 
-                    if stmt.orelse:
-                        for el_stmt in stmt.orelse:
-                            if isinstance(el_stmt, (ast.If, ast.Try)):
-                                try_issues.append(
-                                    (el_stmt.lineno, f"{el_stmt.__class__.__name__} inside Try-Else block")
-                                )
-
-                sub_bodies = []
-                if isinstance(stmt, ast.If):
-                    sub_bodies.append((stmt.body, current_depth))
-                    if len(stmt.orelse) == 1 and isinstance(stmt.orelse[0], ast.If):
-                        sub_bodies.append((stmt.orelse, depth))
-                    else:
-                        sub_bodies.append((stmt.orelse, current_depth))
-                elif isinstance(stmt, ast.Try):
-                    sub_bodies.append((stmt.body, current_depth))
-                    for h in stmt.handlers:
-                        sub_bodies.append((h.body, current_depth))
-                    sub_bodies.append((stmt.orelse, current_depth))
-                    sub_bodies.append((stmt.finalbody, current_depth))
-                elif isinstance(stmt, (ast.For, ast.While)):
-                    sub_bodies.append((stmt.body, current_depth))
-                    sub_bodies.append((stmt.orelse, current_depth))
-                elif isinstance(stmt, ast.With):
-                    sub_bodies.append((stmt.body, current_depth))
-
-                for sb, sb_depth in sub_bodies:
-                    if sb:
-                        d, line_no, ti = self._check_body_nesting(sb, sb_depth)
-                        try_issues.extend(ti)
-                        if d > max_d:
-                            max_d = d
-                            max_line = line_no
+            for sb, sb_depth in self._collect_sub_bodies(stmt, depth):
+                if sb:
+                    d, line_no, ti = self._check_body_nesting(sb, sb_depth)
+                    try_issues.extend(ti)
+                    if d > max_d:
+                        max_d = d
+                        max_line = line_no
 
         return max_d, max_line, try_issues
 
@@ -598,34 +606,43 @@ def _render_narrative(
     )
 
 
-def ensure_pydantic_imports(source: str, ref_code: str) -> str:
+def _scan_imports_for_pydantic(source: str) -> tuple[bool, bool]:
     has_basemodel = False
     has_field = False
     try:
         source_tree = ast.parse(source)
-        for node in ast.walk(source_tree):
-            if isinstance(node, ast.ImportFrom) and node.module == "pydantic":
-                for alias in node.names:
-                    name = alias.asname or alias.name
-                    if name == "BaseModel":
-                        has_basemodel = True
-                    elif name == "Field":
-                        has_field = True
-    except Exception:
-        pass
+    except SyntaxError:
+        return False, False
+    pydantic_imports = {
+        a.asname or a.name: True
+        for n in ast.walk(source_tree)
+        if isinstance(n, ast.ImportFrom) and n.module == "pydantic"
+        for a in n.names
+    }
+    has_basemodel = "BaseModel" in pydantic_imports
+    has_field = "Field" in pydantic_imports
+    return has_basemodel, has_field
 
+
+def _scan_ref_for_pydantic_usage(code: str) -> tuple[bool, bool]:
     uses_basemodel = False
     uses_field = False
     try:
-        ref_tree = ast.parse(ref_code)
-        for node in ast.walk(ref_tree):
-            if isinstance(node, ast.Name):
-                if node.id == "BaseModel":
-                    uses_basemodel = True
-                elif node.id == "Field":
-                    uses_field = True
-    except Exception:
-        pass
+        ref_tree = ast.parse(code)
+    except SyntaxError:
+        return False, False
+    for node in ast.walk(ref_tree):
+        if isinstance(node, ast.Name):
+            if node.id == "BaseModel":
+                uses_basemodel = True
+            elif node.id == "Field":
+                uses_field = True
+    return uses_basemodel, uses_field
+
+
+def ensure_pydantic_imports(source: str, ref_code: str) -> str:
+    has_basemodel, has_field = _scan_imports_for_pydantic(source)
+    uses_basemodel, uses_field = _scan_ref_for_pydantic_usage(ref_code)
 
     needed = []
     if uses_basemodel and not has_basemodel:
