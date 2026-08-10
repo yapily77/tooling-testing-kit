@@ -1,9 +1,7 @@
 {
   "database": "dolt",
   "backend": "dolt",
-  "dolt_mode": "server",
-  "dolt_server_host": "127.0.0.1",
-  "dolt_server_user": "root",
-  "dolt_database": "kit",
-  "project_id": "d84006bd-a6da-42d9-9a3b-9f5c4d1bb39a"
+  "dolt_mode": "embedded",
+  "dolt_database": "tooling",
+  "project_id": "37c0fb7d-f481-4bad-b676-c565482cdbec"
 }
