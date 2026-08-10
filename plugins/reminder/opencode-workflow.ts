@@ -9,7 +9,7 @@ try {
 }
 
 export const RemindWorkflowPlugin: Plugin = async ({ project }) => {
-  console.log(`[Plugin] RemindWorkflowPlugin loaded for: ${(project as any)?.name || 'unknown'}`);
+  console.log("[Plugin] RemindWorkflowPlugin loaded");
 
   return {
     "experimental.chat.system.transform": async (_input, output) => {

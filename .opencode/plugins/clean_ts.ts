@@ -1,1 +1,0 @@
-../../plugins/opencode/clean_ts.ts
