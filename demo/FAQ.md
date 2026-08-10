@@ -1,6 +1,6 @@
 # FAQ — Demo / Case Study Suite
 
-> Answers to the questions developers actually ask when running the `demo/python/` case studies — *why is demo separate from tests?* *what's with the two hallucination finders?* *do I need an API key?*
+> Answers to the questions developers actually ask when running the `demo/opencode/` case studies — *why is demo separate from tests?* *what's with the two hallucination finders?* *do I need an API key?*
 
 ---
 
@@ -25,12 +25,12 @@ The slop version has a single 40-line `main()` (CC ≈ 12) and uses untyped `dic
 
 ## Q3: Do I need an API key to run the case studies?
 
-**A:** **No.** All scripts in `demo/python/` run **100% offline**. They use only the Python standard library (`ast`, `argparse`, `pathlib`, `sys`) plus `radon` for cyclomatic complexity analysis. No LLM, no API key, no internet required.
+**A:** **No.** All scripts in `demo/opencode/python/` run **100% offline**. They use only the Python standard library (`ast`, `argparse`, `pathlib`, `sys`) plus `radon` for cyclomatic complexity analysis. No LLM, no API key, no internet required.
 
 The case studies are designed to be cloned and run immediately:
 
 ```bash
-cd demo/python
+cd demo/opencode/python
 uv run find_cc_nested.py --min-cc 6 find_bad_style.py
 ```
 
@@ -56,7 +56,7 @@ uv run find_cc_nested.py --min-cc 6 find_bad_style.py
 **A:** `test_daily_pillar.py` is a **pytest** file — run it with:
 
 ```bash
-uv run pytest demo/python/test_daily_pillar.py -v
+uv run pytest demo/opencode/python/test_daily_pillar.py -v
 ```
 
 The other `.py` files (`find_bad_style.py`, `find_cc_nested.py`, etc.) are **CLI scripts** with `--help` output. They're not test cases but verification utilities you can invoke directly.
@@ -102,16 +102,16 @@ The test suite covers:
 
 ```bash
 # Example: verify your file passes all gates
-.venv/bin/ruff check demo/python/my_new_file.py
-.venv/bin/mypy --strict demo/python/my_new_file.py
-.venv/bin/python -m radon cc demo/python/my_new_file.py
+.venv/bin/ruff check demo/opencode/python/my_new_file.py
+.venv/bin/mypy --strict demo/opencode/python/my_new_file.py
+.venv/bin/python -m radon cc demo/opencode/python/my_new_file.py
 ```
 
 ---
 
 ## Q9: What happened to the original `box/` directory?
 
-**A:** It was renamed to `demo/python/` to better reflect its purpose — these are **demonstration case studies**, not a generic "box" of files. The 3 doc files (`README.md`, `GUIDE.md`, `FAQ.md`) were added to `demo/` following the same `README → GUIDE → FAQ` convention used in `hygiene/` and `examples/`.
+**A:** It was renamed to `demo/opencode/` to better reflect its purpose — these are **demonstration case studies**, not a generic "box" of files. The 3 doc files (`README.md`, `GUIDE.md`, `FAQ.md`) were added to `demo/` following the same `README → GUIDE → FAQ` convention used in `hygiene/` and `examples/`.
 
 ---
 
@@ -120,7 +120,7 @@ The test suite covers:
 **A:** No, they're listed in `.gitignore`. They're local analysis caches that speed up repeated scanning. Safe to delete:
 
 ```bash
-rm -rf demo/python/.mypy_cache demo/python/.ruff_cache
+rm -rf demo/opencode/python/.mypy_cache demo/opencode/python/.ruff_cache
 ```
 
 ---

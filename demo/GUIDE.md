@@ -22,10 +22,10 @@
 
 ```bash
 # Find functions with CC >= 6 (default threshold)
-uv run demo/python/find_cc_nested.py --min-cc 6 demo/python/find_bad_style.py
+uv run demo/opencode/python/find_cc_nested.py --min-cc 6 demo/opencode/python/find_bad_style.py
 
 # Show all functions sorted by CC
-uv run demo/python/find_cc_nested.py --min-cc 1 demo/python/*.py
+uv run demo/opencode/python/find_cc_nested.py --min-cc 1 demo/opencode/python/*.py
 ```
 
 Scans use `radon.complexity.cc_visit()` to compute cyclomatic complexity. Functions exceeding the threshold are sorted descending and printed in a formatted table.
@@ -34,7 +34,7 @@ Scans use `radon.complexity.cc_visit()` to compute cyclomatic complexity. Functi
 
 ```bash
 # Check for mutable defaults, missing type hints, unsafe open()
-uv run demo/python/find_bad_style.py --files demo/python/find_cc_nested.py
+uv run demo/opencode/python/find_bad_style.py --files demo/opencode/python/find_cc_nested.py
 ```
 
 Uses a custom `ast.NodeVisitor` (`GoogleStyleVisitor`) to detect:
@@ -48,7 +48,7 @@ Uses a custom `ast.NodeVisitor` (`GoogleStyleVisitor`) to detect:
 
 ```bash
 # Compare original vs refactored code for API drift
-uv run demo/python/find_hallucinations.py original.py refactored.py
+uv run demo/opencode/python/find_hallucinations.py original.py refactored.py
 ```
 
 Validates LLM-refactored code against the original by checking:
@@ -62,7 +62,7 @@ Validates LLM-refactored code against the original by checking:
 
 ```bash
 # Read JSON test logs and produce a Markdown summary
-uv run demo/python/generate_report.py --input ./logs/ --output ./report.md
+uv run demo/opencode/python/generate_report.py --input ./logs/ --output ./report.md
 ```
 
 Reads JSON log files from a directory, calculates statistics (total tests, pass/fail counts, average execution time, error distribution), and outputs a formatted Markdown summary report.
@@ -71,10 +71,10 @@ Reads JSON log files from a directory, calculates statistics (total tests, pass/
 
 ```bash
 # Run the full test suite
-uv run pytest demo/python/test_daily_pillar.py -v
+uv run pytest demo/opencode/python/test_daily_pillar.py -v
 
 # Run a specific test class
-uv run pytest demo/python/test_daily_pillar.py::TestResolveDailyPillarRange -v
+uv run pytest demo/opencode/python/test_daily_pillar.py::TestResolveDailyPillarRange -v
 ```
 
 Tests `resolve_daily_pillar_range()` and `get_month_anchor_for_date()` for correct behavior across year boundaries (Dec → Jan transitions).
@@ -83,7 +83,7 @@ Tests `resolve_daily_pillar_range()` and `get_month_anchor_for_date()` for corre
 
 ## 3. Running with clean_python Plugin
 
-The `clean_python` plugin enforces quality gates before code reaches disk. All `.py` files in `demo/python/` must pass:
+The `clean_python` plugin enforces quality gates before code reaches disk. All `.py` files in `demo/opencode/python/` must pass:
 
 - **Radon CC < 6** for every function
 - **MyPy strict** type annotations
@@ -93,9 +93,9 @@ The `clean_python` plugin enforces quality gates before code reaches disk. All `
 ```bash
 # The plugin intercepts writes automatically when used via OpenCode
 # For manual verification:
-.venv/bin/ruff check demo/python/*.py
-.venv/bin/mypy --strict demo/python/*.py
-.venv/bin/python -m radon cc demo/python/*.py
+.venv/bin/ruff check demo/opencode/python/*.py
+.venv/bin/mypy --strict demo/opencode/python/*.py
+.venv/bin/python -m radon cc demo/opencode/python/*.py
 ```
 
 ---
@@ -110,7 +110,7 @@ The `clean_python` plugin enforces quality gates before code reaches disk. All `
 These are safe to delete — they regenerate on each run:
 
 ```bash
-rm -rf demo/python/.mypy_cache demo/python/.ruff_cache
+rm -rf demo/opencode/python/.mypy_cache demo/opencode/python/.ruff_cache
 ```
 
 ---
@@ -137,7 +137,7 @@ The `case_generate.md` file contains a prompt specification for generating `gene
 Read it to understand the anti-slop validation workflow:
 
 ```bash
-.venv/bin/python -c "print(open('demo/python/case_generate.md').read())"
+.venv/bin/python -c "print(open('demo/opencode/python/case_generate.md').read())"
 ```
 
 ---

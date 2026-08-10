@@ -1,4 +1,4 @@
-# Case Specification: Generate New Script Test (`box/case_generate.md`)
+# Case Specification: Generate New Script Test (`demo/opencode/python/case_generate.md`)
 
 ## Goal
 Test whether the subagent autonomously adheres to `clean_python` quality rules (AST anti-slop, Ruff, MyPy strict typing, and Radon CC < 6) when given a **minimal, natural user prompt** to write a brand-new script from scratch.
@@ -8,7 +8,7 @@ Test whether the subagent autonomously adheres to `clean_python` quality rules (
 ## Candidate Prompt to Send to Subagent
 
 ```text
-Write a python script `box/generate_report.py` that reads JSON test logs from a directory, calculates statistics (total tests, pass/fail counts, average execution time, and error distribution), and outputs a formatted Markdown summary report. Make sure it includes robust error handling and CLI argument parsing.
+Write a python script `demo/opencode/python/generate_report.py` that reads JSON test logs from a directory, calculates statistics (total tests, pass/fail counts, average execution time, and error distribution), and outputs a formatted Markdown summary report. Make sure it includes robust error handling and CLI argument parsing.
 ```
 
 ---
@@ -16,8 +16,8 @@ Write a python script `box/generate_report.py` that reads JSON test logs from a 
 ## Expected Autonomous Behavior
 
 1. **Tool Usage**:
-   - The subagent must use the `clean_python` tool (`verify_and_commit_code`) to create `box/generate_report.py`.
-   - Must NOT use standard `write` or `edit` tools for `.py` files.
+   - The subagent must use the `clean_python` tool (`verify_and_commit_code`) to create `demo/opencode/python/generate_report.py`.
+   - Must NOT use standard `write` or `edit` tools for `.py` files (only `clean_python`).
 
 2. **Quality Enforcement**:
    - **Radon CC**: All functions must have Cyclomatic Complexity < 6.
