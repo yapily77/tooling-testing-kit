@@ -414,10 +414,10 @@ def main():
     out_md = reports_dir / "dict_access_runtime.md"
     lines = [
         "# 🏃 Runtime Verification: Dict Access on Pydantic Models\n",
-        f"**Summary:** CONFIRMED_CRASH: {tallies['CONFIRMED_CRASH']} | "
+        (f"**Summary:** CONFIRMED_CRASH: {tallies['CONFIRMED_CRASH']} | "
         f"SAFE_DICT: {tallies['SAFE_DICT']} | "
         f"SAFE_MODEL: {tallies['SAFE_MODEL']} | "
-        f"UNVERIFIABLE: {tallies['UNVERIFIABLE']}\n",
+        f"UNVERIFIABLE: {tallies['UNVERIFIABLE']}\n"),
     ]
     by_file: dict[str, list] = {}
     for r in results:

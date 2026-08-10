@@ -2,6 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 
+import aiofiles
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -83,7 +84,7 @@ async def main():
 
         # Dump the result to a JSON artifact
         artifact_path = Path(__file__).parent / "final_report.json"
-        with open(artifact_path, "w", encoding="utf-8") as f:
+        with aiofiles.open(artifact_path, "w", encoding="utf-8") as f:
             f.write(result.model_dump_json(indent=2))
         print(f"Final artifact saved to {artifact_path}")
 

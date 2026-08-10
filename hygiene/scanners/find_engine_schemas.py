@@ -76,10 +76,7 @@ def is_potential_schema_hazard(node: ast.FunctionDef) -> bool:
         return True  # Untyped return is a potential hazard
 
     returns_str = ast.unparse(node.returns).strip()
-    if any(x in returns_str for x in ("dict", "Dict", "list", "List", "Any")):
-        return True
-
-    return False
+    return bool(any(x in returns_str for x in ("dict", "Dict", "list", "List", "Any")))
 
 
 class FunctionDefExtractor(ast.NodeVisitor):

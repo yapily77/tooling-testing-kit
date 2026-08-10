@@ -76,7 +76,7 @@ def sync_environment_drift():
             if m:
                 existing_vars.add(m.group(1))
 
-    missing_vars = sorted(list(env_vars - existing_vars))
+    missing_vars = sorted(env_vars - existing_vars)
 
     if missing_vars:
         print(f"  Appending {len(missing_vars)} missing variables to .env.example...")

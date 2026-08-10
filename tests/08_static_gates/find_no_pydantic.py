@@ -206,7 +206,7 @@ def main() -> int:
         print(f"Error: Directory '{TARGET_DIR}' does not exist.")
         return 1
 
-    py_files = sorted(list(target_path.glob("**/*.py")))
+    py_files = sorted(target_path.glob("**/*.py"))
     print(f"Scanning {len(py_files)} Python file(s) in: {TARGET_DIR}\n")
 
     pydantic_files, non_pydantic_files = _categorize_files(py_files)

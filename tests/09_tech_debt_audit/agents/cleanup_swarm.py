@@ -6,6 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import aiofiles
 import httpx
 
 # KIT_* bridge — honour config.load_config, keep localfree gemini fallback
@@ -75,7 +76,7 @@ def run_tests() -> bool:
     return True
 
 async def request_fix(file_path: Path, issue: dict) -> str:
-    with open(file_path, encoding="utf-8") as f:
+    with aiofiles.open(file_path, encoding="utf-8") as f:
         file_content = f.read()
 
     prompt = (
@@ -129,11 +130,11 @@ async def fix_issue(issue: dict):
         return
 
     # 2. Backup current content
-    with open(file_path, encoding="utf-8") as f:
+    with aiofiles.open(file_path, encoding="utf-8") as f:
         original_content = f.read()
 
     # 3. Write fixed content
-    with open(file_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(file_path, "w", encoding="utf-8") as f:
         f.write(fixed_content)
 
     # 4. Validate with linter and tests
@@ -143,7 +144,7 @@ async def fix_issue(issue: dict):
         run_cmd(["git", "add", str(file_rel)])
     else:
         logger.warning(f"Validation failed for {file_rel}. Reverting change...")
-        with open(file_path, "w", encoding="utf-8") as f:
+        with aiofiles.open(file_path, "w", encoding="utf-8") as f:
             f.write(original_content)
 
 async def main():
@@ -151,7 +152,7 @@ async def main():
         logger.error("No verified technical debt report found.")
         return
 
-    with open(VERIFIED_DEBT_PATH, encoding="utf-8") as f:
+    with aiofiles.open(VERIFIED_DEBT_PATH, encoding="utf-8") as f:
         items = json.load(f)
 
     # Filter strictly for HIGH priority silent failures first to handle them safely

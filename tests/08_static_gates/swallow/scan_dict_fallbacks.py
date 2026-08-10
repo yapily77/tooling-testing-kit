@@ -36,9 +36,9 @@ def find_get_defaults(tree: ast.Module) -> list[tuple[int, str]]:
                 default_src = ast.unparse(default)
                 violations.append((
                     node.lineno,
-                    f".get(…, {default_src}) — dictionary call with a default "
+                    (f".get(…, {default_src}) — dictionary call with a default "
                     "fallback value silently substitutes a guessed constant; use "
-                    "strict bracket notation [key] to trigger KeyError instead",
+                    "strict bracket notation [key] to trigger KeyError instead"),
                 ))
             else:
                 default_src = ast.unparse(
@@ -46,10 +46,10 @@ def find_get_defaults(tree: ast.Module) -> list[tuple[int, str]]:
                 )
                 violations.append((
                     node.lineno,
-                    f".get(…, default={default_src}) — dictionary call with a "
+                    (f".get(…, default={default_src}) — dictionary call with a "
                     "default fallback value silently substitutes a guessed "
                     "constant; use strict bracket notation [key] to trigger "
-                    "KeyError instead",
+                    "KeyError instead"),
                 ))
     return violations
 

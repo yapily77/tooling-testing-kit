@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 def _import_node(import_code: str) -> ast.stmt:
     stripped = import_code.strip()
-    if not (stripped.startswith("import ") or stripped.startswith("from ")):
+    if not (stripped.startswith(("import ", "from "))):
         raise ValueError(f"Not a valid import statement: {import_code!r}")
     tree = ast.parse(stripped)
     return tree.body[0]

@@ -520,7 +520,7 @@ def test_classical_source_hierarchy_structure() -> None:
 def test_classical_source_hierarchy_focus_values() -> None:
     """Kill mutant: focus values must be non-empty strings."""
     hierarchy = get_classical_source_hierarchy()
-    for source, info in hierarchy.items():
+    for info in hierarchy.values():
         assert isinstance(info["focus"], str)
         assert len(info["focus"]) > 0
 

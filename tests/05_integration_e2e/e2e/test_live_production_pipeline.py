@@ -1,3 +1,4 @@
+import aiofiles
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -74,7 +75,7 @@ async def test_live_production_pipeline():
 
     # Save the profile for the pipeline to load
     k3_profile = map_profile_to_k3(profile, chat_id, dob="1990-01-01", tailoring_concerns=tailoring_concerns)
-    with open(profile_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(profile_path, "w", encoding="utf-8") as f:
         json.dump(k3_profile, f, indent=2, ensure_ascii=False)
 
     print(f"[Step 1/4] Data Ready. Profile saved to {profile_path}")

@@ -208,7 +208,6 @@ def main():
                     "type": t,
                     "file_path_src": file_path_src,
                     "line_src": line_src,
-                    "file_path_src": file_path_src,
                     "reason_src": item.get("reason", "")
                 })
             else:
@@ -216,8 +215,7 @@ def main():
                     "name": name,
                     "type": t,
                     "file_path_src": file_path_src,
-                    "line_src": line_src,
-                    "file_path_src": file_path_src
+                    "line_src": line_src
                 })
         elif status_src == "FALSE_POSITIVE":
             # False Positive means alive in src
@@ -226,7 +224,6 @@ def main():
                 "type": t,
                 "file_path_src": file_path_src,
                 "is_alive_src": is_alive_src,
-                "file_path_src": file_path_src,
                 "reason_src": item.get("reason", "")
             })
 

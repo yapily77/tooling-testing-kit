@@ -1,3 +1,4 @@
+import aiofiles
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -72,7 +73,7 @@ async def test_report_menu_flow(db):
     test_report_dir.mkdir(parents=True, exist_ok=True)
     master_json_path = str(test_report_dir / "master.json")
 
-    with open(master_json_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(master_json_path, "w", encoding="utf-8") as f:
         json.dump(master_json, f, indent=2)
 
     # 4. Add to DB

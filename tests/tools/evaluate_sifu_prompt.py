@@ -2,6 +2,8 @@ import asyncio
 import os
 import sys
 
+import aiofiles
+
 sys.path.append(os.getcwd())
 
 from src.bot.chronomancer_handler import _build_advisory_prompt
@@ -102,7 +104,7 @@ async def evaluate_sifu_prompt_impact():
     # Write evaluation log to TEST/logs/sifu_eval_run.md
     os.makedirs("TEST/logs", exist_ok=True)
     report_path = "TEST/logs/sifu_eval_run.md"
-    with open(report_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(report_path, "w", encoding="utf-8") as f:
         f.write("# Sifu Translation Prompt A/B Evaluation\n\n")
         f.write("This report evaluates the qualitative impact and value-to-token ratio of the `SIFU_INTERPRETATION_GUIDE` prompt injection.\n\n")
         f.write("## Prompt Stats\n")

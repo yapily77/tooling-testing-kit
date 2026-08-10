@@ -50,7 +50,7 @@ def get_changed_files() -> list[str]:
                 if line.strip():
                     files.add(line.strip())
 
-    return sorted(list(files))
+    return sorted(files)
 
 
 def main():
@@ -70,7 +70,7 @@ def main():
     files_to_scan = []
     for f in changed_files:
         path = Path(f)
-        if path.suffix == ".py" and (f.startswith("src/") or f.startswith("kit-hygiene/")):
+        if path.suffix == ".py" and (f.startswith(("src/", "kit-hygiene/"))):
             if f not in exceptions:
                 files_to_scan.append(f)
 

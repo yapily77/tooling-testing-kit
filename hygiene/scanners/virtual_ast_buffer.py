@@ -210,9 +210,8 @@ def _parse_has_imports(tree: ast.Module, symbols: set[str]) -> set[str]:
             for alias in node.names:
                 if alias.name == "pydantic":
                     found.update(s for s in ("BaseModel", "Field") if s in symbols)
-                elif alias.name == "typing":
-                    if "Any" in symbols:
-                        found.add("Any")
+                elif alias.name == "typing" and "Any" in symbols:
+                    found.add("Any")
     return found
 
 
@@ -233,7 +232,7 @@ def _find_insert_after_docstring(lines: list[str]) -> int | None:
     in_docstring = False
     for idx, line in enumerate(lines):
         stripped = line.strip()
-        if idx == 0 and (stripped.startswith('"""') or stripped.startswith("'''")):
+        if idx == 0 and (stripped.startswith(('"""', "'''"))):
             quote = '"""' if stripped.startswith('"""') else "'''"
             if stripped.count(quote) == 2:
                 return 1

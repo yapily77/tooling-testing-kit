@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 
+import aiofiles
 from dotenv import load_dotenv
 
 # Load env variables BEFORE importing src modules
@@ -28,7 +29,7 @@ async def main():
         print(f"Error: Profile not found at {profile_path}")
         return
 
-    with open(profile_path, encoding="utf-8") as f:
+    with aiofiles.open(profile_path, encoding="utf-8") as f:
         profile = json.load(f)
 
     dm_strength = profile.get("dm_strength_type") or profile.get("day_master_strength") or "Strong"

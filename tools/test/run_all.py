@@ -5,8 +5,7 @@ from pathlib import Path
 
 def run_test_script(script_name):
     print(f"--- Running {script_name} ---")
-    result = subprocess.run([sys.executable, str(Path(__file__).parent / f"{script_name}.py")],, check=False)
-                            capture_output=True, text=True)
+    result = subprocess.run([sys.executable, str(Path(__file__).parent / f"{script_name}.py")], check=False, capture_output=True, text=True)
     print(result.stdout)
     if result.stderr:
         print(f"Errors in {script_name}:\n{result.stderr}")

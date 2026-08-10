@@ -2,6 +2,8 @@ import asyncio
 import os
 import sys
 
+import aiofiles
+
 sys.path.append(os.getcwd())
 
 from src.bot.chronomancer_handler import _build_advisory_prompt
@@ -118,7 +120,7 @@ async def evaluate_raw_scores_impact():
     # Write evaluation log to TEST/logs/raw_math_eval_run.md
     os.makedirs("TEST/logs", exist_ok=True)
     report_path = "TEST/logs/raw_math_eval_run.md"
-    with open(report_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(report_path, "w", encoding="utf-8") as f:
         f.write("# Raw Math Scores and Rule 5 Legend A/B Evaluation\n\n")
         f.write("This report evaluates the qualitative impact of unmasking raw daily scores and injecting the Rule 5 Mathematical Scale Legend.\n\n")
         f.write("## Prompt Delta\n")

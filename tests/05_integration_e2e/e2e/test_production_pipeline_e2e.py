@@ -1,3 +1,4 @@
+import aiofiles
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -60,7 +61,7 @@ async def test_full_production_pipeline():
     technical_md_path = artifact_dir / "technical_report.md"
     final_html_path = artifact_dir / "final_report.html"
 
-    with open(profile_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(profile_path, "w", encoding="utf-8") as f:
         json.dump(k3_profile, f, indent=2, ensure_ascii=False)
 
     # 3. ENGINE PROCESSING
@@ -84,7 +85,7 @@ async def test_full_production_pipeline():
         "monthly_forecasts": results,
         "annual_summary": annual_summary
     }
-    with open(master_json_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(master_json_path, "w", encoding="utf-8") as f:
         json.dump(master_report, f, indent=2, ensure_ascii=False)
 
     # 5. SUMMARIZER (MOCKING LLM)
@@ -128,7 +129,7 @@ async def test_full_production_pipeline():
 
     # Render the summary MD directly using the formatter
     exec_md = format_markdown_summary(mock_summary_data, k3_profile, [m["month_metadata"] for m in results])
-    with open(summary_md_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(summary_md_path, "w", encoding="utf-8") as f:
         f.write(exec_md)
 
     # 6. FORMAT TECHNICAL REPORT

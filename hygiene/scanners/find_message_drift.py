@@ -168,7 +168,7 @@ def main():
         data["_usage"] = []
         occurrences = usage.get(key, [])
         # Deduplicate file references for yaml usage comments
-        used_files = sorted(list(set(occ[0] for occ in occurrences)))
+        used_files = sorted({occ[0] for occ in occurrences})
         for module_path in used_files:
             comment = f"# {serial_counter:04d} {module_path}"
             data["_usage"].append(comment)

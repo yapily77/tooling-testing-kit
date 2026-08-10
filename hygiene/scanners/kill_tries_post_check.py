@@ -28,7 +28,7 @@ def _collect_defined_names(blob: str) -> set[str]:
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             defined.add(node.name)
-        elif isinstance(node, ast.Import) or isinstance(node, ast.ImportFrom):
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
             for alias in node.names:
                 defined.add(alias.asname or alias.name)
     return defined

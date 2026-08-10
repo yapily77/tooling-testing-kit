@@ -4,6 +4,8 @@ import os
 import sys
 from pathlib import Path
 
+import aiofiles
+
 # Ensure we can import base_agent from the same directory
 sys.path.append(str(Path(__file__).parent))
 
@@ -47,7 +49,7 @@ async def run_repair(task_id, task):
     logger.info(f"[Repair Agent {task_id}] Repairing {file_path}...")
 
     try:
-        with open(file_path, encoding="utf-8") as f:
+        with aiofiles.open(file_path, encoding="utf-8") as f:
             current_code = f.read()
     except Exception as e:
         logger.error(f"[Repair Agent {task_id}] Failed to read {file_path}: {e}")

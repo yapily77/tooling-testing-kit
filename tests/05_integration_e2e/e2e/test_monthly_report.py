@@ -1,3 +1,4 @@
+import aiofiles
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -107,7 +108,7 @@ async def test_francis_monthly_report():
         json_path = "TEST/reports/francis_yap_monthly_master.json"
         md_path = "TEST/reports/francis_yap_monthly_report.md"
 
-        with open(json_path, "w", encoding="utf-8") as f:
+        with aiofiles.open(json_path, "w", encoding="utf-8") as f:
             json.dump(master_json, f, indent=2, ensure_ascii=False)
 
         print(f"Master JSON saved to {json_path}")

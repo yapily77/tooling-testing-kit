@@ -42,7 +42,7 @@ def main():
 
         for line in lines:
             stripped = line.strip()
-            if stripped.startswith("import ") or stripped.startswith("from "):
+            if stripped.startswith(("import ", "from ")):
                 try:
                     line_ast = ast.parse(line)
                     keep = False

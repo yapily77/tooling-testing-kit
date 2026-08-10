@@ -1133,7 +1133,7 @@ class FunctionCandidateScanner(ast.NodeVisitor):
         comp_vis.visit(node)
         cc = comp_vis.complexity
 
-        max_depth, max_depth_line, try_issues = self._check_body_nesting(node.body, depth=0)
+        max_depth, _max_depth_line, try_issues = self._check_body_nesting(node.body, depth=0)
 
         if len(try_issues) > 0 or max_depth > 3 or cc > 5:
             end_line = getattr(node, "end_lineno", node.lineno)
@@ -1568,7 +1568,7 @@ def verify_refactored_ast(
                     for target in top_node.targets:
                         if isinstance(target, ast.Name):
                             orig_namespace.add(target.id)
-                elif isinstance(top_node, ast.Import) or isinstance(top_node, ast.ImportFrom):
+                elif isinstance(top_node, (ast.Import, ast.ImportFrom)):
                     for alias in top_node.names:
                         orig_namespace.add(alias.asname or alias.name)
         except SyntaxError as e:
@@ -2071,7 +2071,6 @@ async def refactor_single_attempt_with_llm(
                 verification_msg=str(e),
             )
         raise
-            return False, history, prompt, res
 
         retry_prompt = format_prompt(template, candidate, attempt + 1, history, violations_text=str(e))
         return False, history, retry_prompt, None
@@ -2268,7 +2267,7 @@ async def main_async(do_refactor: bool, priorities: list[int], limit: int, resum
                 break
             cand: FunctionCandidate = item["candidate"]
             async with semaphore:
-                passed, new_hist, next_prmpt, res = await refactor_single_attempt_with_llm(
+                _passed, new_hist, next_prmpt, res = await refactor_single_attempt_with_llm(
                     cand, item["attempt"], item["history"], item["prompt"], template, item["index"], item["total"]
                 )
             if res is not None:

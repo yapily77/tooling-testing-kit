@@ -1,3 +1,4 @@
+import aiofiles
 import pytest
 
 pytest.skip("Legacy alt_src module removed", allow_module_level=True)
@@ -52,7 +53,7 @@ async def sequential_phase_a(month_idx, profile, engine_res, cache_dir, phase_a_
     month_cache_file = cache_dir / f"month_{month_idx}_rag_bundle.json"
 
     if month_cache_file.exists():
-        with open(month_cache_file, encoding="utf-8") as f:
+        with aiofiles.open(month_cache_file, encoding="utf-8") as f:
             return json.load(f)
 
     print(f"  [SERIAL] Phase A: Starting {m_name}...")
@@ -100,7 +101,7 @@ async def sequential_phase_a(month_idx, profile, engine_res, cache_dir, phase_a_
 
     # Cache to disk
     month_cache_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(month_cache_file, "w", encoding="utf-8") as f:
+    with aiofiles.open(month_cache_file, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
     return results
 
@@ -149,7 +150,7 @@ async def run_front_to_back():
     final_html_path = output_dir / "final_report.html"
 
     k3_profile = map_profile_to_k3(profile, chat_id, dob="1990-01-01", tailoring_concerns=tailoring_concerns)
-    with open(profile_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(profile_path, "w", encoding="utf-8") as f:
         json.dump(k3_profile, f, indent=2, ensure_ascii=False)
 
     # 3. RUN K3 PIPELINE (Strictly Sequential)

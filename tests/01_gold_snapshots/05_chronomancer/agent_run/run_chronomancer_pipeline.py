@@ -7,6 +7,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+import aiofiles
+
 # IMPORTANT: Ensure dotenv is loaded so Mem0 and Qdrant have credentials
 from dotenv import load_dotenv
 
@@ -140,7 +142,7 @@ async def phase2_permutations():
 
     # Write report
     report_path = Path(__file__).parent / "final_report.json"
-    with open(report_path, "w") as f:
+    with aiofiles.open(report_path, "w") as f:
         json.dump(report, f, indent=2)
     logger.info(f"✅ Full report saved to {report_path}")
 
@@ -205,7 +207,7 @@ async def phase3_session_amnesia():
             "structure": "Other"
         }
     }
-    with open(master_path, "w") as f:
+    with aiofiles.open(master_path, "w") as f:
         json.dump(mock_master, f)
 
     logger.info("3.0: Register report in DB")

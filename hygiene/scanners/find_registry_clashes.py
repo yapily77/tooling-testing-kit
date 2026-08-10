@@ -16,6 +16,8 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import aiofiles
+
 if TYPE_CHECKING:
     import instructor
 
@@ -182,7 +184,7 @@ def scan_file_ast(path: Path, registry_map: dict) -> tuple[list[CallSite], dict[
                 local_name = alias.asname or alias.name
                 import_map[local_name] = alias.name
                 import_module_map[local_name] = alias.name
-        elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.AsyncFunctionDef):
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             # Also catch inner imports
             for inner in ast.walk(node):
                 if isinstance(inner, ast.ImportFrom) and inner.module:
@@ -328,7 +330,7 @@ async def evaluate_call_site(client: instructor.AsyncInstructor, site: CallSite,
                 await asyncio.sleep(2 ** attempt)  # exponential backoff
             else:
                 print(f"\x1b[91m🚨 FATAL LLM ERROR on {site.file_path}:{site.line} after {max_retries} attempts: {e}\x1b[0m")
-            raise
+                raise
                 return {
                     "file_path": site.file_path,
                     "line": site.line,
@@ -592,8 +594,8 @@ async def main_async(do_verify: bool, limit: int | None = None, scripts_only: bo
 
     # Reload all findings from checkpoint for final report
     final_findings = []
-    with open(CHECKPOINT_FILE) as f:
-        for line in f:
+    async with aiofiles.open(CHECKPOINT_FILE) as f:
+        async for line in f:
             try:
                 data = json.loads(line)
                 if data.get("findings"):
@@ -610,7 +612,7 @@ async def main_async(do_verify: bool, limit: int | None = None, scripts_only: bo
         "errors": [f for f in final_findings if f["status"] == "ERROR"],
     }
 
-    with open(REPORT_FILE, "w") as f:
+    async with aiofiles.open(REPORT_FILE, "w") as f:
         json.dump(report, f, indent=2)
 
     print(f"Report saved to {REPORT_FILE}")

@@ -4,6 +4,8 @@ import os
 import sys
 from pathlib import Path
 
+import aiofiles
+
 # Annot: my-repo-only (src.* imports). Honour KIT_PATH / TARGET_REPO override.
 _kit_root = os.getenv("KIT_PATH", "") or os.getenv("TARGET_REPO", "")
 PROJECT_ROOT = Path(_kit_root) if _kit_root else Path(__file__).resolve().parents[3]
@@ -120,7 +122,7 @@ async def run_test(verbose=False, chat_id_override=None):
 
     # Initialize UI.md as blank
     ui_md_path = Path(__file__).resolve().parent / "UI.md"
-    with open(ui_md_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "w", encoding="utf-8") as f:
         f.write("")
 
     # Clean up Valkey/cache db values for today's forecast
@@ -153,7 +155,7 @@ async def run_test(verbose=False, chat_id_override=None):
         "structure": "Direct Wealth",
         "domain_focus": "General"
     }
-    with open(profile_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(profile_path, "w", encoding="utf-8") as f:
         json.dump(mock_profile_data, f, indent=2)
 
     session.profile = UserProfile(
@@ -182,11 +184,11 @@ async def run_test(verbose=False, chat_id_override=None):
         mock_sifu.run.return_value = MagicMock(output="Daily forecast: Today is Geng Metal day. Pay attention to wealth.")
         mock_simplifier.run.return_value = MagicMock(output="Today is Geng Metal day. Pay attention to wealth.")
 
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write("### STEP 1\n💬 **User**: `/daily`\n\n🤖 **Bot**:\n> ⏳ _Chronomancer is thinking..._\n\n")
     daily_res = await handle_daily(user_id)
     print("\n[BOT DAILY FORECAST (LIVE GENERATED)]:\n", daily_res, "\n")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"🤖 **Bot**:\n> {sanitize_response(daily_res)}\n\n\n")
     assert len(daily_res.strip()) > 0, "Daily forecast narrative was empty"
 
@@ -211,11 +213,11 @@ async def run_test(verbose=False, chat_id_override=None):
 
     # Verify cache extraction by querying /daily again
     logger.info("--- TURN 1b: /daily Cache Ingestion Verification ---")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write("### STEP 2\n💬 **User**: `/daily` (cached)\n\n🤖 **Bot**:\n> ⏳ _Chronomancer is thinking..._\n\n")
     daily_res_cached = await handle_daily(user_id)
     print("\n[BOT DAILY FORECAST (EXTRACTED FROM CACHE)]:\n", daily_res_cached, "\n")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"🤖 **Bot**:\n> {sanitize_response(daily_res_cached)}\n\n\n")
     assert daily_res_cached.replace(" (Cached).", ". You can now ask follow-up questions.") == daily_res, "Cached narrative differs from the original"
     logger.info("✅ Verified: Daily forecast was successfully extracted from the database cache!")
@@ -228,10 +230,10 @@ async def run_test(verbose=False, chat_id_override=None):
 
     ask_q2 = "Is today a good day to meet my partner?"
     print(f"\n[USER]: {ask_q2}")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"### STEP 3\n💬 **User**: `{ask_q2}`\n\n🤖 **Bot**:\n> ⏳ _Chronomancer is thinking..._\n\n")
     reply_q2 = await handle_ask(user_id, ask_q2)
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"🤖 **Bot**:\n> {sanitize_response(reply_q2)}\n\n\n")
     print("[BOT]:\n", reply_q2, "\n")
     assert len(reply_q2.strip()) > 0, "QA turn 2 reply was empty"
@@ -244,10 +246,10 @@ async def run_test(verbose=False, chat_id_override=None):
 
     ask_q3 = "I recently started a new job as a Senior Engineer, and I am planning to buy a house next month in Singapore."
     print(f"\n[USER]: {ask_q3}")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"### STEP 4\n💬 **User**: `{ask_q3}`\n\n🤖 **Bot**:\n> ⏳ _Chronomancer is thinking..._\n\n")
     reply_q3 = await handle_ask(user_id, ask_q3)
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"🤖 **Bot**:\n> {sanitize_response(reply_q3)}\n\n\n")
     print("[BOT]:\n", reply_q3, "\n")
     assert len(reply_q3.strip()) > 0, "QA turn 3 reply was empty"
@@ -270,10 +272,10 @@ async def run_test(verbose=False, chat_id_override=None):
 
     ask_q4 = "Based on my Singapore plans, what should I look out for?"
     print(f"\n[USER]: {ask_q4}")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"### STEP 5\n💬 **User**: `{ask_q4}`\n\n🤖 **Bot**:\n> ⏳ _Chronomancer is thinking..._\n\n")
     reply_q4 = await handle_ask(user_id, ask_q4)
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"🤖 **Bot**:\n> {sanitize_response(reply_q4)}\n\n\n")
     print("[BOT]:\n", reply_q4, "\n")
 
@@ -283,11 +285,11 @@ async def run_test(verbose=False, chat_id_override=None):
 
     # 6. Turn 5: Final /daily cache verification
     logger.info("--- TURN 5: Final /daily Cache Verification ---")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write("### STEP 6\n💬 **User**: `/daily` (final cache verification)\n\n🤖 **Bot**:\n> ⏳ _Chronomancer is thinking..._\n\n")
     daily_res_final = await handle_daily(user_id)
     print("\n[BOT DAILY FORECAST (FINAL CACHED EXTRACTION)]:\n", daily_res_final, "\n")
-    with open(ui_md_path, "a", encoding="utf-8") as f:
+    with aiofiles.open(ui_md_path, "a", encoding="utf-8") as f:
         f.write(f"🤖 **Bot**:\n> {sanitize_response(daily_res_final)}\n\n\n")
     assert daily_res_final == daily_res_cached, "Final cached narrative differs from the original"
     logger.info("✅ Verified: Daily forecast was successfully extracted from cache at the end of the simulation!")

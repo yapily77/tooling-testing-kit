@@ -385,7 +385,7 @@ def enforce_return_shape(ctx: RunContext[RefactorDeps], result: RefactoringVerdi
             logger.warning(f"[ModelRetry] VirtualASTBuffer Replace Error: {msg}")
             raise ModelRetry(msg)
 
-        tmp_fd, tmp_path = tempfile.mkstemp(suffix=".py")
+        _tmp_fd, tmp_path = tempfile.mkstemp(suffix=".py")
         try:
             with open(tmp_path, "w", encoding="utf-8") as f:
                 f.write(temp_source)
@@ -436,7 +436,7 @@ class FunctionCandidateScanner(ast.NodeVisitor):
         comp_vis.visit(node)
         cc = comp_vis.complexity
 
-        max_depth, max_depth_line, try_issues = self._check_body_nesting(node.body, depth=0)
+        max_depth, _max_depth_line, try_issues = self._check_body_nesting(node.body, depth=0)
 
         if len(try_issues) > 0 or max_depth > 3 or cc > 5:
             end_line = getattr(node, "end_lineno", node.lineno)
@@ -713,7 +713,7 @@ async def refactor_single_attempt_with_llm(
 ) -> tuple[bool, list, str, RefactorResult | None]:
     req_id = str(uuid.uuid4())[:8]
     model_obj = CONTROL_SHEET.scanner_model
-    model_name = getattr(model_obj, "model_name", str(model_obj))
+    getattr(model_obj, "model_name", str(model_obj))
     _provider = get_model_provider_name(CONTROL_SHEET.scanner_model)
     start_t = time.time()
 
@@ -808,7 +808,6 @@ async def refactor_single_attempt_with_llm(
                 verification_msg=str(e),
             )
         raise
-            return False, history, prompt, res
 
         retry_prompt = format_prompt(template, candidate, attempt + 1, history, violations_text=str(e))
         return False, history, retry_prompt, None
@@ -870,7 +869,7 @@ async def main_async(do_refactor: bool, priorities: list[int], limit: int, resum
     async def worker_task(item: dict) -> None:
         cand: FunctionCandidate = item["candidate"]
         async with semaphore:
-            passed, new_hist, next_prmpt, res = await refactor_single_attempt_with_llm(
+            _passed, new_hist, next_prmpt, res = await refactor_single_attempt_with_llm(
                 cand, item["attempt"], item["history"], item["prompt"], template, item["index"], item["total"]
             )
         if res is not None:

@@ -2,6 +2,8 @@ import asyncio
 import os
 import sys
 
+import aiofiles
+
 # Add src to path
 sys.path.append(os.getcwd())
 
@@ -99,7 +101,7 @@ async def generate_examples():
     output_path = "TEST/reports/function_wordings_v5.md"
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-    with open(output_path, "w", encoding="utf-8") as f:
+    with aiofiles.open(output_path, "w", encoding="utf-8") as f:
         f.write("# Function Wordings Verification Report\n\n")
         f.write("This report shows the exact output for each primary Chronomancer function.\n\n")
 

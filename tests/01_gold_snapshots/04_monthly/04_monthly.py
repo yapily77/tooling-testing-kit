@@ -132,7 +132,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
             with open(md_file, "a", encoding="utf-8") as f:
                 f.write(f"\n\n### STEP {step_num}\n")
                 f.write(f"💬 **User**: `{command}`\n\n")
-                f.write(f"🤖 **Bot**:\n> {display_text.replace('\n', '\n> ')}\n")
+                f.write(f"🤖 **Bot**:\n> {display_text.replace(chr(10), chr(10) + '> ')}\n")
 
             # If the response contains error keywords or is a Temporary System Error, abort the test immediately
             lower_intercepted = intercepted_text.lower()
@@ -191,7 +191,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
                                     written_channel_msgs.add(msg_id)
                                     with open(md_file, "a", encoding="utf-8") as f:
                                         f.write(
-                                            f"\n\n📢 **Qimen Channel Alert**:\n> {msg.get('text').replace('\n', '\n> ')}\n"
+                                            f"\n\n📢 **Qimen Channel Alert**:\n> {msg.get('text').replace(chr(10), chr(10) + '> ')}\n"
                                         )
 
                             if msg.get("chat_id") == chat_id and "Analysis Complete" in msg.get("text", ""):

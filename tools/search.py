@@ -110,8 +110,8 @@ def _get_scope_expanded_snippet(rel_path: str, match_text: str) -> str:
 
         snippet = lines[max(0, match_line - 3) : match_line + 5]
         return parent_header + "\n".join(snippet)
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
 async def query_knowledge_graph(query: str, query_vec: list[float], max_entities: int = 10) -> dict[str, Any]:
     if not GRAPH_JSON.exists():
@@ -195,8 +195,8 @@ async def inject_directives(query_vec: list[float], top_k: int = 2, threshold: f
                     "content": row["content"][:500],
                     "score": round(score, 4),
                 })
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
     results.sort(key=lambda x: x["score"], reverse=True)
     return results[:top_k]

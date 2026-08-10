@@ -2,6 +2,8 @@ import asyncio
 import sys
 from pathlib import Path
 
+import aiofiles
+
 # Project Root
 project_root = Path(__file__).parents[3].resolve()
 sys.path.append(str(Path(__file__).parent))
@@ -64,7 +66,7 @@ async def run_agent(task):
     file_path = project_root / task["file"]
     print(f"[AGENT {task['id']}] Starting: {task['name']} on {task['file']}...")
 
-    with open(file_path, encoding="utf-8") as f:
+    with aiofiles.open(file_path, encoding="utf-8") as f:
         content = f.read()
 
     prompt = f"TASK: {task['instruction']}\nCONTEXT: {task['extra_context']}\n\nFILE CONTENT:\n{content}\n\nReturn the ENTIRE updated file content. Do not include any explanation or markdown blocks."

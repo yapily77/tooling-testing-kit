@@ -71,7 +71,7 @@ def find_duplications(file_contents: dict[str, str], min_lines: int = 8) -> list
             while idx_a < len(lines_a):
                 line_a = lines_a[idx_a]
                 # Skip empty lines and imports
-                if not line_a or line_a.startswith("import") or line_a.startswith("from"):
+                if not line_a or line_a.startswith(("import", "from")):
                     idx_a += 1
                     continue
 

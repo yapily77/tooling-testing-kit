@@ -1,6 +1,7 @@
 #!/usr/env/bin python3
 import logging
 
+import aiofiles
 import uvicorn
 from fastapi import FastAPI, Request
 
@@ -37,7 +38,7 @@ async def mock_send_message(token: str, request: Request):
     })
 
     # Optional: write to a file for easy debugging
-    with open("logs/intercepted_markdown.log", "a", encoding="utf-8") as f:
+    with aiofiles.open("logs/intercepted_markdown.log", "a", encoding="utf-8") as f:
         f.write(f"--- TO: {chat_id} ---\n{text}\n\n")
 
     return {

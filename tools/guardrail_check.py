@@ -142,7 +142,7 @@ def _changed_lines_from_diff(diff_text: str) -> set[int] | None:
             m = re.search(r"\+(\d+)(?:,(\d+))?", ln)
             new_lineno = int(m.group(1)) if m else None
             continue
-        if ln.startswith("+++") or ln.startswith("---"):
+        if ln.startswith(("+++", "---")):
             continue
         if new_lineno is None:
             continue
@@ -228,10 +228,9 @@ def discover_dependencies(primary: Path, edit_set: set[str] | None = None) -> li
             for alias in node.names:
                 stem = alias.name.split(".")[-1]
                 wanted[stem] = wanted.get(stem, 0) + 1
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                stem = node.module.split(".")[-1]
-                wanted[stem] = wanted.get(stem, 0) + 1
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            stem = node.module.split(".")[-1]
+            wanted[stem] = wanted.get(stem, 0) + 1
 
     if not wanted:
         # New file with no imports: fall back to the edit set (planner deps).

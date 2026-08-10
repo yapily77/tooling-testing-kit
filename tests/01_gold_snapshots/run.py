@@ -149,7 +149,7 @@ def check_server_health():
         return False
 
 
-def send_webhook(chat_id: int, text: str, update_id: int = None) -> dict:
+def send_webhook(chat_id: int, text: str, update_id: int | None = None) -> dict:
     """Send a webhook request to the bot."""
     import urllib.error
     import urllib.request
@@ -376,11 +376,10 @@ def run_single_test(snap_file: Path, verbose: bool = False, chat_id_override: in
 
         # Verify response body
         expected_body = expected.get("response_body")
-        if expected_body:
-            if resp.get("body") != expected_body:
-                result["errors"].append(f"Step {step_num}: Response body mismatch")
-                result["status"] = "FAIL"
-                return result
+        if expected_body and resp.get("body") != expected_body:
+            result["errors"].append(f"Step {step_num}: Response body mismatch")
+            result["status"] = "FAIL"
+            return result
 
         # Wait for setup steps to complete session establishment
         if expected.get("is_setup", False):

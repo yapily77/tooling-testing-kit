@@ -83,9 +83,8 @@ def fix_file_imports(file_path: Path) -> bool:
 def main():
     fixed_count = 0
     for py_file in sorted(src_dir.rglob("*.py")):
-        if py_file.is_file():
-            if fix_file_imports(py_file):
-                fixed_count += 1
+        if py_file.is_file() and fix_file_imports(py_file):
+            fixed_count += 1
     print(f"🎉 Moved mid-file imports to top in {fixed_count} file(s).")
 
 

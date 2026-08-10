@@ -6,6 +6,7 @@ import re
 import sys
 from pathlib import Path
 
+import aiofiles
 import httpx
 
 # KIT_* bridge — honour config.load_config, keep localfree gemini fallback
@@ -63,7 +64,7 @@ async def scan_file(file_path: Path, semaphore: asyncio.Semaphore) -> list:
     """Reads a file and sends it to the LLM while respecting the concurrency limit with retry logic."""
     async with semaphore:
         try:
-            with open(file_path, encoding="utf-8") as f:
+            with aiofiles.open(file_path, encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
             logger.error(f"Could not read {file_path.name}: {e}")
@@ -184,7 +185,7 @@ async def orchestrate_swarm():
 
     # 6. Save report
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(REPORT_PATH, "w", encoding="utf-8") as f:
+    with aiofiles.open(REPORT_PATH, "w", encoding="utf-8") as f:
         json.dump(all_debt, f, indent=2)
 
     logger.info(f"SWARM COMPLETE. Found {len(all_debt)} total debt items.")

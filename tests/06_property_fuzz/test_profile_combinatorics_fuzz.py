@@ -49,7 +49,7 @@ _BRANCH_SET = set(_BRANCHES)
 _STRENGTH_TIERS = {t.value for t in StrengthTier}
 
 # A "Stem Branch" string guaranteed to satisfy the 60-cycle Yang/Yin pairing.
-_VALID_PAIR = sorted(JIA_ZI_60)[0].split()
+_VALID_PAIR = min(JIA_ZI_60).split()
 _VALID_STEM, _VALID_BRANCH = _VALID_PAIR[0], _VALID_PAIR[1]
 _VALID_PILLAR = {"stem": _VALID_STEM, "branch": _VALID_BRANCH}
 

@@ -143,7 +143,7 @@ async def check_celery_worker_ready() -> bool:
 
         pings = await loop.run_in_executor(None, _ping_workers)
         if pings:
-            workers = [list(d.keys())[0] for d in pings]
+            workers = [next(iter(d.keys())) for d in pings]
             print_status("6. Celery Workers Active", True, f"Online: {', '.join(workers)}")
             return True
         else:

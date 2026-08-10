@@ -26,8 +26,8 @@ def find_exit_swallows(tree: ast.Module) -> list[tuple[int, str]]:
                 if isinstance(val, ast.Constant) and val.value is True:
                     violations.append((
                         child.lineno,
-                        f"{node.name} returns True — explicitly swallows exceptions "
-                        f"in the with block (context manager {node.name})",
+                        (f"{node.name} returns True — explicitly swallows exceptions "
+                        f"in the with block (context manager {node.name})"),
                     ))
     return violations
 

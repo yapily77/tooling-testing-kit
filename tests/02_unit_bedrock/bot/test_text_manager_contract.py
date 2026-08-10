@@ -25,10 +25,10 @@ def test_all_yaml_keys_accessible():
     text.get(category, key) resolves cleanly without raising exceptions or returning fallback error strings.
     """
     app_messages = text._messages
-    for category_name in type(app_messages).model_fields.keys():
+    for category_name in type(app_messages).model_fields:
         category_obj = getattr(app_messages, category_name)
         assert isinstance(category_obj, BaseModel), f"Category {category_name} should be a BaseModel"
-        for key_name in type(category_obj).model_fields.keys():
+        for key_name in type(category_obj).model_fields:
             res = text.get(category_name, key_name)
             assert isinstance(res, str), f"Result for {category_name}.{key_name} should be string"
             assert res, f"Result for {category_name}.{key_name} should not be empty"

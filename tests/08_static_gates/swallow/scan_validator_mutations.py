@@ -98,14 +98,14 @@ def find_validator_mutations(tree: ast.Module) -> list[tuple[int, str]]:
                     if _is_subscript_on(param_name, target):
                         violations.append((
                             stmt.lineno,
-                            f"@model_validator mutates input dict «{param_name}[...]» "
-                            f"— {ast.unparse(stmt)}",
+                            (f"@model_validator mutates input dict «{param_name}[...]» "
+                            f"— {ast.unparse(stmt)}"),
                         ))
                     if _is_name(param_name, target):
                         violations.append((
                             stmt.lineno,
-                            f"@{dec} reassigns value parameter «{param_name}» "
-                            f"— {ast.unparse(stmt)}",
+                            (f"@{dec} reassigns value parameter «{param_name}» "
+                            f"— {ast.unparse(stmt)}"),
                         ))
 
             # --- ast.AugAssign (e.g. v += 1, data['k'] += 1) ---
@@ -113,14 +113,14 @@ def find_validator_mutations(tree: ast.Module) -> list[tuple[int, str]]:
                 if _is_subscript_on(param_name, stmt.target):
                     violations.append((
                         stmt.lineno,
-                        f"@model_validator aug-mutates input dict «{param_name}[...]» "
-                        f"— {ast.unparse(stmt)}",
+                        (f"@model_validator aug-mutates input dict «{param_name}[...]» "
+                        f"— {ast.unparse(stmt)}"),
                     ))
                 if _is_name(param_name, stmt.target):
                     violations.append((
                         stmt.lineno,
-                        f"@{dec} aug-reassigns value parameter «{param_name}» "
-                        f"— {ast.unparse(stmt)}",
+                        (f"@{dec} aug-reassigns value parameter «{param_name}» "
+                        f"— {ast.unparse(stmt)}"),
                     ))
 
             # --- ast.AnnAssign (e.g. v: str = str(v)) ---
@@ -129,14 +129,14 @@ def find_validator_mutations(tree: ast.Module) -> list[tuple[int, str]]:
                 if _is_name(param_name, target):
                     violations.append((
                         stmt.lineno,
-                        f"@{dec} annotated-reassigns value parameter «{param_name}» "
-                        f"— {ast.unparse(stmt)}",
+                        (f"@{dec} annotated-reassigns value parameter «{param_name}» "
+                        f"— {ast.unparse(stmt)}"),
                     ))
                 if _is_subscript_on(param_name, target):
                     violations.append((
                         stmt.lineno,
-                        f"@model_validator mutates input dict «{param_name}[...]]» "
-                        f"— {ast.unparse(stmt)}",
+                        (f"@model_validator mutates input dict «{param_name}[...]]» "
+                        f"— {ast.unparse(stmt)}"),
                     ))
 
     return violations

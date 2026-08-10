@@ -57,7 +57,7 @@ async def test_replicate_agentrunresult_crash(monkeypatch):
     
     # Mock the intake_model to return a dummy response
     # We patch CONTROL_SHEET.intake_model
-    original_model = getattr(CONTROL_SHEET, "intake_model", None)
+    getattr(CONTROL_SHEET, "intake_model", None)
     
     # Pydantic AI's Agent class
     
