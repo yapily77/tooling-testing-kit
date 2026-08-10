@@ -61,7 +61,7 @@ def main():
                         new_lines.append(line)
                     else:
                         removed += 1
-                except Exception:
+                except (OSError, SyntaxError, TypeError, ValueError):
                     new_lines.append(line)
             else:
                 new_lines.append(line)
@@ -69,7 +69,7 @@ def main():
         target.write_text("\n".join(new_lines) + ("\n" if lines and lines[-1] == "" else ""), encoding="utf-8")
         print(json.dumps(ok(f"Cleaned {removed} unused import(s)", {"path": args.relative_path, "removed_count": removed}), indent=2))
 
-    except Exception as e:
+    except (OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"ast_clean_imports failed: {e}"), indent=2))
         sys.exit(1)
 

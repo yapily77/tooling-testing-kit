@@ -27,7 +27,7 @@ def scrub_file(file_path, legacy, target):
                 f.write(new_content)
             print(f"[SCRUBBED] {file_path}")
             return 1
-    except Exception as e:
+    except OSError as e:
         print(f"[ERROR] Could not process {file_path}: {e}")
     return 0
 

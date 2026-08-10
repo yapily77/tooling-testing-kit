@@ -88,8 +88,8 @@ async def main():
             f.write(result.model_dump_json(indent=2))
         print(f"Final artifact saved to {artifact_path}")
 
-    except Exception as e:
-        logger.error(f"Engine Run Failed: {e}", exc_info=True)
+    except (OSError, RuntimeError, ValueError):
+        logger.exception("Engine Run Failed")
 
 if __name__ == "__main__":
     asyncio.run(main())

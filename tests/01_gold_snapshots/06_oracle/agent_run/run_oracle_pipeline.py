@@ -157,6 +157,6 @@ async def run_oracle_pipeline_test():
 if __name__ == "__main__":
     try:
         asyncio.run(run_oracle_pipeline_test())
-    except Exception as e:
-        logger.exception("Oracle E2E Pipeline Test failed with error: %s", e)
+    except (OSError, RuntimeError, ValueError):
+        logger.exception("Oracle E2E Pipeline Test failed")
         sys.exit(1)

@@ -75,7 +75,7 @@ def load_verified_manual_terms() -> dict[str, str]:
             for w in words:
                 if len(w) > 3:  # Only index meaningful length words
                     terms[w] = md_file.name
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Warning reading {md_file.name}: {e}", file=sys.stderr)
     return terms
 
@@ -264,7 +264,7 @@ def audit_candidate_with_llm(
         try:
             response = audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(
@@ -338,7 +338,7 @@ def load_manual_whitelist() -> set[str]:
                     line = line.strip()
                     if line and not line.startswith("#"):
                         whitelist.add(line)
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Warning: Could not read kit-hygiene/whitelist.txt: {e}", file=sys.stderr)
     return whitelist
 
@@ -371,7 +371,7 @@ def main():
                 if definition.name not in all_defs:
                     all_defs[definition.name] = []
                 all_defs[definition.name].append(definition)
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     # 2. Whitelist compilation (Manual + Decorator + Standard entrypoints)
@@ -456,7 +456,7 @@ def main():
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     existing_results[(res.get("file_path"), res.get("line"), res.get("name"))] = res
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
     md_path = output_dir / "dead_code_audit.md"
 
@@ -487,7 +487,7 @@ def main():
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             error_msg = str(e)
             print(
                 f"WARNING: Auditing failed or exhausted retries for {definition.name} in {definition.file_path}: {error_msg}",
@@ -508,7 +508,7 @@ def main():
     try:
         generate_markdown_report(report, md_path)
         print(f"Rendered Markdown report saved to {md_path}")
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
         print(f"Error generating Markdown report: {e}", file=sys.stderr)
 
     print(f"\nAudit completed. JSON store stored in {json_path}")

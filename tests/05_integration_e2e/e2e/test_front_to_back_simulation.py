@@ -90,7 +90,7 @@ async def sequential_phase_a(month_idx, profile, engine_res, cache_dir, phase_a_
                     "verbatim_excerpt": f"Query: {q}",
                     "english_translation": "Result from BaziRAG"
                 })
-            except Exception as e:
+            except (OSError, KeyError, ValueError) as e:
                 print(f"      [RAG ERROR] {e}")
 
         extracted["classical_citations"] = citations
@@ -169,7 +169,7 @@ async def run_front_to_back():
             progress_callback=progress_logger
         )
         print(f"OK: Master JSON generated at {master_json_path}")
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         print(f"ERROR: Pipeline failed: {e}")
 
     # 4. RUN SUMMARIZER
@@ -186,7 +186,7 @@ async def run_front_to_back():
                 loop=loop
             ))
             print(f"OK: Executive Summary generated at {summary_md_path}")
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError) as e:
             print(f"ERROR: Summarizer failed: {e}")
 
     # 5. CONSOLIDATE
@@ -195,7 +195,7 @@ async def run_front_to_back():
         try:
             stitch_and_convert(str(summary_md_path), str(final_html_path))
             print(f"OK: FINAL REPORT READY: {final_html_path}")
-        except Exception as e:
+        except (OSError, ValueError, TypeError) as e:
             print(f"ERROR: Consolidation failed: {e}")
 
     print("\n--- FRONT-TO-BACK RUN COMPLETE ---")

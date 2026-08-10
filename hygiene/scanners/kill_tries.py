@@ -22,7 +22,7 @@ import re
 import subprocess
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -74,12 +74,15 @@ def fill_template(template_str: str, **kwargs: str) -> str:
 
     return _KNOWN_TEMPLATE_KEYS.sub(_replacer, template_str)
 
+# Module-level logger
+_logger = logging.getLogger(__name__)
+
 # Initialize Logfire instrumentation once globally
 try:
     logfire.configure(send_to_logfire=False)
     logfire.instrument_pydantic_ai()
-except Exception as err:
-    logging.warning("Logfire instrumentation failed: %s", err)
+except ImportError as err:
+    _logger.warning("Logfire instrumentation failed: %s", err)
 
 CHECKPOINT_FILE = pkg_root / "reports" / "kill_tries_checkpoint.jsonl"
 REPORT_FILE = pkg_root / "reports" / "kill_tries.json"
@@ -90,7 +93,7 @@ LIST_FILE = pkg_root / "scanners" / "kill_tries_list.txt"
 
 
 def get_timestamp() -> str:
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     return now.strftime("%m-%d-%H:%M:%S") + f":{int(now.microsecond / 1000):03d}"
 
 
@@ -107,15 +110,18 @@ def get_model_provider_name(model: Any) -> str:
 
 # Configure logging with ANSI colors
 class ColoredFormatter(logging.Formatter):
-    COLORS = {
-        "INFO": "\033[94m",
-        "WARNING": "\033[93m",
-        "ERROR": "\033[91m",
-        "CRITICAL": "\033[91m\033[1m",
-    }
     RESET = "\033[0m"
     BOLD = "\033[1m"
     GREEN = "\033[92m"
+
+    def __init__(self):
+        super().__init__()
+        self.COLORS: dict[str, str] = {
+            "INFO": "\033[94m",
+            "WARNING": "\033[93m",
+            "ERROR": "\033[91m",
+            "CRITICAL": "\033[91m\033[1m",
+        }
 
     def format(self, record: logging.LogRecord) -> str:
         color = self.COLORS.get(record.levelname, self.RESET)
@@ -394,8 +400,7 @@ class RefactoringVerdict(BaseModel):
         try:
             main_tree = ast.parse(self.refactored_code)
             for node in ast.walk(main_tree):
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    if node.name != self.function_name:
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name != self.function_name:
                         raise ModelRetry(
                             f"CRITICAL: Nested function `{node.name}` defined inside `refactored_code`. "
                             f"Move `{node.name}` into `helper_functions` and ensure it starts with `_{self.function_name}_`."
@@ -408,8 +413,7 @@ class RefactoringVerdict(BaseModel):
             try:
                 helper_tree = ast.parse(helper_code)
                 for node in helper_tree.body:
-                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                        if not node.name.startswith("_"):
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and not node.name.startswith("_"):
                             raise ModelRetry(
                                 f"CRITICAL: Helper function `{node.name}` MUST start with an underscore (e.g., `_{node.name}`)."
                             )
@@ -1576,19 +1580,18 @@ def verify_refactored_ast(
 
     # 3. Helper naming and namespace collision check
     for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            if node.name != candidate_name:
-                if not node.name.startswith("_"):
-                    violations.append(
-                        f"invalid_helper_name: Helper `{node.name}` must start with an underscore. "
-                        f"Suggestion: Rename to _{node.name} or pick a unique _-prefixed name."
-                    )
-                elif node.name in orig_namespace:
-                    violations.append(
-                        f"namespace_collision: Helper `{node.name}` shadows an existing import, "
-                        f"function, class, or global variable in this file. "
-                        f"Suggestion: Pick a unique _-prefixed name for this helper."
-                    )
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name != candidate_name:
+            if not node.name.startswith("_"):
+                violations.append(
+                    f"invalid_helper_name: Helper `{node.name}` must start with an underscore. "
+                    f"Suggestion: Rename to _{node.name} or pick a unique _-prefixed name."
+                )
+            elif node.name in orig_namespace:
+                violations.append(
+                    f"namespace_collision: Helper `{node.name}` shadows an existing import, "
+                    f"function, class, or global variable in this file. "
+                    f"Suggestion: Pick a unique _-prefixed name for this helper."
+                )
 
     # 4. Attribute sandbox: detect hallucinated fields
     if orig_code:
@@ -2109,7 +2112,7 @@ def scan_all_candidates(target_files: set[str] | None = None) -> list[FunctionCa
                 scanner = FunctionCandidateScanner(rel_path, content.splitlines(), content)
                 scanner.visit(tree)
                 candidates.extend(scanner.candidates)
-            except Exception as e:
+            except (OSError, SyntaxError, ValueError, TypeError) as e:
                 logger.warning(f"Skipped {py_file.name}: {e}")
 
     logger.info(f"✅ Found {len(candidates)} candidates violating Flat Control Flow standards.")
@@ -2149,8 +2152,8 @@ def load_checkpoint() -> dict[str, dict]:
     if CHECKPOINT_FILE.exists():
         try:
             with open(CHECKPOINT_FILE, encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
+                for raw_line in f:
+                    line = raw_line.strip()
                     if line:
                         item = json.loads(line)
                         key = f"{item.get('file_path', '')}:{item.get('function_name', '')}"
@@ -2159,7 +2162,7 @@ def load_checkpoint() -> dict[str, dict]:
                         elif key in completed:
                             completed.pop(key, None)
             logger.info(f"Loaded {len(completed)} prior results from checkpoint ({CHECKPOINT_FILE.name}).")
-        except Exception as e:
+        except (OSError, json.JSONDecodeError, ValueError) as e:
             logger.warning(f"Failed loading checkpoint: {e}")
     return completed
 
@@ -2221,8 +2224,7 @@ async def main_async(do_refactor: bool, priorities: list[int], limit: int, resum
                     requires_decomposition=False,
                 )
                 decomposed_targets.append(main_candidate)
-                for hc in plan.helper_candidates:
-                    decomposed_targets.append(hc)
+                decomposed_targets.extend(plan.helper_candidates)
                 logger.info(
                     f"🔀 Decomposition produced {len(plan.helper_candidates)} helpers "
                     f"for {c.function_name} (CC {c.cc} → {plan.residual_cc})"

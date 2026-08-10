@@ -30,7 +30,7 @@ import shutil
 import subprocess
 import sys
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -128,7 +128,7 @@ def checkpoint(file_path: str) -> str | None:
         logger.error(f"File not found: {path}")
         return None
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     backup_path = CHECKPOINT_DIR / f"{path.stem}_{ts}{path.suffix}.bak"
     shutil.copy2(str(path), str(backup_path))
     logger.info(f"Checkpoint created: {backup_path}")
@@ -547,7 +547,7 @@ def sanitize(file_path: str) -> CheckResult:
         return CheckResult(success=result.returncode == 0, message=output)
     except subprocess.TimeoutExpired:
         return CheckResult(success=False, message="Sanitizer timed out")
-    except Exception as e:
+    except (OSError, ValueError, TypeError) as e:
         return CheckResult(success=False, message=str(e))
 
 

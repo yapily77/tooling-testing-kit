@@ -47,7 +47,7 @@ def sync_environment_drift():
                 env_vars.add(m.group(1))
             for m in environ_get_pattern.finditer(content):
                 env_vars.add(m.group(1))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"  Warning reading {py_file}: {e}")
 
     if not env_vars:
@@ -95,7 +95,15 @@ class LogTee:
     """Tee all prints to cleanup.log and stdout."""
     def __init__(self, log_path: Path):
         self.terminal = sys.stdout
-        self.log = open(log_path, "a", encoding="utf-8")
+        self.log_path = log_path
+        self.log = open(log_path, "a", encoding="utf-8")  # noqa: SIM115
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.log.close()
+        return False
 
     def write(self, message):
         self.terminal.write(message)
@@ -227,23 +235,22 @@ def main():
     log_path = log_dir / "cleanup.log"
 
     # Enable Tee logging
-    tee = LogTee(log_path)
-    sys.stdout = tee
+    with LogTee(log_path) as tee:
+        sys.stdout = tee
 
-    print("🧹 Starting Codebase Hygiene Cleanup Pipeline (Phase 1)...")
-    print("=" * 60)
+        print("🧹 Starting Codebase Hygiene Cleanup Pipeline (Phase 1)...")
+        print("=" * 60)
 
-    try:
-        # 1. Sync environment drift variables
-        sync_environment_drift()
+        try:
+            # 1. Sync environment drift variables
+            sync_environment_drift()
 
-        # 2. Surgically strip confirmed dead code
-        strip_dead_code()
+            # 2. Surgically strip confirmed dead code
+            strip_dead_code()
 
-        print("\n✅ Phase 1 Cleanup Completed.")
-    finally:
-        sys.stdout = tee.terminal
-        tee.log.close()
+            print("\n✅ Phase 1 Cleanup Completed.")
+        finally:
+            sys.stdout = tee.terminal
 
 
 if __name__ == "__main__":

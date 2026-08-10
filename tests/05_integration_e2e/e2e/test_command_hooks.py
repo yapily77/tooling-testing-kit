@@ -19,12 +19,14 @@ def setup_teardown():
 
 async def send_mock_update(text: str):
     update = {"update_id": 999, "message": {"chat": {"id": CHAT_ID}, "text": text}}
-    with patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send:
-        with patch("src.bot.app.check_user_access", return_value=True):
-            with patch("src.bot.security.can_use_chronomancer", return_value=True):
-                with patch("src.bot.security.can_generate_report", return_value=True):
-                    await process_webhook_logic(update)
-                    return mock_send
+    with (
+        patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send,
+        patch("src.bot.app.check_user_access", return_value=True),
+        patch("src.bot.security.can_use_chronomancer", return_value=True),
+        patch("src.bot.security.can_generate_report", return_value=True),
+    ):
+        await process_webhook_logic(update)
+        return mock_send
 
 
 @pytest.mark.asyncio
@@ -102,12 +104,14 @@ async def test_conversational_routing_chronomancer():
 @pytest.mark.asyncio
 async def test_hook_reports():
     """Test /reports hook (plural)."""
-    with patch("src.bot.db.Database.get_all_reports_for_user", return_value=[{"master_json_path": "fake.json"}]) as mock_get_reports:
-        with patch("src.bot.app.get_report_menu_text", return_value="Monthly Forecasts Menu"):
-            mock_send = await send_mock_update("/reports")
-            mock_get_reports.assert_called_once_with(CHAT_ID)
-            calls = [call.args[1] for call in mock_send.call_args_list]
-            assert "Monthly Forecasts Menu" in calls
+    with (
+        patch("src.bot.db.Database.get_all_reports_for_user", return_value=[{"master_json_path": "fake.json"}]) as mock_get_reports,
+        patch("src.bot.app.get_report_menu_text", return_value="Monthly Forecasts Menu"),
+    ):
+        mock_send = await send_mock_update("/reports")
+        mock_get_reports.assert_called_once_with(CHAT_ID)
+        calls = [call.args[1] for call in mock_send.call_args_list]
+        assert "Monthly Forecasts Menu" in calls
 
 async def send_mock_callback(data: str):
     update = {
@@ -119,13 +123,15 @@ async def send_mock_callback(data: str):
             "message": {"chat": {"id": CHAT_ID}}
         }
     }
-    with patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send:
-        with patch("src.bot.app.check_user_access", return_value=True):
-            with patch("src.bot.security.can_use_chronomancer", return_value=True):
-                with patch("src.bot.security.can_generate_report", return_value=True):
-                    with patch("src.bot.utils.answer_telegram_callback", new_callable=AsyncMock):
-                        await process_webhook_logic(update)
-                        return mock_send
+    with (
+        patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send,
+        patch("src.bot.app.check_user_access", return_value=True),
+        patch("src.bot.security.can_use_chronomancer", return_value=True),
+        patch("src.bot.security.can_generate_report", return_value=True),
+        patch("src.bot.utils.answer_telegram_callback", new_callable=AsyncMock),
+    ):
+        await process_webhook_logic(update)
+        return mock_send
 
 @pytest.mark.asyncio
 async def test_hook_add_direct():

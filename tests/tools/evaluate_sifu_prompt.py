@@ -96,7 +96,7 @@ async def evaluate_sifu_prompt_impact():
                 system_prompt="You are a Bazi Advisor.",
                 temperature=0.1
             )
-        except Exception as e:
+        except (OSError, ConnectionError, TimeoutError, KeyError, ValueError) as e:
             print(f"LLM call failed: {e}. Falling back to simulation mode.")
             response_without = "Standard LLM output: High physical injury risk. Bad luck, stay indoors."
             response_with = "Sifu Guided LLM output: Branch Clash (Chong) active. Move deliberately, avoid stagnation."

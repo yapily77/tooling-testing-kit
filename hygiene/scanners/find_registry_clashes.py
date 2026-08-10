@@ -14,7 +14,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import aiofiles
 
@@ -37,7 +37,7 @@ except ImportError:
 
 # Configure logging with ANSI colors
 class ColoredFormatter(logging.Formatter):
-    COLORS = {
+    COLORS: ClassVar[dict] = {
         'INFO': '\033[94m',      # Blue
         'WARNING': '\033[93m',   # Yellow
         'ERROR': '\033[91m',     # Red
@@ -323,7 +323,7 @@ async def evaluate_call_site(client: instructor.AsyncInstructor, site: CallSite,
                 "registry_class": response.registry_class,
                 "suggested_fix": response.suggested_fix
             }
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             if attempt < max_retries - 1:
                 print(f"\x1b[93m⚠️  LLM timeout/error on {site.file_path}:{site.line} -> {e}. Retrying ({attempt+1}/{max_retries})...\x1b[0m")
                 import asyncio
@@ -432,7 +432,7 @@ def runtime_verify(finding: dict, registry_map: dict) -> dict:
             else:
                 finding["verified_status"] = "CONFIRMED_CRASH"
 
-    except Exception as e:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
         finding["verified_status"] = f"IMPORT_ERROR: {e!s}"
 
     return finding
@@ -497,7 +497,7 @@ async def main_async(do_verify: bool, limit: int | None = None, scripts_only: bo
                 api_key=s.api_key,
             )
             instructor_client = instructor.from_openai(client, mode=instructor.Mode.JSON)
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print("❌ ERROR: " + f"Failed to initialize Instructor client: {e}")
             sys.exit(1)
     else:

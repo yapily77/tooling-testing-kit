@@ -131,8 +131,8 @@ class TestOpenRouterGeneric(unittest.IsolatedAsyncioTestCase):
 
         # Force non-local mode and patch sleep
         env_patch = {"LLM_FORCE_LOCAL": "false"}
-        with patch.dict(os.environ, env_patch, clear=False):
-            with patch("asyncio.sleep", AsyncMock()):
+        with patch.dict(os.environ, env_patch, clear=False), \
+                patch("asyncio.sleep", AsyncMock()):
                 response = await call_openrouter_async(
                     prompt="test",
                     url="https://openrouter.ai/api/v1/chat/completions",

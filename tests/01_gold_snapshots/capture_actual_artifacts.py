@@ -16,17 +16,19 @@ CHAT_ID = int(os.getenv("GOLD_CHAT_ID", "999"))
 # [my-repo-only: TEST/GOLD/actual_artifacts directory not in kit download]
 OUT = Path("TEST/GOLD/actual_artifacts")  # [my-repo-only: not in kit download]
 OUT.mkdir(parents=True, exist_ok=True)
-GLOBAL_UPDATE_ID = int(time.time() * 1000)
+_GLOBAL_UPDATE_ID = int(time.time() * 1000)
 
 
-
-def send_webhook(text: str, update_id: int | None = None) -> dict:
+def send_webhook(text: str, update_id: int | None = None) -> dict[str, object]:
+    local_update_id: int
     if update_id is None:
-        update_id = int(time.time() * 1000) % 1000000
-    payload = {
-        "update_id": update_id,
+        local_update_id = int(time.time() * 1000) % 1000000
+    else:
+        local_update_id = update_id
+    payload: dict[str, object] = {
+        "update_id": local_update_id,
         "message": {
-            "message_id": update_id,
+            "message_id": local_update_id,
             "from": {"id": CHAT_ID, "is_bot": False, "first_name": "Test"},
             "chat": {"id": CHAT_ID, "type": "private"},
             "date": int(time.time()),
@@ -45,11 +47,43 @@ def send_webhook(text: str, update_id: int | None = None) -> dict:
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             body = resp.read().decode("utf-8")
-            return {"status": resp.status, "body": json.loads(body) if body else None}
+            parsed: object
+            if body:
+                parsed = json.loads(body)
+            else:
+                parsed = None
+            return {"status": resp.status, "body": parsed}
     except urllib.error.HTTPError as e:
         return {"status": e.code, "body": e.read().decode("utf-8")}
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return {"status": 0, "body": str(e)}
+
+
+def _sqlite_query_state(sqlite_path: Path) -> object:
+    import sqlite3
+    conn = sqlite3.connect(str(sqlite_path), timeout=5)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute(
+        "SELECT state_json FROM Sessions WHERE user_id = ?",
+        (CHAT_ID,)
+    ).fetchone()
+    conn.close()
+    if not row or not row[0]:
+        return "UNKNOWN"
+    state = row[0]
+    if isinstance(state, str):
+        state = json.loads(state)
+    return state
+
+
+def _extract_step_from_state(state: object) -> str:
+    if isinstance(state, dict):
+        result = state.get("step", "UNKNOWN")
+        if isinstance(result, str):
+            return result
+    if isinstance(state, str):
+        return state
+    return "UNKNOWN"
 
 
 def get_session_step() -> str:
@@ -57,21 +91,9 @@ def get_session_step() -> str:
     if not sqlite_db_path.exists():
         return f"DB_ERROR: bot.db not found at {sqlite_db_path}"
     try:
-        import sqlite3
-        conn = sqlite3.connect(str(sqlite_db_path), timeout=5)
-        conn.row_factory = sqlite3.Row
-        row = conn.execute(
-            "SELECT state_json FROM Sessions WHERE user_id = ?",
-            (CHAT_ID,)
-        ).fetchone()
-        conn.close()
-        if not row or not row[0]:
-            return "UNKNOWN"
-        state = row[0]
-        if isinstance(state, str):
-            state = json.loads(state)
-        return state.get("step", "UNKNOWN")
-    except Exception as e:
+        state = _sqlite_query_state(sqlite_db_path)
+        return _extract_step_from_state(state)
+    except Exception as e:  # noqa: BLE001
         return f"DB_ERROR:{type(e).__name__}:{e}"
 
 
@@ -79,24 +101,25 @@ def extract_bot_messages(log_path: Path) -> list[str]:
     if not log_path.exists():
         return []
     text = log_path.read_text(encoding="utf-8", errors="replace")
-    messages = []
+    messages: list[str] = []
     for m in re.finditer(r"sendMessage\((.*?)\)", text, re.DOTALL):
         block = m.group(1)
-        text_match = re.search(r"text=['\"](.*?)['\"]", block, re.DOTALL)
+        text_match = re.search(r"text['\"](.*?)['\"]", block, re.DOTALL)
         if text_match:
-            messages.append(text_match.group(1).encode("utf-8").decode("unicode_escape", errors="replace"))
+            decoded = text_match.group(1).encode("utf-8").decode("unicode_escape", errors="replace")
+            messages.append(decoded)
     return messages
 
 
-def run_scenario(name: str, steps: list[str], waits: list[int] | None = None) -> dict:
-    global GLOBAL_UPDATE_ID
-    waits = waits or [2] * len(steps)
-    captured = []
+def run_scenario(name: str, steps: list[str], waits: list[int] | None = None) -> dict[str, object]:
+    global _GLOBAL_UPDATE_ID
+    local_waits = waits if waits is not None else [2] * len(steps)
+    captured: list[dict[str, object]] = []
     for idx, text in enumerate(steps):
-        GLOBAL_UPDATE_ID += 1
+        _GLOBAL_UPDATE_ID += 1
         before = get_session_step()
-        resp = send_webhook(text, GLOBAL_UPDATE_ID)
-        time.sleep(waits[idx])
+        resp = send_webhook(text, _GLOBAL_UPDATE_ID)
+        time.sleep(local_waits[idx])
         after = get_session_step()
         captured.append({
             "step": idx + 1,
@@ -115,8 +138,8 @@ def run_scenario(name: str, steps: list[str], waits: list[int] | None = None) ->
     }
 
 
-def main():
-    scenarios = {
+def main() -> None:
+    scenarios: dict[str, dict[str, object]] = {
         "02_auto_capture": {
             "steps": [
                 "/auto",
@@ -143,9 +166,13 @@ def main():
             "waits": [2, 20, 20],
         },
     }
-    results = []
+    results: list[dict[str, object]] = []
     for name, spec in scenarios.items():
-        results.append(run_scenario(name, spec["steps"], spec["waits"]))
+        steps_val = spec["steps"]
+        waits_val = spec.get("waits")
+        steps_list = steps_val if isinstance(steps_val, list) else []
+        waits_list = waits_val if isinstance(waits_val, list) else None
+        results.append(run_scenario(name, steps_list, waits_list))
     out_path = OUT / f"serial_capture_{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}.json"
     out_path.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
     print(out_path)

@@ -13,9 +13,9 @@ def get_python_pids():
     """Get PIDs of all python processes running test/server (excluding this one)."""
     current_pid = os.getpid()
     try:
-        output = subprocess.check_output(["pgrep", "-f", "python"]).decode(, check=False)
+        output = subprocess.check_output(["pgrep", "-f", "python"]).decode()
         return [int(pid) for pid in output.split() if int(pid) != current_pid]
-    except Exception:
+    except Exception:  # noqa: BLE001
         return []
 
 
@@ -42,7 +42,7 @@ def monitor_logs():
 
                     # Clean up the file so we don't process it again
                     error_file.unlink()
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001
                     print(f"Failed to read error file {error_file}: {e}")
 
                 print("💥 Terminating all Python processes...")
@@ -51,9 +51,8 @@ def monitor_logs():
                     try:
                         os.kill(pid, 9)
                         print(f"Killed process {pid}")
-                    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+                    except Exception:  # noqa: BLE001, S110
                         pass
-                sys.exit(1)
 
         # 2. Check standard logs
         if not LOG_FILE.exists():
@@ -63,7 +62,7 @@ def monitor_logs():
         try:
             stat = LOG_FILE.stat()
             current_inode = stat.st_ino
-        except Exception:
+        except Exception:  # noqa: BLE001
             time.sleep(0.5)
             continue
 
@@ -71,7 +70,7 @@ def monitor_logs():
         if current_inode != last_inode:
             if f:
                 f.close()
-            f = open(LOG_FILE, encoding="utf-8", errors="ignore")
+            f = open(LOG_FILE, encoding="utf-8", errors="ignore")  # noqa: SIM115
             # If it's a new file (rotation), read from the start.
             # If it's the very first open, seek to end so we only watch new entries.
             if last_inode is None:
@@ -110,7 +109,7 @@ def monitor_logs():
                 try:
                     os.kill(pid, 9)
                     print(f"Killed process {pid}")
-                except (OSError, ValueError, TypeError, KeyError, AttributeError):
+                except Exception:  # noqa: BLE001, S110
                     pass
 
             sys.exit(1)

@@ -77,7 +77,7 @@ async def _search_single(client: AsyncQdrantClient, keyword: str) -> list[dict]:
     """Search Qdrant and rerank for a single keyword, returning top results."""
     try:
         query_vector = (await _embed([keyword]))[0]
-    except Exception as e:
+    except (OSError, ValueError, TypeError, RuntimeError) as e:
         sys.stderr.write(f"Embedding failed for keyword '{keyword}': {e}\n")
         return []
     try:
@@ -89,7 +89,7 @@ async def _search_single(client: AsyncQdrantClient, keyword: str) -> list[dict]:
                 with_payload=True,
             )
         ).points
-    except Exception as e:
+    except (OSError, ValueError, TypeError, RuntimeError) as e:
         sys.stderr.write(f"Qdrant query failed for keyword '{keyword}': {e}\n")
         return []
 
@@ -171,7 +171,7 @@ async def search_bazi(
                 result = await agent.run(query)
                 final_keywords = result.output.classical_terms
                 sys.stderr.write(f"Pydantic AI translated terms: {final_keywords}\n")
-            except Exception as e:
+            except (OSError, ValueError, TypeError, RuntimeError) as e:
                 sys.stderr.write(f"Pydantic AI parsing failed: {e}. Falling back to default heuristics.\n")
                 final_keywords = [query]
     else:

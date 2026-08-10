@@ -68,14 +68,14 @@ def kill_stale_processes(port):
     if os.name == "nt":
         try:
             cmd = f"netstat -ano | findstr LISTENING | findstr :{port}"
-            output = subprocess.check_output(cmd, shell=True).decode(, check=False)
+            output = subprocess.check_output(cmd, shell=True).decode()
             for line in output.splitlines():
                 if f":{port}" in line:
                     parts = line.strip().split()
                     pid = parts[-1]
                     subprocess.run(["taskkill", "/F", "/PID", pid, "/T"], capture_output=True, check=False)
                     time.sleep(0.5)
-        except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        except Exception:  # noqa: BLE001, S110
             pass
         return
 
@@ -84,12 +84,12 @@ def kill_stale_processes(port):
             ["lsof", "-ti", f"tcp:{port}"],
             stderr=subprocess.DEVNULL,
             text=True,
-        ).strip(, check=False)
+        ).strip()
         if output:
             for pid in output.splitlines():
                 subprocess.run(["kill", "-9", pid], capture_output=True, check=False)
             time.sleep(0.5)
-    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+    except Exception:  # noqa: BLE001, S110
         pass
 
 
@@ -115,8 +115,8 @@ def start_server():
         stderr=subprocess.DEVNULL,
         cwd=str(PROJECT_ROOT),
         env=env,
-        preexec_fn=os.setsid, check=False)
-
+        start_new_session=True,
+    )
     # Wait for server to be healthy
     for _ in range(120):
         if check_server_health():
@@ -128,13 +128,12 @@ def start_server():
 
 
 def stop_server():
-    global server_process
     if server_process:
         print("\n🛑 Stopping local server...")
         try:
             os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
             server_process.wait(timeout=5)
-        except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        except Exception:  # noqa: BLE001, S110
             pass
         print("✅ Server stopped")
 
@@ -145,7 +144,7 @@ def check_server_health():
     try:
         resp = urllib.request.urlopen(f"{SERVER_URL}/health", timeout=5)
         return resp.status == 200
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
 
@@ -185,7 +184,7 @@ def send_webhook(chat_id: int, text: str, update_id: int | None = None) -> dict:
         return {"status": resp.status, "body": json.loads(resp.read())}
     except urllib.error.HTTPError as e:
         return {"status": e.code, "body": e.read().decode()}
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return {"status": 0, "body": str(e)}
 
 
@@ -241,7 +240,7 @@ def get_session_step(chat_id: int) -> str:
                 if row and row[0]:
                     state = json.loads(row[0]) if isinstance(row[0], str) else row[0]
                     return state.get("step", "UNKNOWN")
-        except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        except Exception:  # noqa: BLE001, S110
             pass
         return "UNKNOWN"
     try:
@@ -258,7 +257,7 @@ def get_session_step(chat_id: int) -> str:
         if row and row[0]:
             state = json.loads(row[0])
             return state.get("step", "UNKNOWN")
-    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+    except Exception:  # noqa: BLE001, S110
         pass
     return "UNKNOWN"
 
@@ -334,7 +333,7 @@ def run_single_test(snap_file: Path, verbose: bool = False, chat_id_override: in
     try:
         with open(snap_file) as f:
             snapshot = json.load(f)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         result["errors"].append(f"Failed to load snapshot: {e}")
         result["status"] = "FAIL"
         return result
@@ -647,7 +646,7 @@ if __name__ == "__main__":
             # Note: test_monthly_report_generation skipped for quick baseline check to avoid LLM timeouts
             # asyncio.run(test_monthly_report_generation())
             print("🎉 ALL PYDANTIC AI TESTS PASSED")
-        except Exception:
+        except Exception:  # noqa: BLE001
             import traceback
 
             traceback.print_exc()

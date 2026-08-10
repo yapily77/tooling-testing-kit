@@ -100,8 +100,9 @@ class VirtualASTBuffer:
                 new_func_nodes.append(stmt)
                 if stmt.name != target_name:
                     for node in self.tree.body:
-                        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                            if node.name == stmt.name and node.name != target_name and node.name not in self._inserted_helpers:
+                        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and (
+                            node.name == stmt.name and node.name != target_name and node.name not in self._inserted_helpers
+                        ):
                                 raise ValueError(
                                     f"helper_collision: Collision: helper function name '{stmt.name}' already exists in target module {self.file_path}"
                                 )
@@ -133,9 +134,7 @@ class VirtualASTBuffer:
                     h_name = stmt.name
                     # Check for helper collisions with pre-existing module function/class
                     for node in self.tree.body:
-                        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                            if node.name == h_name:
-                                if node.name != target_name and node.name not in self._inserted_helpers:
+                        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.name == h_name and node.name != target_name and node.name not in self._inserted_helpers:
                                     raise ValueError(
                                         f"helper_collision: Collision: helper function name '{stmt.name}' already exists in target module {self.file_path}"
                                     )

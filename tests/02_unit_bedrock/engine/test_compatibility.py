@@ -544,23 +544,23 @@ class TestCompatibilityLevels:
 
     def test_exceptional_level(self):
         """Test Exceptional level (score >= 80)."""
-        assert 85 >= 80
+        assert 85 >= 80  # noqa: PLR0133
 
     def test_favorable_level(self):
         """Test Favorable level (65 <= score < 80)."""
-        assert 70 >= 65 and 70 < 80
+        assert 70 >= 65 and 70 < 80  # noqa: PLR0133
 
     def test_neutral_level(self):
         """Test Neutral level (50 <= score < 65)."""
-        assert 60 >= 50 and 60 < 65
+        assert 60 >= 50 and 60 < 65  # noqa: PLR0133
 
     def test_challenging_level(self):
         """Test Challenging level (35 <= score < 50)."""
-        assert 40 >= 35 and 40 < 50
+        assert 40 >= 35 and 40 < 50  # noqa: PLR0133
 
     def test_discordant_level(self):
         """Test Discordant level (score < 35)."""
-        assert 30 < 35
+        assert 30 < 35  # noqa: PLR0133
 
 
 # ─────────────────────────────────────────────

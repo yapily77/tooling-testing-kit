@@ -16,7 +16,7 @@ def get_files(directory: str) -> list[Path]:
         )
         paths = [Path(line.strip()) for line in result.stdout.strip().split("\n") if line.strip()]
         return [p for p in paths if p.is_file() and p.suffix == ".py" and p.name != "__init__.py"]
-    except Exception:
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         return [
             p
             for p in Path(directory).rglob("*.py")
@@ -149,7 +149,7 @@ def main():
             src_decorator_whitelists.update(whitelist)
             for name, (t, line) in defs.items():
                 src_defs_map[name] = (f_str, t, line)
-        except Exception as e:
+        except (OSError, ValueError, TypeError) as e:
             print(f"Error parsing {f}: {e}")
 
     # Standard global whitelist

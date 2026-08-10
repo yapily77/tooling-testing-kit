@@ -157,7 +157,7 @@ class WebOrchestrator:
             domain = re.sub(r"[^a-zA-Z0-9_]", "_", domain)
             url_hash = hashlib.sha256(url.encode()).hexdigest()[:8]
             return f"{domain}_{url_hash}"
-        except Exception:
+        except (OSError, ValueError, AttributeError):
             return f"unknown_domain_{hashlib.sha256(url.encode()).hexdigest()[:8]}"
 
     async def fetch_and_extract(self, results: list[SearchResult], query_hash: str) -> tuple[list[Path], bool]:
@@ -278,7 +278,7 @@ class WebOrchestrator:
                     shutil.rmtree(folders.pop(0))
 
             await asyncio.to_thread(prune_capacity)
-        except Exception as e:
+        except (OSError, ValueError, TypeError) as e:
             print(f"Cleanup Error: {e}")
 
     async def run(self, query: str) -> WebResponse:
@@ -356,7 +356,7 @@ async def main():
             print(f"[{i}] {url}")
         print("\nEvidence stored at:", response.evidence_paths)
 
-    except Exception as e:
+    except (RuntimeError, OSError, ValueError) as e:
         print(f"Fatal Error: {e}")
         import traceback
 

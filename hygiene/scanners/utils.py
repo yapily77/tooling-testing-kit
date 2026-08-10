@@ -29,8 +29,8 @@ def _resolve_scan_roots() -> list[Path]:
 
     factory_root = os.environ.get("AIB_FACTORY_ROOT")
     roots: list[Path] = []
-    for raw in scan_roots_env.split(","):
-        raw = raw.strip()
+    for raw_entry in scan_roots_env.split(","):
+        raw = raw_entry.strip()
         if not raw:
             continue
         if Path(raw).is_absolute():
@@ -76,8 +76,8 @@ def get_src_files() -> list[Path]:
             return []
         target_root = os.environ.get("TARGET_ROOT")
         resolved_paths = []
-        for p in paths_str.split(","):
-            p = p.strip()
+        for raw_p in paths_str.split(","):
+            p = raw_p.strip()
             if not p:
                 continue
             path = Path(p)
@@ -100,8 +100,11 @@ def get_src_files() -> list[Path]:
         try:
             changed_files: set[str] = set()
             res1 = subprocess.run(
-                ["git", "diff", "--name-only", "HEAD"], capture_output=True, text=True
-    check=False)
+                ["git", "diff", "--name-only", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
             if res1.returncode == 0:
                 changed_files.update(res1.stdout.strip().split("\n"))
             res2 = subprocess.run(
@@ -113,8 +116,8 @@ def get_src_files() -> list[Path]:
                 changed_files.update(res2.stdout.strip().split("\n"))
 
             paths: list[Path] = []
-            for line in sorted(changed_files):
-                line = line.strip()
+            for raw_line in sorted(changed_files):
+                line = raw_line.strip()
                 if not line or not _is_py_file(line):
                     continue
                 path = Path(line)
@@ -138,8 +141,8 @@ def get_src_files() -> list[Path]:
                 text=True,
                 check=True,
             )
-            for line in result.stdout.strip().split("\n"):
-                line = line.strip()
+            for raw_line in result.stdout.strip().split("\n"):
+                line = raw_line.strip()
                 if line and _is_py_file(line):
                     all_paths.append(Path(line))
 
@@ -179,8 +182,7 @@ def is_binary_file(file_path: Path) -> bool:
         with open(file_path, "rb") as f:
             chunk = f.read(1024)
             return b"\x00" in chunk
-    except Exception:
+    except OSError:
         return False
 
 
-get_src_files = get_src_files

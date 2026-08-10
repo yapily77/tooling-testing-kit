@@ -80,9 +80,9 @@ if __name__ == "__main__":
         repro_fq29_risk_priority()
         repro_fq30_spectrum_fallback()
         print("\nALL REPRODUCED BUGS ARE NOW VERIFIED AS FIXED.")
-    except AssertionError as e:
+    except (AssertionError, RuntimeError) as e:
         print(f"\n[STILL BUGGY] {e}")
         sys.exit(1)
-    except Exception as e:
+    except (ValueError, TypeError) as e:
         print(f"\n[ERROR] {e}")
         sys.exit(1)

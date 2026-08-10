@@ -45,7 +45,7 @@ def seed_users():
         session.add(new_account)
         session.commit()
         print("Successfully seeded user 999123489 as PAID on test_telegram01.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - broad catch for DB rollback safety
         session.rollback()
         print(f"Error seeding users: {e}")
     finally:

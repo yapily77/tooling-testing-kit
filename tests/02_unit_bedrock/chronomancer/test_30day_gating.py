@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -54,7 +54,7 @@ async def test_handle_ask_30day_gating_rejects_far_future_date():
     mock_session.profile.alias = "Tester"
     mock_session.conversation_history = []
 
-    today = date.today()
+    today = datetime.now(UTC).date()
     far_future = today + timedelta(days=45)
     parsed_mock = {
         "dates": [far_future],
@@ -79,7 +79,7 @@ async def test_handle_ask_30day_gating_handles_datetime_objects():
     mock_session.profile.alias = "Tester"
     mock_session.conversation_history = []
 
-    today_dt = datetime.now()
+    today_dt = datetime.now(UTC)
     parsed_mock = {
         "dates": [today_dt],
         "clarified_prompt": "Forecast for today with datetime object",

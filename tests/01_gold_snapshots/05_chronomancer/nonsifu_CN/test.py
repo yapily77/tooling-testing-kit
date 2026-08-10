@@ -78,7 +78,7 @@ async def run_test(verbose=False, chat_id_override=None):
             q = question.lower()
             if "partner" in q:
                 return {
-                    "dates": [date.today()],
+                    "dates": [date.today()],  # noqa: DTZ011
                     "entity": "lover",
                     "intent": "love",
                     "raw_question": question,
@@ -110,7 +110,7 @@ async def run_test(verbose=False, chat_id_override=None):
     # Clean up DB records for test user to guarantee a fresh run
     try:
         db.delete_all_user_data(user_id)
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.warning(f"Failed to clean up user data: {e}")
 
     # Initialize session (which automatically creates the user and links the testing semantic ID in the database)
@@ -131,7 +131,7 @@ async def run_test(verbose=False, chat_id_override=None):
         from src.interfaces.telegram.chronomancer.coordinator import get_sg_today
         today_str = get_sg_today().isoformat()
         db.delete_chrono_cache_for_user_date(user_id, today_str)
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.warning(f"Failed to clear cache: {e}")
 
     # Save Tester' profile to memory manager disk

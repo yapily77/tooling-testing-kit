@@ -122,7 +122,7 @@ async def test_fix_b_initial_timeout_is_loud(monkeypatch):
         calls["n"] += 1
         try:
             res = await coro
-        except Exception:
+        except (TimeoutError, asyncio.CancelledError):
             res = None
         if calls["n"] == 1:
             raise TimeoutError()
@@ -159,7 +159,7 @@ async def test_fix_b_respawn_timeout_is_loud(monkeypatch):
         calls["n"] += 1
         try:
             res = await coro
-        except Exception:
+        except (TimeoutError, asyncio.CancelledError):
             res = None
         if calls["n"] >= 2:
             raise TimeoutError()

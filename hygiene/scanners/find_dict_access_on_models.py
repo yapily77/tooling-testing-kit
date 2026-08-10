@@ -47,7 +47,7 @@ def relative_path(path: Path) -> str:
 def base_source(node: ast.AST) -> str:
     try:
         return ast.unparse(node)
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError):
         if isinstance(node, ast.Name):
             return node.id
         if isinstance(node, ast.Attribute):
@@ -58,7 +58,7 @@ def base_source(node: ast.AST) -> str:
 def scan_file(path: Path) -> list[dict]:
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    except Exception:
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError):
         return []
 
     candidates: list[dict] = []

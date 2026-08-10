@@ -250,7 +250,7 @@ def main():
         r = requests.get("http://localhost:8002/health", timeout=5)
         r.raise_for_status()
         log("TEI embedding server OK (BAAI/bge-m3)")
-    except Exception as e:
+    except (OSError, ValueError, TypeError, RuntimeError) as e:
         log(f"ERROR: TEI embedding server not reachable: {e}")
         log("Run: text-embeddings-router ...")
         sys.exit(1)
@@ -284,7 +284,7 @@ def main():
 
         conn.close()
 
-    except Exception as e:
+    except (OSError, ValueError, TypeError, RuntimeError) as e:
         log(f"ERROR: Pipeline failed: {e}")
         import traceback
         traceback.print_exc()

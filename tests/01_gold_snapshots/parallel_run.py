@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import signal
@@ -77,14 +78,14 @@ def wait_for_health(config: WorkerConfig, timeout: int = 120) -> bool:
             with urllib.request.urlopen(f"{config.server_url}/health", timeout=5) as resp:
                 if resp.status == 200:
                     return True
-        except Exception:
+        except Exception:  # noqa: BLE001
             time.sleep(1)
     return False
 
 
 def start_server(config: WorkerConfig) -> subprocess.Popen:
     config.worker_dir.mkdir(parents=True, exist_ok=True)
-    stdout = (config.worker_dir / "server_stdout.log").open("a", encoding="utf-8")
+    stdout = open(config.worker_dir / "server_stdout.log", "a", encoding="utf-8")  # noqa: SIM115
     process = subprocess.Popen(
         ["uv", "run", "start.py"],
         cwd=str(PROJECT_ROOT),
@@ -92,8 +93,8 @@ def start_server(config: WorkerConfig) -> subprocess.Popen:
         stdout=stdout,
         stderr=subprocess.STDOUT,
         text=True,
-        preexec_fn=os.setsid, check=False)
-
+        start_new_session=True,
+    )
     if not wait_for_health(config):
         stop_process(process)
         raise RuntimeError(f"Worker {config.worker_id} server did not become healthy")
@@ -106,11 +107,9 @@ def stop_process(process: subprocess.Popen) -> None:
     try:
         os.killpg(os.getpgid(process.pid), signal.SIGTERM)
         process.wait(timeout=10)
-    except Exception:
-        try:
+    except Exception:  # noqa: BLE001
+        with contextlib.suppress(Exception):
             os.killpg(os.getpgid(process.pid), signal.SIGKILL)
-        except (OSError, ValueError, TypeError, KeyError, AttributeError):
-            pass
 
 
 def run_gold(config: WorkerConfig, tests: list[str], snapshots: list[str] | None = None) -> dict:
@@ -160,14 +159,12 @@ def run_gold(config: WorkerConfig, tests: list[str], snapshots: list[str] | None
 def wait_for_report(config: WorkerConfig, timeout: int = 180) -> bool:
     deadline = time.time() + timeout
     while time.time() < deadline:
-        try:
+        with contextlib.suppress(Exception):
             conn = sqlite3.connect(config.db_file)
             row = conn.execute("SELECT COUNT(*) FROM Reports WHERE user_id = ?", (config.chat_id,)).fetchone()
             conn.close()
             if row and row[0] > 0:
                 return True
-        except (OSError, ValueError, TypeError, KeyError, AttributeError):
-            pass
         time.sleep(2)
     return False
 

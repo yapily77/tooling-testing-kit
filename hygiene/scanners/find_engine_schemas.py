@@ -143,7 +143,7 @@ def audit_candidate_with_llm(candidate: EngineSchemaCandidate) -> SchemaAuditRes
         try:
             response = schema_audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(f"WARNING: API call failed ({e}). Backing off for {sleep_time:.1f}s (attempt {attempt}/{max_attempts})...", file=sys.stderr)
@@ -196,7 +196,7 @@ def main():
             extractor = FunctionDefExtractor(file_path, content)
             extractor.visit(tree)
             all_candidates.extend(extractor.candidates)
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     import argparse
@@ -226,7 +226,7 @@ def main():
                 for res in existing_data.get("audit_results", []):
                     audit = SchemaAuditResult(**res)
                     existing_results[(res.get("file_path"), res.get("name"))] = audit
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
 
     # Pre-populate report with existing results so we never lose them when overwriting incrementally
@@ -253,7 +253,7 @@ def main():
 
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"CRITICAL: Auditing failed for {candidate.name}: {e}. Shutting down.", file=sys.stderr)
             sys.exit(1)
 

@@ -31,7 +31,7 @@ def _clear_engine_session(chat_id: int) -> None:
 
         db = Database()
         db.delete_session(chat_id, platform=PLATFORM)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"WARN: could not clear engine session for {chat_id}: {e}")
 
 
@@ -97,7 +97,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
                 raise
             finally:
                 db.Session.remove()
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print(f"WARN: could not perform initial DB cleanup: {e}")
 
         for step in snapshot.get("steps", []):
@@ -132,8 +132,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
             deadline = time.time() + 15.0  # 15s timeout
             while time.time() < deadline:
                 current_meta = get_last_bot_reply_record(chat_id, PLATFORM)
-                if current_meta:
-                    if not prev_reply_meta or current_meta["id"] != prev_reply_meta["id"]:
+                if current_meta and (not prev_reply_meta or current_meta["id"] != prev_reply_meta["id"]):
                         if "Chronomancer is thinking" in current_meta["message_text"]:
                             # Status update, record it and keep waiting for actual response
                             prev_reply_meta = current_meta
@@ -159,7 +158,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
         SNAPSHOT_PATH.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False))
 
         result["status"] = "PASS"
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         result["errors"].append(str(e))
         result["status"] = "FAIL"
         ui_lines.append(f"\nExecution aborted due to exception: {e}\n")

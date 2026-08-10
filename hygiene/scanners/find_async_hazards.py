@@ -85,10 +85,9 @@ class AsyncHazardExtractor(ast.NodeVisitor):
                 name = "open"
 
             # 4. Check for subprocess synchronous runs
-            elif isinstance(node.func, ast.Attribute) and node.func.attr in ["run", "popen", "call", "check_output"]:
-                if isinstance(node.func.value, ast.Name) and node.func.value.id == "subprocess":
-                    is_hazard = True
-                    name = f"subprocess.{node.func.attr}"
+            elif isinstance(node.func, ast.Attribute) and node.func.attr in ["run", "popen", "call", "check_output"] and isinstance(node.func.value, ast.Name) and node.func.value.id == "subprocess":
+                is_hazard = True
+                name = f"subprocess.{node.func.attr}"
 
             if is_hazard:
                 self.candidates.append(
@@ -135,7 +134,7 @@ def audit_candidate_with_llm(candidate: AsyncHazardCandidate, file_contents: dic
         try:
             response = audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(
@@ -191,7 +190,7 @@ def main():
             extractor = AsyncHazardExtractor(file_path)
             extractor.visit(tree)
             all_candidates.extend(extractor.candidates)
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     import argparse
@@ -219,7 +218,7 @@ def main():
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     existing_results[(res.get("file_path"), res.get("line"), res.get("name"))] = res
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
     md_path = output_dir / "async_hazards_audit.md"
 
@@ -241,7 +240,7 @@ def main():
 
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Auditing failed for {candidate.name}: {e}", file=sys.stderr)
 
     generate_markdown_report(report, md_path)

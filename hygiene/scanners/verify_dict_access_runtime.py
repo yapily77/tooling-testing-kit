@@ -114,9 +114,6 @@ def get_src_files() -> list[Path]:
     return list(src_dir.rglob("*.py"))
 
 
-get_src_files = get_src_files
-
-
 def discover_models(files: list[Path]) -> dict[str, str]:
     """Maps model class name -> module path (for instantiating annotated args)."""
     model_classes: dict[str, str] = {}
@@ -149,10 +146,9 @@ def module_path_for_file(file_path: str) -> str | None:
 def _find_enclosing_func(tree: ast.Module, line: int) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
     """Return the function node whose body spans `line`."""
     for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            if hasattr(node, "lineno") and hasattr(node, "end_lineno"):
-                if node.lineno <= line <= node.end_lineno:
-                    return node
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and hasattr(node, "lineno") and hasattr(node, "end_lineno"):  # noqa: SIM102
+            if node.lineno <= line <= node.end_lineno:
+                return node
     return None
 
 
@@ -181,7 +177,7 @@ def resolve_producing_function(file_path: str, line: int, variable: str) -> tupl
     try:
         with open(full_path, encoding="utf-8") as f:
             tree = ast.parse(f.read(), filename=str(full_path))
-    except Exception:
+    except (SyntaxError, OSError):
         return None, None
 
     enclosing_func = _find_enclosing_func(tree, line)
@@ -218,7 +214,7 @@ def _navigate(obj: Any, path: str) -> Any:
             key = idx.strip().strip("'\"") if idx.strip() else "__probe__"
             try:
                 cur = cur[key]
-            except Exception:
+            except (KeyError, TypeError, IndexError):
                 cur = cur["__probe__"]
     return cur
 
@@ -265,14 +261,14 @@ def instantiate_model(class_name: str, mod_path: str) -> BaseModel | None:
             return build_sample_profile()
         try:
             return cls()
-        except Exception:
+        except (TypeError, ValueError, AttributeError):
             # Model has required fields we cannot satisfy generically.
             # Returning a bare __new__ instance yields a half-built object whose
             # fields are missing, which makes probe_access falsely report a crash
             # (CONFIRMED_CRASH) on dict-typed fields like session.metadata.
             # Honest verdict is UNVERIFIABLE: we cannot reconstruct the object.
             return None
-    except Exception:
+    except (ImportError, AttributeError, ValueError):
         return None
 
 
@@ -302,7 +298,7 @@ def execute_and_verify(func_name: str, mod_path: str, candidate: dict[str, Any])
     try:
         mod = importlib.import_module(mod_path)
         func = getattr(mod, func_name)
-    except Exception:
+    except (ImportError, AttributeError):
         return "UNVERIFIABLE"
 
     kwargs: dict[str, Any] = {}
@@ -310,7 +306,7 @@ def execute_and_verify(func_name: str, mod_path: str, candidate: dict[str, Any])
         sig = inspect.signature(func)
         for name, param in sig.parameters.items():
             kwargs[name] = _sample_value_for_annotation(str(param.annotation), param)
-    except Exception:
+    except (LookupError, TypeError):
         return "UNVERIFIABLE"
 
     try:
@@ -318,7 +314,7 @@ def execute_and_verify(func_name: str, mod_path: str, candidate: dict[str, Any])
             result = asyncio.run(func(**kwargs))
         else:
             result = func(**kwargs)
-    except Exception:
+    except (TypeError, ValueError, RuntimeError, OSError):
         # Fails due to network, missing DB, or strict validation of dummy data.
         return "UNVERIFIABLE"
 

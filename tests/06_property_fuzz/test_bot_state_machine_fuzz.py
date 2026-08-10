@@ -223,7 +223,7 @@ def _patch_llm(stack: ExitStack):
 def _step_of():
     try:
         return get_session(CHAT_ID, PLATFORM).step
-    except Exception:
+    except (OSError, KeyError, ValueError):
         return None
 
 
@@ -263,7 +263,7 @@ def _run_sequence(actions):
                             "message": {"chat": {"id": CHAT_ID}, "message_id": i + 1},
                         }
                         loop.run_until_complete(_route_callback_query(cb, PLATFORM))
-                except Exception as e:
+                except (KeyError, ValueError, RuntimeError) as e:
                     exc = e
                     if isinstance(e, KeyError):
                         recorded_keyerrors.append((i, kind, payload, repr(e)))
@@ -323,7 +323,7 @@ def test_format_subscription_status_with_missing_prefs():
             asyncio.set_event_loop(loop)
             try:
                 loop.run_until_complete(_route_message_data({"chat": {"id": CHAT_ID}, "text": "/subscribe"}, PLATFORM))
-            except Exception as e:
+            except (KeyError, ValueError, RuntimeError) as e:
                 err = e
             finally:
                 loop.close()

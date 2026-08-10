@@ -76,7 +76,7 @@ def _resolve_secure_path(relative_path: str) -> Path:
         if not target.is_relative_to(root):
             raise ValueError(f"Path escape detected: {relative_path}")
         return target
-    except Exception as e:
+    except (ValueError, AttributeError) as e:
         raise ValueError(f"Invalid path: {relative_path} ({e!s})")
 
 def _get_scope_expanded_snippet(rel_path: str, match_text: str) -> str:
@@ -87,31 +87,27 @@ def _get_scope_expanded_snippet(rel_path: str, match_text: str) -> str:
     except FileNotFoundError:
         return match_text[:300] + "..."
 
-    try:
-        tree = ast.parse(content)
+    tree = ast.parse(content)
 
-        match_line = -1
-        lines = content.splitlines()
-        for i, line in enumerate(lines):
-            if match_text in line:
-                match_line = i + 1
-                break
+    match_line = -1
+    lines = content.splitlines()
+    for i, line in enumerate(lines):
+        if match_text in line:
+            match_line = i + 1
+            break
 
-        if match_line == -1:
-            return match_text[:300] + "..."
+    if match_line == -1:
+        return match_text[:300] + "..."
 
-        parent_header = ""
-        for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                if node.lineno <= match_line <= (node.end_lineno or node.lineno):
-                    header_line = lines[node.lineno - 1].strip()
-                    parent_header = f"[{header_line}] "
-                    break
+    parent_header = ""
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and node.lineno <= match_line <= (node.end_lineno or node.lineno):
+            header_line = lines[node.lineno - 1].strip()
+            parent_header = f"[{header_line}] "
+            break
 
-        snippet = lines[max(0, match_line - 3) : match_line + 5]
-        return parent_header + "\n".join(snippet)
-    except Exception:
-        raise
+    snippet = lines[max(0, match_line - 3) : match_line + 5]
+    return parent_header + "\n".join(snippet)
 
 async def query_knowledge_graph(query: str, query_vec: list[float], max_entities: int = 10) -> dict[str, Any]:
     if not GRAPH_JSON.exists():
@@ -119,7 +115,7 @@ async def query_knowledge_graph(query: str, query_vec: list[float], max_entities
 
     try:
         graph = json.loads(GRAPH_JSON.read_text(encoding="utf-8"))
-    except Exception as e:
+    except (json.JSONDecodeError, OSError) as e:
         return {"success": False, "message": f"Failed to load graph: {e}", "data": {}}
 
     entities = graph.get("entities", [])
@@ -195,8 +191,8 @@ async def inject_directives(query_vec: list[float], top_k: int = 2, threshold: f
                     "content": row["content"][:500],
                     "score": round(score, 4),
                 })
-        except Exception:
-            raise
+        except (ValueError, TypeError, json.JSONDecodeError):
+            continue
 
     results.sort(key=lambda x: x["score"], reverse=True)
     return results[:top_k]
@@ -237,9 +233,8 @@ async def mcp_search(query: str, limit: int = 10):
                 if structured_query.file_extensions:
                     norm_exts = [e.replace("*", "").strip() for e in structured_query.file_extensions]
                     norm_exts = [e for e in norm_exts if e]
-                    if norm_exts:
-                        if not any(rel_path.endswith(ext) for ext in norm_exts):
-                            continue
+                    if norm_exts and not any(rel_path.endswith(ext) for ext in norm_exts):
+                        continue
 
                 snippet = _get_scope_expanded_snippet(rel_path, raw_content)
 
@@ -290,7 +285,7 @@ async def mcp_search(query: str, limit: int = 10):
                 for d in directives:
                     print(f"### {d['section_title']} (Score: {d['score']})")
                     print(f"{d['content']}...\n")
-    except Exception as e:
+    except (OSError, ValueError, TypeError, RuntimeError, KeyError) as e:
         print(f"Error during search: {e}", file=sys.stderr)
         raise
 

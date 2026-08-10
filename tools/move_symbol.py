@@ -81,7 +81,7 @@ def main():
         )
     except SystemExit:
         raise
-    except Exception as e:
+    except (OSError, SyntaxError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(json.dumps(fail(f"move_symbol failed: {e}"), indent=2))
         sys.exit(1)
 

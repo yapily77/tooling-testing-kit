@@ -19,7 +19,7 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Ensure workspace root is in path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
@@ -100,9 +100,9 @@ async def main():
     from src.engine.pydantic_prompt_engine import run_pipeline_direct
 
     logger.info("🚀 Starting pipeline...")
-    start = datetime.now()
+    start = datetime.now(timezone.utc)
     await run_pipeline_direct(args.chat_id)
-    elapsed = (datetime.now() - start).total_seconds()
+    elapsed = (datetime.now(timezone.utc) - start).total_seconds()
 
     logger.info(f"✅ Pipeline completed in {elapsed:.1f}s")
     logger.info("Check DB Reports table and report directory for output.")

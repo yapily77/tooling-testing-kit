@@ -1,4 +1,5 @@
 import ast
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -80,15 +81,16 @@ def find_message_keys_in_file(file_path: Path) -> list[tuple[str, int]]:
                 isinstance(node.func, ast.Attribute)
                 and getattr(node.func.value, "id", None) == "text_manager"
                 and node.func.attr == "get"
+                and node.args
+                and isinstance(node.args[0], ast.Constant)
+                and isinstance(node.args[0].value, str)
             ):
-                if node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
-                    keys.append((node.args[0].value, node.lineno))
+                keys.append((node.args[0].value, node.lineno))
             self.generic_visit(node)
 
         def visit_Subscript(self, node: ast.Subscript):
             # text_manager["key"]
-            if isinstance(node.value, ast.Name) and node.value.id == "text_manager":
-                if isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, str):
+            if isinstance(node.value, ast.Name) and node.value.id == "text_manager" and isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, str):
                     keys.append((node.slice.value, node.lineno))
             self.generic_visit(node)
 
@@ -221,7 +223,7 @@ def main():
         try:
             audit = audit_candidate_locally(candidate)
             report.audit_results.append(audit)
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Auditing failed for candidate {candidate.name}: {e}", file=sys.stderr)
 
     with open(json_path, "w", encoding="utf-8") as f:

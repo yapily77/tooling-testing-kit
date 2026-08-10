@@ -64,7 +64,7 @@ def read_file(ctx: RunContext[DebuggerDeps], relative_path: str, start_line: int
         end = min(len(lines), end_line)
         content = "\n".join(f"{i + 1}: {line}" for i, line in enumerate(lines[start:end], start=start))
         return f"--- Content of {relative_path} (Lines {start_line}-{end_line}) ---\n{content}"
-    except Exception as e:
+    except (OSError, ValueError) as e:
         return f"Error reading file: {e}"
 
 
@@ -85,7 +85,7 @@ def apply_fix(ctx: RunContext[DebuggerDeps], relative_path: str, target_code: st
         new_content = content.replace(target_code, replacement_code, 1)
         path.write_text(new_content, encoding="utf-8")
         return f"Success: Surgically replaced code in {relative_path}."
-    except Exception as e:
+    except (OSError, ValueError) as e:
         return f"Error applying fix: {e}"
 
 

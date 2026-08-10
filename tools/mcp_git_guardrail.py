@@ -31,7 +31,7 @@ def checkpoint_file(
         if backup:
             return {"success": True, "checkpoint_path": backup, "message": f"Successfully checkpointed {relative_path}"}
         return {"success": False, "message": f"Failed to checkpoint {relative_path}"}
-    except Exception as e:
+    except (OSError, ValueError, RuntimeError) as e:
         return {"success": False, "message": str(e)}
 
 @mcp.tool()
@@ -43,7 +43,7 @@ def validate_file(
         target_path = _resolve_path(relative_path)
         res = validate(str(target_path))
         return res
-    except Exception as e:
+    except (OSError, ValueError, RuntimeError) as e:
         return {"success": False, "message": str(e)}
 
 if __name__ == "__main__":

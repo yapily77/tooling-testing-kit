@@ -26,7 +26,7 @@ def main():
     try:
         target.unlink()
         print(json.dumps(ok(f"Deleted {args.relative_path}", {"path": args.relative_path}), indent=2))
-    except Exception as e:
+    except OSError as e:
         print(json.dumps(fail(f"delete_file failed: {e}"), indent=2))
         sys.exit(1)
 

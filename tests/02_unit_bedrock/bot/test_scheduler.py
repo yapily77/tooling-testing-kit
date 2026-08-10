@@ -4,7 +4,7 @@ Unit tests for src/bot/scheduler.py — _precompute_user_forecast.
 Verifies the fix for the _hash_profile missing argument bug (TypeError).
 """
 
-from datetime import date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -39,7 +39,7 @@ def _make_mock_score():
         },
         "events": [],
         "pillar": {"stem": "Jia", "branch": "Zi"},
-        "date": (date.today() + timedelta(days=89)).isoformat(),
+        "date": (datetime.now(UTC).date() + timedelta(days=89)).isoformat(),
     }
 
 
@@ -69,7 +69,7 @@ async def test_precompute_user_forecast_no_type_error():
          }), \
          patch("src.bot.scheduler.resolve_daily_pillar_range", return_value=[mock_day_pillar]), \
          patch("src.bot.scheduler.get_solar_months", return_value=[
-             {"stem": "Yi", "branch": "Chou", "start_date": datetime(2026, 2, 4)},
+              {"stem": "Yi", "branch": "Chou", "start_date": datetime(2026, 2, 4, tzinfo=UTC)},
          ]), \
          patch("src.engine.activity_oracle.score_day", return_value=mock_score), \
          patch("src.bot.scheduler.db") as mock_db:
@@ -117,7 +117,7 @@ async def test_precompute_user_forecast_skips_if_cached():
     }
 
     # Compute the real hash so the cache match works
-    horizon = date.today() + timedelta(days=89)
+    horizon = datetime.now(UTC).date() + timedelta(days=89)
     real_hash = _hash_profile(mock_profile, horizon)
 
     with patch("src.bot.scheduler.get_session", return_value=mock_session), \

@@ -15,7 +15,7 @@ def fix_file_imports(file_path: Path) -> bool:
     try:
         content = file_path.read_text(encoding="utf-8")
         tree = ast.parse(content, filename=str(file_path))
-    except Exception:
+    except (OSError, SyntaxError):
         return False
 
     lines = content.splitlines(keepends=True)

@@ -166,7 +166,7 @@ def audit_candidate_with_llm(candidate: CircularDepCandidate, file_contents: dic
         try:
             response = audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(
@@ -224,7 +224,7 @@ def main():
             extractor = ImportExtractor(file_path)
             extractor.visit(tree)
             graph[module_path] = extractor.imports
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     candidates = find_cycles(graph)
@@ -254,7 +254,7 @@ def main():
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     existing_results[(res.get("file_path"), res.get("line"), res.get("name"))] = res
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
     md_path = output_dir / "circular_deps_audit.md"
 
@@ -279,7 +279,7 @@ def main():
 
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Auditing failed for cycle: {e}", file=sys.stderr)
 
     generate_markdown_report(report, md_path)

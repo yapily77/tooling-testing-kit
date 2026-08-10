@@ -177,10 +177,9 @@ class FanFuDiagnostic:
         try:
             if not await self.run_verification_gate():
                 return False
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError) as e:
             logger.error(f"❌ POST-MISSION GATE CRASHED: {e}")
             raise
-            return False
 
         logger.info("✨ MISSION SUCCESS: Fan Yin / Fu Yin logic satisfies consistency and structural integrity criteria.")
         return True
@@ -201,6 +200,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Mission interrupted.")
         sys.exit(0)
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError, KeyError, TypeError) as e:
         logger.critical(f"UNHANDLED MISSION EXCEPTION: {e}")
         sys.exit(1)

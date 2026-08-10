@@ -41,7 +41,7 @@ def test_embed():
         else:
             print(f"Raw data: {data}")
 
-    except Exception as e:
+    except (OSError, KeyError, ValueError, TypeError) as e:
         print(f"Error: {e}")
 
 if __name__ == "__main__":

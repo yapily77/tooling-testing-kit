@@ -100,22 +100,22 @@ def step1_tailoring_unit():
     # 1a: No path
     s = FakeSession()
     s = init_tailoring(s)
-    reply, s, proceed = handle_tailor_callback(s, "tailor_no")
+    _reply, s, proceed = handle_tailor_callback(s, "tailor_no")
     check("1a_no_proceed", proceed is True, "tailor_no fires pipeline immediately")
     check("1a_no_concerns_none", s.metadata.get("tailoring_concerns") is None, "concerns=None on no path")
 
     # 1b: Yes path full flow
     s = FakeSession()
     s = init_tailoring(s)
-    reply, s, proceed = handle_tailor_callback(s, "tailor_yes")
+    _reply, s, proceed = handle_tailor_callback(s, "tailor_yes")
     check("1b_yes_no_proceed", proceed is False, "tailor_yes does NOT fire pipeline yet")
     check("1b_career_step", get_tailoring_state(s)["step"] == "career", "step=career after yes")
 
-    reply, s, proceed = handle_tailor_input(s, BOGUS_TAILORING["career"])
+    _reply, s, proceed = handle_tailor_input(s, BOGUS_TAILORING["career"])
     check("1c_career_saved", get_tailoring_state(s)["career"] == BOGUS_TAILORING["career"], "career saved")
     check("1c_step_relationships", get_tailoring_state(s)["step"] == "relationships", "step=relationships")
 
-    reply, s, proceed = handle_tailor_input(s, BOGUS_TAILORING["relationships"])
+    _reply, s, proceed = handle_tailor_input(s, BOGUS_TAILORING["relationships"])
     check(
         "1d_rel_saved",
         get_tailoring_state(s)["relationships"] == BOGUS_TAILORING["relationships"],
@@ -188,7 +188,7 @@ def step3_engine(profile_path: Path):
         try:
             res = run_full_engine(profile, i)
             months_computed.append(res["month_metadata"]["month_name"])
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             check(f"3_month_{i}", False, f"CRASHED: {e}")
             return None
 
@@ -229,7 +229,7 @@ def step4_context_injection():
             all(c in full_prompt for c in BOGUS_TAILORING.values()),
             "all 3 concerns in prompt",
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         check("4_injection", False, f"CRASHED: {e}")
 
 
@@ -249,7 +249,7 @@ def step5_full_pipeline(profile_path: Path, tmp_dir: Path) -> Path:
     t0 = time.time()
     try:
         run_k3_pipeline(str(profile_path), str(output_path))
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         check("5_pipeline_run", False, f"CRASHED: {e}")
         return None
     elapsed = time.time() - t0
@@ -310,7 +310,7 @@ def step6_summarizer(master_path: Path, tmp_dir: Path):
             output_md_path=str(md_path),
             live_api=True,
         )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         check("6_summarizer_run", False, f"CRASHED: {e}")
         return
     finally:

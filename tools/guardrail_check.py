@@ -35,7 +35,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -63,7 +63,7 @@ def checkpoint(file_path: str) -> str | None:
         raise FileNotFoundError(f"File not found: {path}")
 
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     backup_path = CHECKPOINT_DIR / f"{path.stem}_{ts}{path.suffix}"
     shutil.copy2(str(path), str(backup_path))
     return str(backup_path)
@@ -219,7 +219,7 @@ def discover_dependencies(primary: Path, edit_set: set[str] | None = None) -> li
     """
     try:
         tree = ast.parse(primary.read_text(encoding="utf-8", errors="replace"))
-    except Exception:
+    except (OSError, SyntaxError, MemoryError):
         return []
 
     wanted: dict[str, int] = {}  # module stem -> import count (edge weight)
@@ -255,11 +255,9 @@ def discover_dependencies(primary: Path, edit_set: set[str] | None = None) -> li
             # Skip the primary itself and anything outside the repo src tree.
             if cand.resolve() == primary.resolve():
                 continue
-            if edit_set and rel not in edit_set:
-                # Prefer files in the active edit set; otherwise allow any repo
-                # module but cap total.
-                if len(resolved) >= UNION_MAX_DEPS:
-                    break
+            if edit_set and rel not in edit_set and len(resolved) >= UNION_MAX_DEPS:
+                # Prefer files in the active edit set; otherwise allow any repo module but cap total.
+                break
             seen.add(rel)
             resolved.append(cand)
             break
@@ -271,7 +269,7 @@ def _within_bounds(files: list[Path]) -> bool:
     for f in files:
         try:
             n = sum(1 for _ in f.open(encoding="utf-8", errors="replace"))
-        except Exception:
+        except OSError:
             n = 0
         if n > UNION_MAX_LINES_PER_FILE:
             return False
@@ -500,7 +498,7 @@ def validate(file_path: str, edit_set: list[str] | None = None) -> dict:
             )
             smoke_ok = bool(smoke_payload.get("success", True))
             smoke_msg = smoke_payload.get("message", "")
-        except Exception as e:
+        except (OSError, ValueError, subprocess.SubprocessError) as e:
             smoke_ok, smoke_msg = (True, f"smoke gate skipped: {e}")
         smoke_ok = bool(smoke_ok)
 

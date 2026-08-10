@@ -17,7 +17,7 @@ def _class_node(class_code: str) -> ast.ClassDef:
         raise ValueError(f"Empty class code: {class_code!r}")
     node = tree.body[0]
     if not isinstance(node, ast.ClassDef):
-        raise ValueError(
+        raise TypeError(
             f"add_class expects a class definition, got {type(node).__name__}"
         )
     return node
@@ -131,9 +131,7 @@ def main() -> None:
                 indent=2,
             )
         )
-    except SystemExit:
-        raise
-    except Exception as e:
+    except (SystemExit, OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"add_class failed: {e}"), indent=2))
         sys.exit(1)
 

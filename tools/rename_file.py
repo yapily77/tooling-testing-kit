@@ -41,7 +41,7 @@ def main():
         print(json.dumps(ok(f"Renamed {args.source_relative_path} -> {args.destination_relative_path}",
                             {"from": args.source_relative_path,
                              "to": args.destination_relative_path}), indent=2))
-    except Exception as e:
+    except (OSError, ValueError) as e:
         print(json.dumps(fail(f"rename_file failed: {e}"), indent=2))
         sys.exit(1)
 

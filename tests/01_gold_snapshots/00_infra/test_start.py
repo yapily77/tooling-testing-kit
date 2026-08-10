@@ -63,7 +63,7 @@ def kill_stale_processes(port: int):
             ["lsof", "-ti", f"tcp:{port}"],
             stderr=subprocess.DEVNULL,
             text=True,
-        ).strip(, check=False)
+        ).strip()
         if output:
             print(f"[UAT] Found stale processes on port {port}. Terminating PIDs: {output.splitlines()}")
             for pid in output.splitlines():

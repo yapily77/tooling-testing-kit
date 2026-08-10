@@ -53,15 +53,13 @@ def collect_kwargs_references(func_node, kwargs_name: str):
         for child in ast.iter_child_nodes(node):
             if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
-            if isinstance(child, ast.Name):
-                if child.id == kwargs_name and isinstance(child.ctx, ast.Load):
-                    references.append(child)
+            if isinstance(child, ast.Name) and child.id == kwargs_name and isinstance(child.ctx, ast.Load):
+                references.append(child)
             _walk(child)
 
     for stmt in func_node.body:
-        if isinstance(stmt, ast.Name):
-            if stmt.id == kwargs_name and isinstance(stmt.ctx, ast.Load):
-                references.append(stmt)
+        if isinstance(stmt, ast.Name) and stmt.id == kwargs_name and isinstance(stmt.ctx, ast.Load):
+            references.append(stmt)
         _walk(stmt)
 
     return references

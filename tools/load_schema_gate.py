@@ -44,7 +44,7 @@ def main():
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
         spec.loader.exec_module(module)
-    except Exception as e:
+    except (ImportError, SyntaxError, AttributeError, TypeError, ValueError) as e:
         print(f"Failed to import {module_name}: {type(e).__name__}: {e}")
         sys.exit(1)
 
@@ -53,7 +53,7 @@ def main():
         if isinstance(obj, type) and issubclass(obj, BaseModel) and obj is not BaseModel:
             try:
                 obj.model_json_schema()
-            except Exception as e:
+            except (ValueError, TypeError) as e:
                 print(f"Failed schema validation for {name}: {type(e).__name__}: {e}")
                 sys.exit(1)
 

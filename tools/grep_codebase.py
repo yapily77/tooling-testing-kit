@@ -58,7 +58,7 @@ def main():
                                                 {"results": results}), indent=2))
                             return
         print(json.dumps(ok(f"Found {len(results)} results", {"results": results}), indent=2))
-    except Exception as e:
+    except OSError as e:
         print(json.dumps(fail(f"Grep failed: {e}"), indent=2))
 
 

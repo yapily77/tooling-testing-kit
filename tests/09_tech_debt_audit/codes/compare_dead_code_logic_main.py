@@ -47,8 +47,8 @@ def main():
             truly_dead.append({
                 "name": name,
                 "type": t2,
-                "file_path_src": item1["file_path"],
-                "line_src": item1["line"],
+                "file_path": item1["file_path"],
+                "line": item1["line"],
                 "file_path_src": file2,
                 "line_src": item2["line"],
                 "reason_src": reason2

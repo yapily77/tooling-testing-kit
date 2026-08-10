@@ -16,7 +16,7 @@ def _constant_node(constant_code: str, constant_name: str = "") -> ast.stmt:
     tree = ast.parse(stripped)
     node = tree.body[0]
     if not isinstance(node, (ast.Assign, ast.AnnAssign)):
-        raise ValueError(f"Not a valid constant assignment: {constant_code!r}")
+        raise TypeError(f"Not a valid constant assignment: {constant_code!r}")
     return node
 
 
@@ -26,9 +26,8 @@ def _existing_constant(tree: ast.Module, constant_name: str) -> bool:
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == constant_name:
                     return True
-        elif isinstance(node, ast.AnnAssign):
-            if isinstance(node.target, ast.Name) and node.target.id == constant_name:
-                return True
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.target.id == constant_name:
+            return True
     return False
 
 
@@ -76,7 +75,7 @@ def main():
         print(json.dumps(ok(f"Added constant to {args.relative_path}",
                             {"file_path": args.relative_path, "changed": True,
                              "constant": args.constant_name}), indent=2))
-    except Exception as e:
+    except (OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"add_constant failed: {e}"), indent=2))
         sys.exit(1)
 

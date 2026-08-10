@@ -81,7 +81,7 @@ def run_mypy_checker() -> list[TypeSafetyCandidate]:
                         error_message=error_msg
                     )
                 )
-    except Exception as e:
+    except (OSError, subprocess.SubprocessError, RuntimeError) as e:
         print(f"Error running mypy: {e}", file=sys.stderr)
     return candidates
 
@@ -117,7 +117,7 @@ def audit_candidate_with_llm(candidate: TypeSafetyCandidate, file_contents: dict
         try:
             response = audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError, TypeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(
@@ -167,7 +167,7 @@ def main():
             with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
                 file_contents[path_str] = content
-        except Exception as e:
+        except OSError as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     candidates = run_mypy_checker()
@@ -196,7 +196,7 @@ def main():
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     existing_results[(res.get("file_path"), res.get("line"), res.get("name"))] = res
-        except Exception as e:
+        except (OSError, json.JSONDecodeError, ValueError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
     md_path = output_dir / "type_safety_audit.md"
 
@@ -218,7 +218,7 @@ def main():
 
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, RuntimeError) as e:
             print(f"WARNING: Auditing failed for type error: {e}", file=sys.stderr)
 
     generate_markdown_report(report, md_path)

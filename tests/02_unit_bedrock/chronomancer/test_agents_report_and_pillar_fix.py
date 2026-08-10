@@ -177,8 +177,8 @@ def test_format_forecast_output_uses_pydantic_attributes():
         activities = acts
         stem = "甲"
         branch = "子"
-        events = []
-        hourly_scores = {}
+        events = None
+        hourly_scores = None
 
     output = _format_forecast_output(5, [FakeDayResult()])
     assert "Overall" in output

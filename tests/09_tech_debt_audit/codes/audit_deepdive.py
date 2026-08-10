@@ -83,7 +83,7 @@ def main():
         if file_path.exists():
             try:
                 content = file_path.read_text(errors="ignore")
-            except Exception as e:
+            except OSError as e:
                 content = f"[Error reading file: {e}]"
 
         prompt = (
@@ -103,8 +103,6 @@ def main():
             results[unique_key] = {
                 "name": name,
                 "type": item["type"],
-                "file_path_src": item["file_path_src"],
-                "line_src": item["line_src"],
                 "file_path_src": file_src,
                 "line_src": item.get("line_src", item.get("line_src", 1)),
                 "reason_src": item.get("reason_src", ""),
@@ -117,7 +115,7 @@ def main():
             with open(json_store_path, "w", encoding="utf-8") as f:
                 json.dump(results, f, indent=2)
 
-        except Exception as e:
+        except (OSError, KeyError, ValueError, TypeError) as e:
             print(f"Error auditing {name}: {e}", file=sys.stderr)
 
     # Now, format the saved JSON results back into the DeepDive Markdown file

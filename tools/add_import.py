@@ -64,7 +64,7 @@ def main():
         print(json.dumps(ok(f"Added import to {args.relative_path}",
                             {"file_path": args.relative_path, "changed": True,
                              "import": args.import_code}), indent=2))
-    except Exception as e:
+    except (OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"Failed to add import: {e}"), indent=2))
 
 

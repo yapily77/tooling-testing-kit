@@ -33,7 +33,7 @@ def send_webhook(chat_id: int, text: str) -> dict:
     try:
         resp = httpx.post(f"{SERVER_URL}/webhook", json=payload, headers=headers, timeout=60.0)
         return {"status": resp.status_code, "body": resp.json() if resp.status_code == 200 else resp.text}
-    except Exception as e:
+    except (OSError, httpx.HTTPError) as e:
         return {"status": 0, "body": str(e)}
 
 
@@ -67,7 +67,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
 
             db = Database()
             db.delete_all_user_data(chat_id)
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError) as e:
             print(f"Warning: Failed to clear DB data for user {chat_id}: {e}")
 
         # Initialize UI.md as blank
@@ -90,7 +90,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
             # Clear intercepted queue right before sending to capture only new responses
             try:
                 httpx.delete(f"{FAKE_TELEGRAM_URL}/intercepted", timeout=2.0)
-            except Exception as e:
+            except (OSError, httpx.HTTPError) as e:
                 test_result["errors"].append(f"Step {step_num}: Failed to clear fake Telegram queue: {e}")
                 break
 
@@ -244,12 +244,12 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
                     if not months_data:
                         test_result["errors"].append("Assertion Error: Master JSON contains no monthly forecasts.")
                     else:
-                        for m_idx, m_data in enumerate(months_data):
-                            if "error" in m_data:
-                                test_result["errors"].append(
-                                    f"Assertion Error: Month {m_data.get('month_name', m_idx + 1)} has generation error: {m_data['error']}"
-                                )
-            except Exception as e:
+                            for m_idx, m_data in enumerate(months_data):
+                                if "error" in m_data:
+                                    test_result["errors"].append(
+                                        f"Assertion Error: Month {m_data.get('month_name', m_idx + 1)} has generation error: {m_data['error']}"
+                                    )
+            except (OSError, json.JSONDecodeError, KeyError) as e:
                 test_result["errors"].append(f"Assertion Error during master JSON validation: {e}")
 
         # Try to read the generated K3 profile from disk and append to UI.md as Markdown table
@@ -266,7 +266,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
                 md_table = format_engine_profile_markdown(k3_data)
                 with open(md_file, "a", encoding="utf-8") as f:
                     f.write(f"\n\n{md_table}\n")
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as e:
             print(f"Warning: Could not append K3 profile to UI.md: {e}")
 
         # 4. Update snapshot file metadata
@@ -283,7 +283,7 @@ def run_test(verbose: bool = False, chat_id_override: int | None = None) -> dict
         results["tests"].append(test_result)
         return results
 
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         test_result["errors"].append(f"Unexpected error: {e}")
         results["failed"] += 1
         results["tests"].append(test_result)

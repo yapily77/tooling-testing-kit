@@ -41,8 +41,8 @@ TZ_MINUS_12 = timezone(timedelta(hours=-12))  # Baker / Howland Islands
 # date is 2025-02-03.  The last solar month of 2027 starts Jan 6 2028,
 # covering dates through 2028-01-07.  1-day margin on each end
 # prevents boundary-crossing dates from landing outside the anchor data.
-_SAFE_MIN = datetime(2025, 2, 4)
-_SAFE_MAX = datetime(2027, 12, 30, 23, 59, 59)
+_SAFE_MIN = datetime(2025, 2, 4, tzinfo=UTC)
+_SAFE_MAX = datetime(2027, 12, 30, 23, 59, 59, tzinfo=UTC)
 
 safe_utc = st.datetimes(
     min_value=_SAFE_MIN,
@@ -52,8 +52,8 @@ safe_utc = st.datetimes(
 # Full range: tests OverflowError handling at Python's datetime boundaries
 # (year 1 / year 9999).
 full_utc = st.datetimes(
-    min_value=datetime(1, 1, 1),
-    max_value=datetime(9999, 12, 31, 23, 59, 59, 999999),
+    min_value=datetime(1, 1, 1, tzinfo=UTC),
+    max_value=datetime(9999, 12, 31, 23, 59, 59, 999999, tzinfo=UTC),
 ).map(lambda dt: dt.replace(tzinfo=UTC))
 
 # Exceptions considered recoverable — they signal *out-of-scope input*

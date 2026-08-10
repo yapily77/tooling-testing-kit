@@ -172,10 +172,9 @@ async def run_test(url: str, tc_id: str, verbose: bool):
             profile = session.get("profile", {})
 
             passed = True
-            if "expected_final_step" in scenario:
-                if session.get("step") != scenario["expected_final_step"]:
-                    print(f"FAIL: Expected step {scenario['expected_final_step']}, got {session.get('step')}")
-                    passed = False
+            if "expected_final_step" in scenario and session.get("step") != scenario["expected_final_step"]:
+                print(f"FAIL: Expected step {scenario['expected_final_step']}, got {session.get('step')}")
+                passed = False
 
             if "check_keyword" in scenario:
                 history_str = json.dumps(session.get("conversation_history", []))

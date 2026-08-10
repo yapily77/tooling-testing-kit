@@ -104,7 +104,7 @@ async def request_fix(file_path: Path, issue: dict) -> str:
                 data = resp.json()
                 raw_text = data["candidates"][0]["content"]["parts"][0]["text"]
                 return clean_llm_response(raw_text)
-        except Exception as e:
+        except (httpx.HTTPError, httpx.TimeoutException, KeyError, ValueError) as e:
             logger.warning(f"Attempt {attempt + 1} failed for {file_path.name}: {e}")
             if attempt < max_retries - 1:
                 logger.info(f"Retrying in {backoff} seconds...")

@@ -119,7 +119,7 @@ def main():
                 indent=2,
             )
         )
-    except Exception as e:
+    except (OSError, ValueError, TypeError, re.error) as e:
         print(json.dumps(fail(f"replace_text failed: {e}"), indent=2))
         sys.exit(1)
 

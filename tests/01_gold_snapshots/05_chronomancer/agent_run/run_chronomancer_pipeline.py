@@ -59,7 +59,6 @@ async def mock_send_telegram_message(chat_id, text, *args, **kwargs):
     return {}
 
 async def run_command_via_app(user_id: int, command: str):
-    global captured_replies
     captured_replies.clear()
 
     data = {
@@ -71,10 +70,12 @@ async def run_command_via_app(user_id: int, command: str):
         }
     }
 
-    with patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message):
-        with patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message):
-            with patch("src.interfaces.telegram.security.can_use_chronomancer", return_value=True):
-                await _process_webhook_logic_inner(data)
+    with (
+        patch("src.interfaces.telegram.app.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message),
+        patch("src.interfaces.telegram.utils.send_telegram_message", new_callable=AsyncMock, side_effect=mock_send_telegram_message),
+        patch("src.interfaces.telegram.security.can_use_chronomancer", return_value=True),
+    ):
+        await _process_webhook_logic_inner(data)
 
     if not captured_replies:
         return "ERROR: No reply captured"
@@ -89,10 +90,9 @@ async def pre_test_mem0():
     await memory_manager.add_memory(user_id=user_id, text=content)
     logger.info("✅ Inserted mock memory")
 
-    # Read
     try:
         logger.info("Attempting mem0 search (this might time out if BGEM3 is down)")
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.warning(f"Mem0 search skipped/failed: {e}")
 
 async def pre_test_simplifier():
@@ -314,8 +314,8 @@ async def main():
             await asyncio.gather(*background_tasks, return_exceptions=True)
             logger.info("✅ Background tasks drained successfully.")
 
-    except Exception as e:
-        logger.error(f"❌ E2E failed: {e}", exc_info=True)
+    except (OSError, RuntimeError, ValueError):
+        logger.exception("❌ E2E failed")
         import sys
         sys.exit(1)
 

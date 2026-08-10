@@ -66,7 +66,7 @@ def _sample_base_model(ann: type) -> Any:
         data[name] = _permissive_value(field.annotation)
     try:
         return ann.model_validate(data)
-    except Exception:
+    except (ValueError, TypeError):
         # Fall back to construct (un-validated) if validation fails on strict
         # Literal/enum fields — still a real instance for container-type checks.
         return ann.model_construct(**data)
@@ -197,7 +197,7 @@ def _load_module_dotted(path: Path) -> tuple[types.ModuleType | None, str | None
     except _ENV_ERRORS as e:
         # Environmental: do not block the coder.
         return (None, f"__ENV_SKIP__:{e}")
-    except Exception as e:  # genuine import failure -> caller falls back
+    except (ImportError, ModuleNotFoundError, AttributeError, SyntaxError) as e:  # genuine import failure -> caller falls back
         return (None, f"Import failed: {type(e).__name__}: {e}")
 
 
@@ -237,7 +237,7 @@ def smoke_module(file_path: str) -> tuple[bool, str]:
             spec.loader.exec_module(module)
         except _ENV_ERRORS as e:
             return (True, f"smoke skipped (environmental import error): {e}")
-        except Exception as e:
+        except (ImportError, ModuleNotFoundError, SyntaxError, AttributeError) as e:
             return (False, f"Import failed: {type(e).__name__}: {e}")
 
     if module is None or mod_name is None:
@@ -285,7 +285,7 @@ def smoke_module(file_path: str) -> tuple[bool, str]:
                     errors.append(
                         f"{cls.__name__}.{name}: container rejects {vtype.__name__} instance — {e}"
                     )
-                except Exception as e:
+                except (TypeError, ValueError, AttributeError) as e:
                     errors.append(f"{cls.__name__}.{name}: probe error {type(e).__name__}: {e}")
                 continue
 
@@ -307,7 +307,7 @@ def smoke_module(file_path: str) -> tuple[bool, str]:
                         f"{x_cls.__name__} instance (likely wrong value type: "
                         f"should be DictMap[{x_cls.__name__}]) — {e}"
                     )
-                except Exception as e:
+                except (TypeError, ValueError, AttributeError) as e:
                     errors.append(f"{cls.__name__}.{name}: probe error {type(e).__name__}: {e}")
 
     if errors:

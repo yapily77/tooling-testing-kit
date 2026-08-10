@@ -39,7 +39,7 @@ def run_test(name, fn):
         print(f"  ✗ FAILED: {e}")
         failed += 1
         errors.append((name, str(e)))
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         import traceback
         traceback.print_exc()
         print(f"  ✗ ERROR: {type(e).__name__}: {e}")

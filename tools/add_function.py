@@ -17,7 +17,7 @@ def _function_node(function_code: str) -> ast.stmt:
         raise ValueError(f"Empty function code: {function_code!r}")
     node = tree.body[0]
     if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-        raise ValueError(
+        raise TypeError(
             f"add_function expects a function definition, got {type(node).__name__}"
         )
     return node
@@ -162,9 +162,7 @@ def main() -> None:
                 indent=2,
             )
         )
-    except SystemExit:
-        raise
-    except Exception as e:
+    except (SystemExit, OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"add_function failed: {e}"), indent=2))
         sys.exit(1)
 

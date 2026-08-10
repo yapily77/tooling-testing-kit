@@ -106,9 +106,9 @@ class TestStaleJob:
         with (
             patch("src.bot.pipeline.send_telegram_message", new_callable=AsyncMock) as mock_msg,
             patch("src.bot.pipeline.send_developer_message", new_callable=AsyncMock),
+            pytest.raises(PipelineAbortError),
         ):
-            with pytest.raises(PipelineAbortError):
-                await run_full_report_pipeline({"user_id": user_id})
+            await run_full_report_pipeline({"user_id": user_id})
 
         # 2. User must have been told to re-run /start
         calls = [str(c.args[1]) for c in mock_msg.call_args_list]

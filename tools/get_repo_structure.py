@@ -38,7 +38,7 @@ def main():
             f"Project structure at {PROJECT_ROOT} (depth={args.max_depth})",
             {"structure": tree_str},
         ), indent=2, ensure_ascii=False))
-    except Exception as e:
+    except OSError as e:
         print(json.dumps(fail(f"Failed to get repo structure: {e}"), indent=2))
 
 

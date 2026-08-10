@@ -118,7 +118,7 @@ async def test_francis_monthly_report():
         format_k3_markdown(json_path, md_path)
         print(f"FINAL REPORT GENERATED: {md_path}")
 
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         print(f"FAILED to generate annual summary: {e}")
         import traceback
         traceback.print_exc()

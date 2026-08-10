@@ -62,10 +62,9 @@ class EnvVarExtractor(ast.NodeVisitor):
         var_name = ""
         if isinstance(node.func, ast.Attribute) and node.func.attr == "getenv":
             is_env_call = True
-        elif isinstance(node.func, ast.Attribute) and node.func.attr == "get":
+        elif isinstance(node.func, ast.Attribute) and node.func.attr == "get" and isinstance(node.func.value, ast.Attribute) and node.func.value.attr == "environ":
             # Check if value is os.environ
-            if isinstance(node.func.value, ast.Attribute) and node.func.value.attr == "environ":
-                is_env_call = True
+            is_env_call = True
 
         if is_env_call and node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
             var_name = node.args[0].value
@@ -75,8 +74,7 @@ class EnvVarExtractor(ast.NodeVisitor):
 
     def visit_Subscript(self, node: ast.Subscript):
         # Look for os.environ["VAR"]
-        if isinstance(node.value, ast.Attribute) and node.value.attr == "environ":
-            if isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, str):
+        if isinstance(node.value, ast.Attribute) and node.value.attr == "environ" and isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, str):
                 self.env_vars.append((node.slice.value, node.lineno))
         self.generic_visit(node)
 
@@ -93,7 +91,7 @@ def load_env_example_vars() -> set[str]:
                         parts = line.split("=", 1)
                         if parts:
                             vars_in_example.add(parts[0].strip())
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Warning: Could not read .env.example: {e}", file=sys.stderr)
     return vars_in_example
 
@@ -130,7 +128,7 @@ def audit_candidate_with_llm(candidate: EnvDriftCandidate, file_contents: dict[s
         try:
             response = audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(
@@ -188,7 +186,7 @@ def main():
             extractor.visit(tree)
             for var_name, line in extractor.env_vars:
                 code_vars.setdefault(var_name, []).append((path_str, line))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     candidates = []
@@ -242,7 +240,7 @@ def main():
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     existing_results[(res.get("file_path"), res.get("line"), res.get("name"))] = res
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
     md_path = output_dir / "env_drift_audit.md"
 
@@ -266,7 +264,7 @@ def main():
 
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
-        except Exception as e:
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Auditing failed for {candidate.name}: {e}", file=sys.stderr)
 
     generate_markdown_report(report, md_path)

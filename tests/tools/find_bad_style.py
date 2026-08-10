@@ -25,9 +25,12 @@ class GoogleStyleVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Call(self, node: ast.Call) -> None:
-        if isinstance(node.func, ast.Name) and node.func.id == "open":
-            if node.lineno not in self.safe_opens:
-                self.violations["unsafe_open"].append(node.lineno)
+        if (
+            isinstance(node.func, ast.Name)
+            and node.func.id == "open"
+            and node.lineno not in self.safe_opens
+        ):
+            self.violations["unsafe_open"].append(node.lineno)
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:

@@ -119,8 +119,11 @@ class SilentKillerExtractor(ast.NodeVisitor):
 
             if default_arg:
                 is_suspect_default = False
-                if isinstance(default_arg, ast.Constant) and isinstance(default_arg.value, str):
-                    if default_arg.value.lower() in ("n/a", "unknown", "null"):
+                if (
+                    isinstance(default_arg, ast.Constant)
+                    and isinstance(default_arg.value, str)
+                    and default_arg.value.lower() in ("n/a", "unknown", "null")
+                ):
                         is_suspect_default = True
 
                 if is_suspect_default:
@@ -175,7 +178,7 @@ def audit_candidate_with_llm(
         try:
             response = audit_agent.run_sync(prompt, model_settings=ModelSettings(max_tokens=1024))
             return response.output
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError, TypeError) as e:
             if attempt < max_attempts:
                 sleep_time = backoffs[attempt - 1]
                 print(
@@ -249,7 +252,7 @@ def main():
             extractor.visit(tree)
 
             all_candidates.extend(extractor.candidates)
-        except Exception as e:
+        except (OSError, SyntaxError) as e:
             print(f"Error parsing {path_str}: {e}", file=sys.stderr)
 
     import argparse
@@ -278,7 +281,7 @@ def main():
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     existing_results[(res.get("file_path"), res.get("line"), res.get("name"))] = res
-        except Exception as e:
+        except (OSError, json.JSONDecodeError, ValueError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
     md_path = output_dir / "silent_killers_audit.md"
 
@@ -306,7 +309,7 @@ def main():
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
 
-        except Exception as e:
+        except (OSError, ValueError, TypeError, RuntimeError) as e:
             error_msg = str(e)
             print(f"WARNING: Auditing failed for {candidate.name} at {candidate.file_path}:{candidate.line}: {error_msg}", file=sys.stderr)
             report.failed_audits.append({
@@ -321,7 +324,7 @@ def main():
     try:
         generate_markdown_report(report, md_path)
         print(f"Rendered Markdown report saved to {md_path}")
-    except Exception as e:
+    except (OSError, ValueError, RuntimeError) as e:
         print(f"Error generating Markdown report: {e}", file=sys.stderr)
 
     print(f"\nAudit completed. JSON store stored in {json_path}")

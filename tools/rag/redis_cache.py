@@ -28,50 +28,50 @@ REDIS_TTL_QUERY = int(os.getenv("REDIS_TTL_QUERY", "3600"))
 _PREFIX_EMBED = "bazi:embed:"
 _PREFIX_QUERY = "bazi:query:"
 
-_sync_client: Optional["redis.Redis"] = None
-_async_client: Optional["redis.asyncio.Redis"] = None
+_sync_state: dict[str, Optional["redis.Redis"]] = {"client": None}
+_async_state: dict[str, Optional["redis.asyncio.Redis"]] = {"client": None}
 
 
 # ── Sync client ────────────────────────────────────────────────────────────────
 
 def _get_sync_client():
-    global _sync_client
-    if _sync_client is not None:
-        return _sync_client
+    if _sync_state["client"] is not None:
+        return _sync_state["client"]
     import redis
     try:
-        _sync_client = redis.Redis(
+        client = redis.Redis(
             host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB,
             password=REDIS_PASSWORD or None,
             decode_responses=True,
             socket_connect_timeout=2, socket_timeout=2,
         )
-        _sync_client.ping()
-    except Exception as exc:
+        client.ping()
+        _sync_state["client"] = client
+    except (redis.RedisError, OSError) as exc:
         logger.warning(f"Redis sync unavailable ({exc}) — cache disabled")
-        _sync_client = None
-    return _sync_client
+        _sync_state["client"] = None
+    return _sync_state["client"]
 
 
 # ── Async client ───────────────────────────────────────────────────────────────
 
 async def _get_async_client():
-    global _async_client
-    if _async_client is not None:
-        return _async_client
+    if _async_state["client"] is not None:
+        return _async_state["client"]
     import redis.asyncio as redis_async
     try:
-        _async_client = redis_async.Redis(
+        client = redis_async.Redis(
             host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB,
             password=REDIS_PASSWORD or None,
             decode_responses=True,
             socket_connect_timeout=2, socket_timeout=2,
         )
-        await _async_client.ping()
-    except Exception as exc:
+        await client.ping()
+        _async_state["client"] = client
+    except (redis_async.RedisError, OSError) as exc:
         logger.warning(f"Redis async unavailable ({exc}) — cache disabled")
-        _async_client = None
-    return _async_client
+        _async_state["client"] = None
+    return _async_state["client"]
 
 
 def _key_hash(text: str) -> str:
@@ -88,7 +88,7 @@ def cache_embedding(text: str, vector: list[float]) -> None:
         key = _PREFIX_EMBED + _key_hash(text)
         val = json.dumps(vector, ensure_ascii=False)
         client.setex(key, REDIS_TTL_EMBEDDING, val)
-    except Exception:
+    except (redis.RedisError, OSError):
         logger.debug("Failed to cache embedding", exc_info=True)
 
 
@@ -99,9 +99,8 @@ def get_cached_embedding(text: str) -> list[float] | None:
     try:
         raw = client.get(_PREFIX_EMBED + _key_hash(text))
         return json.loads(raw) if raw is not None else None
-    except Exception:
+    except (redis.RedisError, OSError, json.JSONDecodeError):
         logger.debug("Failed to read cached embedding", exc_info=True)
-        raise
         return None
 
 
@@ -115,7 +114,7 @@ async def async_cache_embedding(text: str, vector: list[float]) -> None:
         key = _PREFIX_EMBED + _key_hash(text)
         val = json.dumps(vector, ensure_ascii=False)
         await client.setex(key, REDIS_TTL_EMBEDDING, val)
-    except Exception:
+    except (redis.RedisError, OSError):
         logger.debug("Failed to cache embedding", exc_info=True)
 
 
@@ -126,9 +125,8 @@ async def async_get_cached_embedding(text: str) -> list[float] | None:
     try:
         raw = await client.get(_PREFIX_EMBED + _key_hash(text))
         return json.loads(raw) if raw is not None else None
-    except Exception:
+    except (redis.RedisError, OSError, json.JSONDecodeError):
         logger.debug("Failed to read cached embedding", exc_info=True)
-        raise
         return None
 
 
@@ -142,7 +140,7 @@ def cache_query_result(query: str, result: list[dict]) -> None:
         key = _PREFIX_QUERY + _key_hash(query)
         val = json.dumps(result, ensure_ascii=False)
         client.setex(key, REDIS_TTL_QUERY, val)
-    except Exception:
+    except (redis.RedisError, OSError):
         logger.debug("Failed to cache query result", exc_info=True)
 
 
@@ -153,9 +151,8 @@ def get_cached_query_result(query: str) -> list[dict] | None:
     try:
         raw = client.get(_PREFIX_QUERY + _key_hash(query))
         return json.loads(raw) if raw is not None else None
-    except Exception:
+    except (redis.RedisError, OSError, json.JSONDecodeError):
         logger.debug("Failed to read cached query result", exc_info=True)
-        raise
         return None
 
 
@@ -169,7 +166,7 @@ async def async_cache_query_result(query: str, result: list[dict]) -> None:
         key = _PREFIX_QUERY + _key_hash(query)
         val = json.dumps(result, ensure_ascii=False)
         await client.setex(key, REDIS_TTL_QUERY, val)
-    except Exception:
+    except (redis.RedisError, OSError):
         logger.debug("Failed to cache query result", exc_info=True)
 
 
@@ -180,9 +177,8 @@ async def async_get_cached_query_result(query: str) -> list[dict] | None:
     try:
         raw = await client.get(_PREFIX_QUERY + _key_hash(query))
         return json.loads(raw) if raw is not None else None
-    except Exception:
+    except (redis.RedisError, OSError, json.JSONDecodeError):
         logger.debug("Failed to read cached query result", exc_info=True)
-        raise
         return None
 
 
@@ -196,7 +192,7 @@ def cache_stats() -> dict[str, Any]:
         embed_count = len(client.keys(_PREFIX_EMBED + "*"))
         query_count = len(client.keys(_PREFIX_QUERY + "*"))
         return {"status": "connected", "embedding_keys": embed_count, "query_keys": query_count}
-    except Exception as exc:
+    except (redis.RedisError, OSError) as exc:
         return {"status": f"error: {exc}", "embedding_keys": 0, "query_keys": 0}
 
 
@@ -212,7 +208,7 @@ async def async_cache_stats() -> dict[str, Any]:
             "embedding_keys": len(embed_keys),
             "query_keys": len(query_keys),
         }
-    except Exception as exc:
+    except (redis.RedisError, OSError) as exc:
         return {"status": f"error: {exc}", "embedding_keys": 0, "query_keys": 0}
 
 
@@ -225,7 +221,7 @@ def clear_cache() -> None:
             client.delete(key)
         for key in client.scan_iter(match=_PREFIX_QUERY + "*"):
             client.delete(key)
-    except Exception:
+    except (redis.RedisError, OSError):
         logger.debug("Failed to clear cache", exc_info=True)
 
 
@@ -238,5 +234,5 @@ async def async_clear_cache() -> None:
             await client.delete(key)
         async for key in client.scan_iter(match=_PREFIX_QUERY + "*"):
             await client.delete(key)
-    except Exception:
+    except (redis.RedisError, OSError):
         logger.debug("Failed to clear cache", exc_info=True)

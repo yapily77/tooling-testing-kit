@@ -123,8 +123,8 @@ def load_checkpoint() -> dict[str, dict]:
     completed = {}
     if CHECKPOINT_FILE.exists():
         with open(CHECKPOINT_FILE, encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
+            for raw_line in f:
+                line = raw_line.strip()
                 if line:
                     item = json.loads(line)
                     key = f"{item['file_path']}:{item['function_name']}"
@@ -154,7 +154,7 @@ def test_file_with_ruff(file_path: Path) -> tuple[bool, str]:
             check=False,
         )
         return (res.returncode == 0, res.stdout + res.stderr)
-    except Exception as e:
+    except (OSError, subprocess.SubprocessError) as e:
         return (False, str(e))
 
 
@@ -191,7 +191,7 @@ def test_suite_with_pytest(rel_path: str | None = None) -> bool:
             check=False,
         )
         return res.returncode == 0
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         return False
 
 
@@ -287,7 +287,7 @@ def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = F
                         save_checkpoint_item(fail_item)
                 finally:
                     os.unlink(tmp_path)
-            except Exception as e:
+            except (SyntaxError, ValueError, RuntimeError) as e:
                 lines = lines_backup
                 logger.error(f"   ❌ AST verification failed for {fname} in {rel_path}: {e}. Skipping.")
                 fail_item = dict(item)
@@ -319,7 +319,7 @@ def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = F
                             logger.info(f"✅ Successfully wrote {applied_targets} refactored function(s) to {rel_path} and passed Pytest gate.")
                     else:
                         logger.info(f"✅ Successfully wrote {applied_targets} refactored function(s) to {rel_path} (Pytest gate skipped via --skip-pytest).")
-            except Exception as e:
+            except (OSError, SyntaxError, ValueError, RuntimeError) as e:
                 file_path.write_text(source, encoding="utf-8")
                 logger.error(f"❌ Failed AST verification after modifying {rel_path}: {e}. Reverting file changes.")
 

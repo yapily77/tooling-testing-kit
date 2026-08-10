@@ -9,7 +9,7 @@ def run_cmd(cmd, env):
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=120, check=False)
         return result.returncode == 0, result.stdout, result.stderr
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         return False, "", str(e)
 
 

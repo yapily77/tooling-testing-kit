@@ -7,7 +7,7 @@ from src.interfaces.telegram.chronomancer.forecast_store import get_or_create_7d
 
 
 def _build_mock_records(count: int = 7) -> list[DailyForecastRecord]:
-    today = datetime.date.today()
+    today = datetime.datetime.now(tz=datetime.UTC).date()
     records = []
     for i in range(count):
         d = today + datetime.timedelta(days=i)

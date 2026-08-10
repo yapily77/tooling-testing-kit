@@ -81,7 +81,7 @@ def main():
 
     try:
         content = file_path.read_text(encoding="utf-8")
-    except Exception as e:
+    except OSError as e:
         print(f"Error reading file: {e}")
         sys.exit(1)
 
@@ -142,7 +142,7 @@ def main():
         print("\n" + "="*80)
         print(res.output)
         print("="*80)
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError, TypeError) as e:
         print(f"\nFailed to analyze with codebase model: {e}")
         sys.exit(1)
 

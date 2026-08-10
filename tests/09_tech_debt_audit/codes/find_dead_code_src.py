@@ -75,7 +75,7 @@ def get_files(directory: str) -> list[Path]:
             raise ValueError("No files found by git")
         paths = [Path(l) for l in lines]
         return [p for p in paths if p.is_file() and p.suffix == ".py" and p.name != "__init__.py"]
-    except Exception:
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError, ValueError):
         return [
             p
             for p in Path(directory).rglob("*.py")
@@ -278,7 +278,7 @@ def main():
                 if definition.name not in all_defs:
                     all_defs[definition.name] = []
                 all_defs[definition.name].append(definition)
-        except Exception as e:
+        except (OSError, ValueError, SyntaxError, TypeError) as e:
             print(f"Error parsing {file_path}: {e}", file=sys.stderr)
 
     whitelist = {
@@ -334,7 +334,7 @@ def main():
                 for item in existing_data.get("failed_audits", []):
                     already_failed[(item["file_path"], item["name"])] = item
             print(f"Loaded {len(already_audited)} existing audited items and {len(already_failed)} failed items from progress file.")
-        except Exception as e:
+        except (OSError, json.JSONDecodeError, KeyError, TypeError) as e:
             print(f"Could not load progress file: {e}")
 
     # Only run LLM validation on candidates
@@ -355,7 +355,7 @@ def main():
 
             with open(json_path, "w", encoding="utf-8") as f:
                 f.write(report.model_dump_json(indent=2))
-        except Exception as e:
+        except (OSError, KeyError, TypeError, ValueError) as e:
             error_msg = str(e)
             print(f"WARNING: Auditing failed for {definition.name}: {error_msg}", file=sys.stderr)
             report.failed_audits.append({
@@ -370,7 +370,7 @@ def main():
     try:
         generate_markdown_report(report, md_path)
         print(f"Rendered Markdown report saved to {md_path}")
-    except Exception as e:
+    except (OSError, TypeError) as e:
         print(f"Error generating Markdown report: {e}", file=sys.stderr)
 
     print(f"\nAudit completed. JSON report saved to {json_path}")

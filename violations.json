@@ -1,0 +1,2048 @@
+[
+  {
+    "file": "cleanup.py",
+    "line": 9,
+    "rule": "E501",
+    "message": "Line too long (94 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 31,
+    "rule": "PLR0912",
+    "message": "Too many branches (14 > 12)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 31,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `sync_environment_drift`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 50,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 67,
+    "rule": "PLW2901",
+    "message": "`for` loop variable `line` overwritten by assignment target"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 84,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 96,
+    "rule": "ANN204",
+    "message": "Missing return type annotation for special method `__init__`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 98,
+    "rule": "SIM115",
+    "message": "Use a context manager for opening files"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 100,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `write`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 100,
+    "rule": "ANN001",
+    "message": "Missing type annotation for function argument `message`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 104,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `flush`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 143,
+    "rule": "E501",
+    "message": "Line too long (99 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 158,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 165,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 178,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 186,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `strip_dead_code`"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 221,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "cleanup.py",
+    "line": 224,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 32,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 39,
+    "rule": "E501",
+    "message": "Line too long (116 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 47,
+    "rule": "E501",
+    "message": "Line too long (122 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 56,
+    "rule": "PLR0912",
+    "message": "Too many branches (32 > 12)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 56,
+    "rule": "PLR0915",
+    "message": "Too many statements (89 > 50)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 56,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 62,
+    "rule": "E501",
+    "message": "Line too long (91 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 73,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 78,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 113,
+    "rule": "E501",
+    "message": "Line too long (126 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 117,
+    "rule": "E501",
+    "message": "Line too long (104 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 124,
+    "rule": "E501",
+    "message": "Line too long (114 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 140,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 140,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 143,
+    "rule": "E501",
+    "message": "Line too long (169 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 147,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 148,
+    "rule": "E501",
+    "message": "Line too long (91 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 161,
+    "rule": "E501",
+    "message": "Line too long (131 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 176,
+    "rule": "E501",
+    "message": "Line too long (147 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 187,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 187,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 190,
+    "rule": "E501",
+    "message": "Line too long (184 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 194,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 198,
+    "rule": "E501",
+    "message": "Line too long (120 > 88)"
+  },
+  {
+    "file": "dailygit-check.py",
+    "line": 201,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 17,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 19,
+    "rule": "E501",
+    "message": "Line too long (92 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 27,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 28,
+    "rule": "E501",
+    "message": "Line too long (119 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 29,
+    "rule": "E501",
+    "message": "Line too long (175 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 33,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 46,
+    "rule": "E501",
+    "message": "Line too long (146 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 47,
+    "rule": "E501",
+    "message": "Line too long (142 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 48,
+    "rule": "E501",
+    "message": "Line too long (144 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 54,
+    "rule": "ANN204",
+    "message": "Missing return type annotation for special method `__init__`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 59,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_AsyncFunctionDef`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 65,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_Call`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 72,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 77,
+    "rule": "E501",
+    "message": "Line too long (120 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 78,
+    "rule": "E501",
+    "message": "Line too long (94 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 88,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 88,
+    "rule": "E501",
+    "message": "Line too long (117 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 89,
+    "rule": "E501",
+    "message": "Line too long (96 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 106,
+    "rule": "RET503",
+    "message": "Missing explicit `return` at the end of function able to return non-`None` value"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 106,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 107,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 118,
+    "rule": "E501",
+    "message": "Line too long (128 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 129,
+    "rule": "E501",
+    "message": "Line too long (119 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 136,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 138,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 142,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 148,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 154,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 171,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 178,
+    "rule": "PLR0915",
+    "message": "Too many statements (57 > 50)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 178,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 194,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 197,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 199,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 208,
+    "rule": "E501",
+    "message": "Line too long (107 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 221,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 222,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 229,
+    "rule": "E501",
+    "message": "Line too long (145 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 235,
+    "rule": "E501",
+    "message": "Line too long (117 > 88)"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 244,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_async_hazards.py",
+    "line": 245,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 19,
+    "rule": "E501",
+    "message": "Line too long (92 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 28,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 31,
+    "rule": "E501",
+    "message": "Line too long (112 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 35,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 40,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 53,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 54,
+    "rule": "E501",
+    "message": "Line too long (124 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 55,
+    "rule": "E501",
+    "message": "Line too long (136 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 61,
+    "rule": "ANN204",
+    "message": "Missing return type annotation for special method `__init__`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 63,
+    "rule": "E501",
+    "message": "Line too long (110 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 66,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_FunctionDef`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 72,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_AsyncFunctionDef`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 78,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_Import`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 83,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_ImportFrom`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 89,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 94,
+    "rule": "ANN202",
+    "message": "Missing return type annotation for private function `dfs`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 120,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 136,
+    "rule": "RET503",
+    "message": "Missing explicit `return` at the end of function able to return non-`None` value"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 136,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 137,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 149,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 160,
+    "rule": "E501",
+    "message": "Line too long (134 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 167,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 169,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 173,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 179,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 185,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 209,
+    "rule": "PLR0915",
+    "message": "Too many statements (62 > 50)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 209,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 215,
+    "rule": "E501",
+    "message": "Line too long (97 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 227,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 231,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 233,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 237,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 256,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 257,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 266,
+    "rule": "E501",
+    "message": "Line too long (99 > 88)"
+  },
+  {
+    "file": "find_circular_deps.py",
+    "line": 282,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 18,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 20,
+    "rule": "E501",
+    "message": "Line too long (96 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 27,
+    "rule": "E501",
+    "message": "Line too long (91 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 29,
+    "rule": "E501",
+    "message": "Line too long (114 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 32,
+    "rule": "E501",
+    "message": "Line too long (115 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 34,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 38,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 40,
+    "rule": "E501",
+    "message": "Line too long (96 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 43,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 55,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 56,
+    "rule": "E501",
+    "message": "Line too long (186 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 57,
+    "rule": "E501",
+    "message": "Line too long (115 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 63,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 76,
+    "rule": "PLR2004",
+    "message": "Magic value used in comparison, consider replacing `3` with a constant variable"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 78,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 93,
+    "rule": "PLR2004",
+    "message": "Magic value used in comparison, consider replacing `4` with a constant variable"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 100,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 102,
+    "rule": "ANN204",
+    "message": "Missing return type annotation for special method `__init__`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 107,
+    "rule": "ANN202",
+    "message": "Missing return type annotation for private function `_check_decorators`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 107,
+    "rule": "ANN001",
+    "message": "Missing type annotation for function argument `node`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 121,
+    "rule": "E501",
+    "message": "Line too long (116 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 125,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_FunctionDef`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 128,
+    "rule": "E501",
+    "message": "Line too long (112 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 133,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_AsyncFunctionDef`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 136,
+    "rule": "E501",
+    "message": "Line too long (118 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 141,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_ClassDef`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 144,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 150,
+    "rule": "PLR0912",
+    "message": "Too many branches (16 > 12)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 150,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 151,
+    "rule": "E501",
+    "message": "Line too long (94 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 171,
+    "rule": "PLR5501",
+    "message": "Use `elif` instead of `else` then `if`, to reduce indentation"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 178,
+    "rule": "PLR1714",
+    "message": "Consider merging multiple comparisons: `alias.name in (name, \"*\")`. Use a `set` if the elements are hashable."
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 184,
+    "rule": "PLR1714",
+    "message": "Consider merging multiple comparisons: `alias.name in (next_part, \"*\")`. Use a `set` if the elements are hashable."
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 189,
+    "rule": "E501",
+    "message": "Line too long (110 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 190,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 205,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 207,
+    "rule": "E501",
+    "message": "Line too long (110 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 209,
+    "rule": "PLR2004",
+    "message": "Magic value used in comparison, consider replacing `5` with a constant variable"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 215,
+    "rule": "RET503",
+    "message": "Missing explicit `return` at the end of function able to return non-`None` value"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 221,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 226,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 237,
+    "rule": "E501",
+    "message": "Line too long (101 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 250,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 255,
+    "rule": "E501",
+    "message": "Line too long (116 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 256,
+    "rule": "E501",
+    "message": "Line too long (107 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 259,
+    "rule": "E501",
+    "message": "Line too long (151 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 265,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 267,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 271,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 277,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 283,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 291,
+    "rule": "E501",
+    "message": "Line too long (151 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 296,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 298,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 321,
+    "rule": "E501",
+    "message": "Line too long (114 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 325,
+    "rule": "E501",
+    "message": "Line too long (128 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 338,
+    "rule": "PLW2901",
+    "message": "`for` loop variable `line` overwritten by assignment target"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 341,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 342,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 346,
+    "rule": "PLR0912",
+    "message": "Too many branches (26 > 12)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 346,
+    "rule": "PLR0915",
+    "message": "Too many statements (103 > 50)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 346,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 374,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 408,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 420,
+    "rule": "PLR5501",
+    "message": "Use `elif` instead of `else` then `if`, to reduce indentation"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 424,
+    "rule": "E501",
+    "message": "Line too long (97 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 425,
+    "rule": "E501",
+    "message": "Line too long (111 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 431,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 433,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 437,
+    "rule": "E501",
+    "message": "Line too long (94 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 441,
+    "rule": "E501",
+    "message": "Line too long (92 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 442,
+    "rule": "E501",
+    "message": "Line too long (111 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 458,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 459,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 463,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 467,
+    "rule": "E501",
+    "message": "Line too long (128 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 474,
+    "rule": "E501",
+    "message": "Line too long (102 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 477,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 490,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 493,
+    "rule": "E501",
+    "message": "Line too long (126 > 88)"
+  },
+  {
+    "file": "find_dead_code.py",
+    "line": 511,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dict_access_on_models.py",
+    "line": 50,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dict_access_on_models.py",
+    "line": 61,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_dict_access_on_models.py",
+    "line": 127,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_dict_access_on_models.py",
+    "line": 128,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 28,
+    "rule": "E501",
+    "message": "Line too long (126 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 29,
+    "rule": "E501",
+    "message": "Line too long (136 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 30,
+    "rule": "E501",
+    "message": "Line too long (175 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 34,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 47,
+    "rule": "E501",
+    "message": "Line too long (150 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 48,
+    "rule": "E501",
+    "message": "Line too long (189 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 49,
+    "rule": "E501",
+    "message": "Line too long (140 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 54,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 59,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 110,
+    "rule": "RET503",
+    "message": "Missing explicit `return` at the end of function able to return non-`None` value"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 110,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 111,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 117,
+    "rule": "E501",
+    "message": "Line too long (104 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 127,
+    "rule": "E501",
+    "message": "Line too long (124 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 134,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 136,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 140,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 146,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 152,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 170,
+    "rule": "PLR0915",
+    "message": "Too many statements (53 > 50)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 170,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 180,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 184,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 186,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 195,
+    "rule": "E501",
+    "message": "Line too long (137 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 208,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 209,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 216,
+    "rule": "E501",
+    "message": "Line too long (128 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 222,
+    "rule": "E501",
+    "message": "Line too long (115 > 88)"
+  },
+  {
+    "file": "find_duplication.py",
+    "line": 231,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 18,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 28,
+    "rule": "E501",
+    "message": "Line too long (129 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 29,
+    "rule": "E501",
+    "message": "Line too long (136 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 30,
+    "rule": "E501",
+    "message": "Line too long (99 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 31,
+    "rule": "E501",
+    "message": "Line too long (145 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 35,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 50,
+    "rule": "E501",
+    "message": "Line too long (112 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 52,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 54,
+    "rule": "E501",
+    "message": "Line too long (129 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 83,
+    "rule": "ANN204",
+    "message": "Missing return type annotation for special method `__init__`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 88,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_FunctionDef`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 123,
+    "rule": "RET503",
+    "message": "Missing explicit `return` at the end of function able to return non-`None` value"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 137,
+    "rule": "E501",
+    "message": "Line too long (135 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 144,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 146,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 149,
+    "rule": "E501",
+    "message": "Line too long (146 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 152,
+    "rule": "E501",
+    "message": "Line too long (114 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 156,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 163,
+    "rule": "E501",
+    "message": "Line too long (92 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 174,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 181,
+    "rule": "PLR0915",
+    "message": "Too many statements (59 > 50)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 181,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 199,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 202,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 204,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 213,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 229,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 232,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 236,
+    "rule": "E501",
+    "message": "Line too long (92 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 243,
+    "rule": "E501",
+    "message": "Line too long (145 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 247,
+    "rule": "E501",
+    "message": "Line too long (117 > 88)"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 256,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_engine_schemas.py",
+    "line": 257,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 17,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 19,
+    "rule": "E501",
+    "message": "Line too long (135 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 28,
+    "rule": "E501",
+    "message": "Line too long (135 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 29,
+    "rule": "E501",
+    "message": "Line too long (130 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 30,
+    "rule": "E501",
+    "message": "Line too long (175 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 34,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 47,
+    "rule": "E501",
+    "message": "Line too long (171 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 48,
+    "rule": "E501",
+    "message": "Line too long (139 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 49,
+    "rule": "E501",
+    "message": "Line too long (129 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 55,
+    "rule": "ANN204",
+    "message": "Missing return type annotation for special method `__init__`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 59,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_Call`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 65,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 67,
+    "rule": "E501",
+    "message": "Line too long (96 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 70,
+    "rule": "E501",
+    "message": "Line too long (120 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 76,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `visit_Subscript`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 78,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 79,
+    "rule": "E501",
+    "message": "Line too long (90 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 91,
+    "rule": "PLW2901",
+    "message": "`for` loop variable `line` overwritten by assignment target"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 96,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 101,
+    "rule": "RET503",
+    "message": "Missing explicit `return` at the end of function able to return non-`None` value"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 101,
+    "rule": "E501",
+    "message": "Line too long (105 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 102,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 113,
+    "rule": "E501",
+    "message": "Line too long (128 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 124,
+    "rule": "E501",
+    "message": "Line too long (128 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 131,
+    "rule": "E501",
+    "message": "Line too long (98 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 133,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 137,
+    "rule": "E501",
+    "message": "Line too long (127 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 143,
+    "rule": "E501",
+    "message": "Line too long (95 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 149,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 155,
+    "rule": "E501",
+    "message": "Line too long (97 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 166,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 173,
+    "rule": "PLR0912",
+    "message": "Too many branches (16 > 12)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 173,
+    "rule": "PLR0915",
+    "message": "Too many statements (64 > 50)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 173,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 191,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 220,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 222,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 226,
+    "rule": "E501",
+    "message": "Line too long (92 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 244,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 245,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 252,
+    "rule": "E501",
+    "message": "Line too long (145 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 258,
+    "rule": "E501",
+    "message": "Line too long (117 > 88)"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 269,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_env_drift.py",
+    "line": 270,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 19,
+    "rule": "E501",
+    "message": "Line too long (97 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 22,
+    "rule": "E501",
+    "message": "Line too long (114 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 33,
+    "rule": "E501",
+    "message": "Line too long (114 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 35,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 43,
+    "rule": "E501",
+    "message": "Line too long (89 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 77,
+    "rule": "ANN202",
+    "message": "Missing return type annotation for private function `visit_Call`"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 79,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 84,
+    "rule": "E501",
+    "message": "Line too long (112 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 88,
+    "rule": "ANN202",
+    "message": "Missing return type annotation for private function `visit_Subscript`"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 90,
+    "rule": "SIM102",
+    "message": "Use a single `if` statement instead of nested `if` statements"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 91,
+    "rule": "E501",
+    "message": "Line too long (94 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 100,
+    "rule": "E501",
+    "message": "Line too long (107 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 116,
+    "rule": "E501",
+    "message": "Line too long (110 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 118,
+    "rule": "E501",
+    "message": "Line too long (93 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 120,
+    "rule": "E501",
+    "message": "Line too long (108 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 133,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `generate_markdown_report`"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 139,
+    "rule": "E501",
+    "message": "Line too long (103 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 150,
+    "rule": "E501",
+    "message": "Line too long (100 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 157,
+    "rule": "ANN201",
+    "message": "Missing return type annotation for public function `main`"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 167,
+    "rule": "PLW2901",
+    "message": "`for` loop variable `data` overwritten by assignment target"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 187,
+    "rule": "E501",
+    "message": "Line too long (106 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 195,
+    "rule": "E501",
+    "message": "Line too long (110 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 199,
+    "rule": "PLC0415",
+    "message": "`import` should be at the top-level of a file"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 201,
+    "rule": "E501",
+    "message": "Line too long (109 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 220,
+    "rule": "E501",
+    "message": "Line too long (117 > 88)"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 224,
+    "rule": "BLE001",
+    "message": "Do not catch blind exception: `Exception`"
+  },
+  {
+    "file": "find_message_drift.py",
+    "line": 225,
+    "rule": "E501",
+    "message": "Line too long (99 > 88)"
+  }
+]

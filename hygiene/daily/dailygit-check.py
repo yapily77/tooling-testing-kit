@@ -70,9 +70,8 @@ def main():
     files_to_scan = []
     for f in changed_files:
         path = Path(f)
-        if path.suffix == ".py" and (f.startswith(("src/", "kit-hygiene/"))):
-            if f not in exceptions:
-                files_to_scan.append(f)
+        if path.suffix == ".py" and (f.startswith(("src/", "kit-hygiene/"))) and f not in exceptions:
+            files_to_scan.append(f)
 
     if not files_to_scan:
         print(f"{GREEN}✅ No non-excepted Python files modified. Bypassing scanners.{RESET}")
@@ -137,14 +136,13 @@ def main():
                     data = json.load(f)
                 for item in data.get("audit_results", []):
                     # Only block on high-severity async hazards
-                    if item.get("status") == "ASYNC_HAZARD" and item.get("severity") == "HIGH":
-                        if item.get("file_path") in files_to_scan:
+                    if item.get("status") == "ASYNC_HAZARD" and item.get("severity") == "HIGH" and item.get("file_path") in files_to_scan:
                             print(
                                 f"{RED}🚨 BLOCKING VIOLATION: High-severity Async Hazard found in {item.get('file_path')}:{item.get('line')} ({item.get('name')}){RESET}"
                             )
                             print(f"  Reason: {item.get('reason')}")
                             failed = True
-            except Exception as e:
+            except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
                 print(f"{YELLOW}Warning: Failed to parse async hazards report: {e}{RESET}")
 
         # Check circular dependencies report
@@ -184,14 +182,13 @@ def main():
                 with open(env_report, encoding="utf-8") as f:
                     data = json.load(f)
                 for item in data.get("audit_results", []):
-                    if item.get("status") == "DRIFT_VIOLATION" and item.get("severity") == "HIGH":
-                        if item.get("file_path") in files_to_scan:
+                    if item.get("status") == "DRIFT_VIOLATION" and item.get("severity") == "HIGH" and item.get("file_path") in files_to_scan:
                             print(
                                 f"{RED}🚨 BLOCKING VIOLATION: Environment Drift / Undocumented Variable found in {item.get('file_path')}:{item.get('line')} ({item.get('name')}){RESET}"
                             )
                             print(f"  Reason: {item.get('reason')}")
                             failed = True
-            except Exception as e:
+            except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
                 print(f"{YELLOW}Warning: Failed to parse env drift report: {e}{RESET}")
 
     if failed:

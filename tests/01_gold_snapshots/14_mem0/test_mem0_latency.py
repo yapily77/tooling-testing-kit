@@ -14,12 +14,12 @@ load_dotenv(".env")
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
 try:
-    from src.core.memory.mem0_store import Mem0Store
+    from src.core.memory.mem0_store import Mem0Store  # type: ignore
 except ImportError as e:
     import pytest
     pytest.skip(f"Skipping test_mem0_latency: {e}", allow_module_level=True)
 
-def main():
+def main() -> None:
     print("--- Starting Mem0 Latency Test ---")
     store = Mem0Store()
     
@@ -34,7 +34,7 @@ def main():
     dummy_text = "I am a test user and I love programming in Python. I also study Bazi and want to understand my wealth element."
     try:
         store.add_memory(user_id=test_user_id, text=dummy_text, memory_type="episodic")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"add_memory failed: {e}")
         
     print("\n[2/2] Testing search()...")
@@ -42,13 +42,13 @@ def main():
     try:
         results = store.search(user_id=test_user_id, query="What do I study?", top_k=3)
         print(f"Search returned {len(results)} results.")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"search failed: {e}")
         
     print("\n--- Cleaning up test user memories ---")
     try:
         store.delete_user_memories(user_id=test_user_id)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"cleanup failed: {e}")
 
     print("--- Test Complete ---")

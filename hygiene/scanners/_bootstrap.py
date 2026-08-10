@@ -24,4 +24,3 @@ for _p in (str(target_root), str(_repo_root), str(_pkg_root), str(_scanners_dir)
 # Re-export for callers that want the package root, repo root, or scan target root
 pkg_root = _pkg_root
 repo_root = _repo_root
-target_root

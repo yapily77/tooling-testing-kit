@@ -73,7 +73,7 @@ async def test_replicate_agentrunresult_crash(monkeypatch):
     # We just run it and see if it passes the result.data / result.output attribute check
     try:
         await run_conductor(session, "__init__")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         if "AgentRunResult" in str(e) and "has no attribute" in str(e):
             pytest.fail(f"Still raising AgentRunResult error: {e}")
         # Other errors are fine, we just want to ensure it passes the attribute check

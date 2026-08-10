@@ -18,12 +18,12 @@ def setup_teardown():
 @pytest.mark.asyncio
 async def test_ask_command_routing():
     """Verify that /ask command reaches the Chronomancer listening prompt."""
-    with patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send:
-        # Mock security check to allow access
-        with patch("src.bot.app.check_user_access", return_value=True):
-            # Mock can_use_chronomancer to true
-            with patch("src.bot.security.can_use_chronomancer", return_value=True):
-                await process_webhook_logic(USER_UPDATE)
+    with (
+        patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send,
+        patch("src.bot.app.check_user_access", return_value=True),
+        patch("src.bot.security.can_use_chronomancer", return_value=True),
+    ):
+        await process_webhook_logic(USER_UPDATE)
 
     # Assertions
     calls = [call.args[1] for call in mock_send.call_args_list]
@@ -46,12 +46,13 @@ async def test_daily_command_routing():
 
     daily_update = {"update_id": 101, "message": {"chat": {"id": CHAT_ID}, "text": "/daily"}}
 
-    with patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send:
-        with patch("src.bot.app.check_user_access", return_value=True):
-            with patch("src.bot.security.can_use_chronomancer", return_value=True):
-                # Mock the actual handler to avoid engine overhead/LLM calls
-                with patch("src.bot.chronomancer_handler.handle_daily", return_value="Today's advice") as mock_handler:
-                    await process_webhook_logic(daily_update)
+    with (
+        patch("src.bot.app.send_telegram_message", new_callable=AsyncMock) as mock_send,
+        patch("src.bot.app.check_user_access", return_value=True),
+        patch("src.bot.security.can_use_chronomancer", return_value=True),
+        patch("src.bot.chronomancer_handler.handle_daily", return_value="Today's advice") as mock_handler,
+    ):
+        await process_webhook_logic(daily_update)
 
     mock_handler.assert_called_once_with(CHAT_ID)
     calls = [call.args[1] for call in mock_send.call_args_list]

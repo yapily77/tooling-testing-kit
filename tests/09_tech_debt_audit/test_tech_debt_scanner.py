@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # --- CONFIGURATION ---
@@ -37,7 +37,7 @@ class TechDebtScanner:
             with open(file_path, "rb") as f:
                 chunk = f.read(1024)
                 return b"\x00" in chunk
-        except Exception:
+        except OSError:
             return True
 
     def _get_indent_depth(self, line: str) -> int:
@@ -57,7 +57,7 @@ class TechDebtScanner:
         try:
             with open(file_path, encoding="utf-8", errors="ignore") as f:
                 lines = f.readlines()
-        except Exception:
+        except OSError:
             return
 
         self.results["summary"]["total_files_scanned"] += 1
@@ -94,12 +94,12 @@ class TechDebtScanner:
 
     def generate_report(self):
         REPORT_DIR.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         report_path = REPORT_DIR / f"tech_debt_{timestamp}.md"
 
         with open(report_path, "w", encoding="utf-8") as f:
             f.write("# Technical Debt Report (Refined)\n")
-            f.write(f"Generated: {datetime.now().isoformat()}\n\n")
+            f.write(f"Generated: {datetime.now(timezone.utc).isoformat()}\n\n")
 
             f.write("## Summary\n")
             f.write(f"- Total Files Scanned: {self.results['summary']['total_files_scanned']}\n")

@@ -62,7 +62,7 @@ class ProjectWideAuditor:
             if file_markers:
                 self.results[str(rel_path)] = file_markers
 
-        except Exception as e:
+        except OSError as e:
             print(f"Error scanning {file_path}: {e}")
 
     def write_report(self):

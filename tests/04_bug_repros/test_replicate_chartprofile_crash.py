@@ -29,7 +29,7 @@ def test_replicate_chartprofile_crash():
     
     try:
         chart_profile = ChartProfile.model_validate_json(json_str)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         pytest.fail(f"ChartProfile validation failed: {e}")
         
     assert chart_profile.year_pillar.stem == "Ding"

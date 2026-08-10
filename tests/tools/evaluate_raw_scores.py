@@ -112,7 +112,7 @@ async def evaluate_raw_scores_impact():
                 system_prompt="You are a Bazi Advisor.",
                 temperature=0.1
             )
-        except Exception as e:
+        except (OSError, ConnectionError, TimeoutError, KeyError, ValueError) as e:
             print(f"LLM call failed: {e}. Falling back to simulation mode.")
             response_without = "Standard LLM output: Treats +18 and +8 equally because both say 'High Opportunity'. Treats monthly score 45.0 as a failure (F grade)."
             response_with = "Sifu Guided LLM output: Explicitly prioritizes career (+18) over speculation (+8). Recognizes monthly score 45.0 as mildly below average on a 35-80 scale, advising persistence rather than panic."

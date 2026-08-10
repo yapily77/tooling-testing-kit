@@ -59,8 +59,8 @@ async def check_mock_telegram_server() -> bool:
             if resp.status_code in (200, 404):
                 print_status("2. Mock Telegram Server (Port 9999)", True, "Online & responsive")
                 return True
-    except Exception as e:
-         print_status(
+    except Exception as e:  # noqa: BLE001
+        print_status(
             "2. Mock Telegram Server (Port 9999)",
             False,
             f"Offline. Run 'uv run python 01_gold_snapshots/00_infra/fake_telegram.py' in the background. Error: {e}",
@@ -81,7 +81,7 @@ async def check_model_gateway_ready() -> bool:
             res = await agent.run("PING")
             response_text = str(res.output).strip()
             print_status(f"   - Role '{role}' ({model.model_name})", True, f"Response: '{response_text}'")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             print_status(f"   - Role '{role}' ({model.model_name})", False, f"Error: {e}")
             all_ready = False
 
@@ -96,7 +96,7 @@ async def check_qdrant_ready() -> bool:
             if resp.status_code == 200:
                 print_status("4. Qdrant Local Database", True, "Online & responsive")
                 return True
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print_status("4. Qdrant Local Database", False, f"Offline on {qdrant_url}: {e}")
     return False
 
@@ -112,7 +112,7 @@ async def check_valkey_ready() -> bool:
         if pong:
             print_status("5. Valkey Server Connection", True, f"Online & responsive at {valkey_host}:{valkey_port}")
             return True
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print_status("5. Valkey Server Connection", False, f"Offline at {valkey_host}:{valkey_port}. Error: {e}")
     return False
 
@@ -138,7 +138,7 @@ async def check_celery_worker_ready() -> bool:
             try:
                 pings = app.control.ping(timeout=2.0)
                 return pings
-            except Exception:
+            except Exception:  # noqa: BLE001
                 return []
 
         pings = await loop.run_in_executor(None, _ping_workers)
@@ -152,7 +152,7 @@ async def check_celery_worker_ready() -> bool:
                 False,
                 "No active workers detected. Start worker using 'celery -A src.worker.celery_app worker --loglevel=info'",
             )
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print_status("6. Celery Workers Active", False, f"Configuration or connection failed. Error: {e}")
     return False
 

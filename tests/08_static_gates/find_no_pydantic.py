@@ -89,13 +89,14 @@ def _get_decorator_names(decorators: list[ast.expr]) -> list[str]:
     for dec in decorators:
         # If the decorator is called with arguments like @dataclass(kw_only=True)
         # unwrap the ast.Call to get to the actual function name
-        if isinstance(dec, ast.Call):
-            dec = dec.func
-            
-        if isinstance(dec, ast.Name):
-            names.append(dec.id)
-        elif isinstance(dec, ast.Attribute):
-            names.append(_build_attr_string(dec))
+        target = dec
+        if isinstance(target, ast.Call):
+            target = target.func
+
+        if isinstance(target, ast.Name):
+            names.append(target.id)
+        elif isinstance(target, ast.Attribute):
+            names.append(_build_attr_string(target))
     return names
 
 
@@ -123,7 +124,7 @@ def check_file(file_path: Path) -> dict[str, Any]:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
         tree = ast.parse(content, filename=str(file_path))
-    except Exception as e:
+    except (OSError, SyntaxError) as e:
         return {
             "file": file_path,
             "valid": False,
