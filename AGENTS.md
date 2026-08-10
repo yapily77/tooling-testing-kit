@@ -13,7 +13,7 @@ For full workflow details: `bd prime`
 
 ## Code Quality
 
-**Hygiene & linting:** No `ruff`/`black`/`mypy` in this repo (check `.venv` before relying on them). Static analysis lives under `hygiene/` — see `hygiene/README.md` and `hygiene/GUIDE.md`. Daily scans are driven by `hygiene/daily/`.
+**Hygiene & linting:** `ruff` is the configured linter/formatter (see `README.md` badge + `[tool.ruff]` in `pyproject.toml`). Static analysis lives under `hygiene/` — see `hygiene/README.md` and `hygiene/GUIDE.md`. Daily scans are driven by `hygiene/daily/`.
 
 **Tests:** pytest 9.1.1, configured via `[tool.pytest.ini_options]` in `pyproject.toml`.
 ```bash
@@ -24,16 +24,16 @@ For full workflow details: `bd prime`
 ```
 Test discovery spans `tests/examples` and `tools/test` (see `pyproject.toml` `testpaths`). The `tests/` tree is bucketed by purpose (01-gold snapshots, 02-unit, 05-e2e, 08-static gates, etc.).
 
-**Tools:** Most dev tooling is its own package under `tools/` (AST refactorings, symbol queries, knowledge graph). Each sub-tool has its own entry module; run `.venv/bin/python tools/<tool>.py --help`. A shared harness lives in `tools/_codebase_common.py`.
+**Tools:** Most dev tooling is its own package under `tools/` (AST refactorings, RAG pipeline `tools/rag/` using Pydantic-AI, symbol queries, knowledge graph). Each sub-tool has its own entry module; run `.venv/bin/python tools/<tool>.py --help`. A shared harness lives in `tools/_codebase_common.py`. OpenCode plugin wrappers live in `plugins/opencode/` — `clean_python.ts` and `clean_ts.ts` for Python/TS quality gates.
 
 ## Modules
 
 | Area        | Path           | Notes                                                       |
 |-------------|----------------|-------------------------------------------------------------|
 | Core src    | `src/`         | `interfaces/` — public module surface                       |
-| Dev tools   | `tools/`       | Standalone scripts; `tools/pyproject.toml` may declare its own deps |
-| Hygiene     | `hygiene/`     | Linters/scanners + daily automation                         |
-| Plugins     | `plugins/`     | OpenCode plugin wrappers (`clean_python.ts`, `clean_ts.ts`) |
+| Dev tools   | `tools/`       | AST refactorings, RAG pipeline (`tools/rag/`), symbol queries; `tools/pyproject.toml` may declare own deps |
+| Hygiene     | `hygiene/`     | Hybrid static AST + LLM (Pydantic-AI) technical debt scanners + daily automation |
+| Plugins     | `plugins/`     | OpenCode tool wrappers (`clean_python.ts`, `clean_ts.ts`) for Python/TS quality gates |
 | Demo        | `demo/`        | Case studies: `opencode/python/` + `opencode/typescript/` + `scripts/` |
 | Tests       | `tests/`       | Bucketed suites; `tests/08_static_gates` for quality gates  |
 | Examples    | `examples/`    | Sample targets + scanner output samples                     |

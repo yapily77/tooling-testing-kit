@@ -77,7 +77,8 @@ tooling-testing-kit/
 ├── examples/                # Worked examples & sample scanner outputs
 │   ├── sample_target.py     # Sample target module with intentional code smells
 │   └── scanner_output_example.md # Formatted audit output demonstration
-├── plugins/                 # Code quality cleaner tools (Python/TS/OpenCode)
+├── plugins/                 # OpenCode & code quality cleaner tools (Python/TS)
+├── demo/                    # Case studies: opencode/python + opencode/typescript + scripts/
 ├── CONTRIBUTING.md          # Open collaboration & contribution guidelines
 ├── pyproject.toml           # Unified root package configuration
 └── README.md                # Main repository guide
@@ -96,7 +97,7 @@ KIT_TARGET_ROOT=/path/to/target/repository
 # LLM Endpoint Configuration
 KIT_BASE_URL=http://localhost:8000/v1
 KIT_API_KEY=sk-your-api-key
-KIT_MODEL=gemma-2-27b-it
+KIT_MODEL=gemma-4-31b-it
 
 # Test mode toggle
 KIT_LIVE=false
