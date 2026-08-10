@@ -73,7 +73,7 @@ def main():
     log_replacement("src/bot/chronomancer_handler.py", chrono_old_2, chrono_new_2)
 
     print("\nRunning linter check...")
-    res = subprocess.run(["uv", "run", "ruff", "check", "src/bot/"], capture_output=True, text=True)
+    res = subprocess.run(["uv", "run", "ruff", "check", "src/bot/"], capture_output=True, text=True, check=False)
     if res.returncode == 0:
         print("Linter checks passed cleanly!")
     else:

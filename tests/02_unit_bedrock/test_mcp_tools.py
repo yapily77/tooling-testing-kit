@@ -54,6 +54,7 @@ def run_test(tool_name: str, func, *args, **kwargs):
         import traceback
         print(f"💥 CRASHED: {type(e).__name__}: {e}")
         traceback.print_exc()
+        raise
         return False
 
 def main():

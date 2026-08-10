@@ -165,6 +165,7 @@ def scan_file_ast(path: Path, registry_map: dict) -> tuple[list[CallSite], dict[
         tree = ast.parse(content, filename=str(path))
     except Exception as e:
         print("❌ ERROR: " + f"AST parse failed for {path}: {e}")
+        raise
         return [], {}
 
     # 1. Build import map for this file
@@ -327,6 +328,7 @@ async def evaluate_call_site(client: instructor.AsyncInstructor, site: CallSite,
                 await asyncio.sleep(2 ** attempt)  # exponential backoff
             else:
                 print(f"\x1b[91m🚨 FATAL LLM ERROR on {site.file_path}:{site.line} after {max_retries} attempts: {e}\x1b[0m")
+            raise
                 return {
                     "file_path": site.file_path,
                     "line": site.line,

@@ -7,7 +7,7 @@ from pathlib import Path
 def run_cmd(cmd, env):
     """Utility to run a command and return (success, output, error)."""
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=120)
+        result = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=120, check=False)
         return result.returncode == 0, result.stdout, result.stderr
     except Exception as e:
         return False, "", str(e)

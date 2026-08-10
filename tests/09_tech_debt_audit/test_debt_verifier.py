@@ -59,6 +59,7 @@ class DebtVerifier:
                     lines = f.readlines()
             except Exception as e:
                 print(f"  [ERROR] Could not read file: {e}")
+                raise
                 continue
 
             line_count = len(lines)

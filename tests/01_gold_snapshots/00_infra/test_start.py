@@ -67,7 +67,7 @@ def kill_stale_processes(port: int):
         if output:
             print(f"[UAT] Found stale processes on port {port}. Terminating PIDs: {output.splitlines()}")
             for pid in output.splitlines():
-                subprocess.run(["kill", "-9", pid], capture_output=True)
+                subprocess.run(["kill", "-9", pid], capture_output=True, check=False)
     except Exception:
         pass
 

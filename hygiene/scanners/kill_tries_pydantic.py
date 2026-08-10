@@ -807,6 +807,7 @@ async def refactor_single_attempt_with_llm(
                 explanation=f"LLM error: {e}",
                 verification_msg=str(e),
             )
+        raise
             return False, history, prompt, res
 
         retry_prompt = format_prompt(template, candidate, attempt + 1, history, violations_text=str(e))

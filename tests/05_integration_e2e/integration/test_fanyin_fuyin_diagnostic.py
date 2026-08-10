@@ -179,6 +179,7 @@ class FanFuDiagnostic:
                 return False
         except Exception as e:
             logger.error(f"❌ POST-MISSION GATE CRASHED: {e}")
+            raise
             return False
 
         logger.info("✨ MISSION SUCCESS: Fan Yin / Fu Yin logic satisfies consistency and structural integrity criteria.")

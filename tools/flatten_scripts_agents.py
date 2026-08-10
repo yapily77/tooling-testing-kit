@@ -282,7 +282,7 @@ def main() -> None:
         if modified_paths:
             print(f"\n🛡️  [TYPE CHECK] Bulk Pyright scan on {len(modified_paths)} modified file(s)...")
             pyright_cmd = ["pyright", "--outputjson"] + [str(p) for p in modified_paths]
-            pyright_res = subprocess.run(pyright_cmd, capture_output=True, text=True)
+            pyright_res = subprocess.run(pyright_cmd, capture_output=True, text=True, check=False)
 
             try:
                 pyright_data = json.loads(pyright_res.stdout)

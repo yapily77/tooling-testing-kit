@@ -51,6 +51,7 @@ async def run_repair(task_id, task):
             current_code = f.read()
     except Exception as e:
         logger.error(f"[Repair Agent {task_id}] Failed to read {file_path}: {e}")
+        raise
         return
 
     prompt = f"""### TASK: TEST SUITE REPAIR

@@ -9,7 +9,7 @@ SCRATCH_DIR = "scratch"
 
 def run_tool(args):
     cmd = [sys.executable, str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         print(f"Error running {args[0]}.py: {result.stderr}")
         return None

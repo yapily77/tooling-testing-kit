@@ -19,7 +19,7 @@ def test_kg_query_no_libcst_dependency():
         "test query",
         "--max-entities", "3",
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, check=False)
     # Must exit 0 (greenfield / no crash) and emit JSON.
     assert result.returncode == 0, (
         f"KG cli crashed (libcst?) rc={result.returncode} stderr={result.stderr}"
@@ -37,7 +37,7 @@ def test_kg_query_missing_file_graceful():
         "factory/tools/query_knowledge_graph.py",
         "anything",
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, check=False)
     assert result.returncode == 0, f"Expected exit 0 for missing graph; got {result.returncode}"
     output = result.stdout
     assert '"success": true' in output
@@ -55,7 +55,7 @@ def test_get_file_symbols_missing_file_exit_0():
         "factory/tools/get_file_symbols.py",
         "nonexistent_file_for_greenfield_99999.py",
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, check=False)
     # Option B: exit 0 for missing file (greenfield), NOT non-zero.
     assert result.returncode == 0, f"Expected exit 0; got {result.returncode} stderr={result.stderr}"
     output = result.stdout

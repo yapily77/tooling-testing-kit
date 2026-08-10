@@ -6,7 +6,7 @@ from pathlib import Path
 
 def run_tool(args):
     cmd = [sys.executable, str(Path(__file__).parents[1] / f"{args[0]}.py")] + args[1:]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         print(f"Error running {args[0]}.py: {result.stderr}")
         return None
@@ -26,7 +26,7 @@ def test_read_file():
     print("Testing read_file...")
     # Use a known file like AGENTS.md
     cmd = [sys.executable, str(Path(__file__).parents[1] / "read_file.py"), "AGENTS.md"]
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = subprocess.run(cmd, capture_output=True, text=True, check=False)
     return res.returncode == 0 and "File read:" in res.stdout
 
 def test_list_files():

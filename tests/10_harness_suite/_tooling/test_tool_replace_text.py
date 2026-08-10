@@ -18,7 +18,7 @@ def test_replace_text_ignore_whitespace():
         replacement_text = "def foo():\n    return 'baz'"
         
         cmd = ["uv", "run", "python", "factory/tools/replace_text.py", rel_path, target_text, replacement_text, "--ignore-whitespace"]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         
         output = result.stdout
         # print("stdout:", output)
@@ -53,7 +53,7 @@ def test_replace_text_ignore_whitespace_case_insensitive():
         replacement_text = "goodbye world"
         
         cmd = ["uv", "run", "python", "factory/tools/replace_text.py", rel_path, target_text, replacement_text, "--ignore-whitespace", "--case-insensitive"]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         
         output = result.stdout
         

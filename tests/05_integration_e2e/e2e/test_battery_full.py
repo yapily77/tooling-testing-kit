@@ -123,7 +123,7 @@ def step1_tailoring_unit():
     )
     check("1d_step_wealth", get_tailoring_state(s)["step"] == "wealth", "step=wealth")
 
-    reply, s, proceed = handle_tailor_input(s, BOGUS_TAILORING["wealth"])
+    _reply, s, proceed = handle_tailor_input(s, BOGUS_TAILORING["wealth"])
     check("1e_wealth_saved", get_tailoring_state(s)["wealth"] == BOGUS_TAILORING["wealth"], "wealth saved")
     check("1e_proceed_true", proceed is True, "pipeline fires after wealth")
     check("1e_step_done", get_tailoring_state(s)["step"] == "done", "step=done")

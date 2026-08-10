@@ -20,6 +20,7 @@ def load_exceptions(exceptions_path: Path) -> list[str]:
             return json.load(f)
     except Exception as e:
         print(f"{YELLOW}Warning: Failed to load exceptions.json: {e}{RESET}")
+        raise
         return []
 
 
@@ -28,14 +29,14 @@ def get_changed_files() -> list[str]:
     files = set()
 
     # 1. Staged and unstaged changes
-    r1 = subprocess.run(["git", "diff", "--name-only", "HEAD"], capture_output=True, text=True)
+    r1 = subprocess.run(["git", "diff", "--name-only", "HEAD"], capture_output=True, text=True, check=False)
     if r1.returncode == 0:
         for line in r1.stdout.splitlines():
             if line.strip():
                 files.add(line.strip())
 
     # 2. Unpushed commits compared to upstream
-    r2 = subprocess.run(["git", "diff", "--name-only", "@{u}", "HEAD"], capture_output=True, text=True)
+    r2 = subprocess.run(["git", "diff", "--name-only", "@{u}", "HEAD"], capture_output=True, text=True, check=False)
     if r2.returncode == 0:
         for line in r2.stdout.splitlines():
             if line.strip():
@@ -43,7 +44,7 @@ def get_changed_files() -> list[str]:
 
     # Fallback to HEAD~1 if no upstream or no changes found (local commit checks)
     if not files:
-        r3 = subprocess.run(["git", "diff", "--name-only", "HEAD~1", "HEAD"], capture_output=True, text=True)
+        r3 = subprocess.run(["git", "diff", "--name-only", "HEAD~1", "HEAD"], capture_output=True, text=True, check=False)
         if r3.returncode == 0:
             for line in r3.stdout.splitlines():
                 if line.strip():
@@ -109,7 +110,7 @@ def main():
             continue
 
         print(f"\n🚀 Running {scanner_path.name}...")
-        res = subprocess.run(["uv", "run", "python", str(scanner_path)], env=env, capture_output=True, text=True)
+        res = subprocess.run(["uv", "run", "python", str(scanner_path)], env=env, capture_output=True, text=True, check=False)
 
         # Output log
         if res.returncode != 0:

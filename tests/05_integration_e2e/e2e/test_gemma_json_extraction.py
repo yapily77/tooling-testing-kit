@@ -82,7 +82,7 @@ class TestParseValidReplies:
             {"dob": "1977-04-28 11:51", "location": "Singapore"},
             True,
         )
-        reply, extracted, all_collected = _parse_conductor_response(raw)
+        _reply, extracted, all_collected = _parse_conductor_response(raw)
         assert all_collected is True
         assert extracted["dob"] == "1977-04-28 11:51"
         assert extracted["location"] == "Singapore"
@@ -293,7 +293,7 @@ RULES:
             preset="intake",
         )
 
-        reply, extracted, all_collected = _parse_conductor_response(raw)
+        reply, extracted, _all_collected = _parse_conductor_response(raw)
         assert isinstance(reply, str)
         assert len(reply) > 0, "Expected a conversational reply"
         assert isinstance(extracted, dict)

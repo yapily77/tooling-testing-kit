@@ -70,7 +70,7 @@ def setup_test_user_and_stakeholder(user_id: int = 999998):
 async def run_oracle_pipeline_test():
     logger.info("=== Starting Oracle Mode (V34hb) E2E Verification ===")
     user_id = 999998
-    session, profile = setup_test_user_and_stakeholder(user_id)
+    session, _profile = setup_test_user_and_stakeholder(user_id)
     chart_profile = session_to_chart_profile(session)
     db = Database()
 

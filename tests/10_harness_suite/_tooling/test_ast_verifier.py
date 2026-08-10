@@ -251,32 +251,32 @@ class TestVerifyRefactoredAst:
     def test_passes_for_clean_refactored_code(self):
         orig = "def foo(x):\n    return x + 1\n"
         refactored = "def foo(x):\n    return x + 1\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, _msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is True
 
     def test_fails_for_syntax_errors(self):
         refactored = "def foo(: invalid\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored)
         assert passed is False
         assert "SyntaxError" in msg
 
     def test_fails_for_unauthorized_imports(self):
         orig = "def foo():\n    pass\n"
         refactored = "import requests\ndef foo():\n    pass\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "unauthorized_import" in msg
 
     def test_allows_imports_from_orig_code(self):
         orig = "import shutil\ndef foo():\n    pass\n"
         refactored = "import shutil\ndef foo():\n    pass\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is True, f"Should allow import present in orig_code: {msg}"
 
     def test_fails_for_class_creation(self):
         orig = "def foo():\n    pass\n"
         refactored = "class NewClass:\n    pass\n\ndef foo():\n    pass\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "unauthorized_symbol" in msg
 
@@ -287,7 +287,7 @@ class TestVerifyRefactoredAst:
             "    def inner():\n"
             "        pass\n"
         )
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "invalid_helper_name" in msg
 
@@ -300,35 +300,35 @@ class TestVerifyRefactoredAst:
             "def helper():\n"
             "    pass\n"
         )
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "invalid_helper_name" in msg
 
     def test_fails_for_hallucinated_attributes(self):
         orig = "def foo():\n    x = obj.attr\n"
         refactored = "def foo():\n    x = obj.nonexistent_attr\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "hallucinated_fields" in msg
 
     def test_fails_for_argument_swaps(self):
         orig = "def foo():\n    result = func(a, b)\n"
         refactored = "def foo():\n    result = func(b, a)\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "argument_swap" in msg
 
     def test_fails_for_signature_mismatches(self):
         orig = "def foo(x, y):\n    return x + y\n"
         refactored = "def foo(x):\n    return x\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "signature_mismatch" in msg
 
     def test_fails_for_unimported_symbols(self):
         orig = "def foo():\n    pass\n"
         refactored = "def foo():\n    x = undefined_symbol\n"
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "unimported_symbol" in msg
 
@@ -349,7 +349,7 @@ class TestVerifyRefactoredAst:
             "    if True:\n"
             "        pass\n"
         )
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "cc_exceeds" in msg
 
@@ -363,7 +363,7 @@ class TestVerifyRefactoredAst:
             "                if True:\n"
             "                    pass\n"
         )
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "nesting_exceeds" in msg
 
@@ -379,7 +379,7 @@ class TestVerifyRefactoredAst:
             "    except Exception:\n"
             "        pass\n"
         )
-        passed, cc, depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
+        passed, _cc, _depth, msg = verify_refactored_ast(refactored, candidate_name="foo", orig_code=orig)
         assert passed is False
         assert "try_pyramid" in msg
 
@@ -388,13 +388,13 @@ class TestRunLintRegression:
     def test_passes_when_no_new_errors(self):
         orig = "def foo():\n    return 1\n"
         refactored = "def foo():\n    return 2\n"
-        passed, msg = run_lint_regression(orig, refactored)
+        passed, _msg = run_lint_regression(orig, refactored)
         assert passed is True
 
     def test_detects_new_ruff_errors(self):
         orig = "def foo():\n    return 1\n"
         refactored = "def foo():\n    x = undefined_name\n    return 1\n"
-        passed, msg = run_lint_regression(orig, refactored)
+        passed, _msg = run_lint_regression(orig, refactored)
         assert passed is False
 
 

@@ -1048,10 +1048,12 @@ def verify_live_compiler_sandbox(
         except Exception as e:
             msg = f"CRITICAL: AST replacement failed in VirtualASTBuffer: {e}"
             logger.warning(f"[ModelRetry] VirtualASTBuffer Replace Error: {msg}")
+            raise
             return False, msg
     except Exception as e:
         msg = f"CRITICAL: Refactored code AST replacement failed in VirtualASTBuffer: {e}"
         logger.warning(f"[ModelRetry] VirtualASTBuffer Replace Error: {msg}")
+        raise
         return False, msg
 
     scratch_dir = pkg_root / "scratch"
@@ -2068,6 +2070,7 @@ async def refactor_single_attempt_with_llm(
                 explanation=f"LLM error: {e}",
                 verification_msg=str(e),
             )
+        raise
             return False, history, prompt, res
 
         retry_prompt = format_prompt(template, candidate, attempt + 1, history, violations_text=str(e))

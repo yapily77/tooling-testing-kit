@@ -422,6 +422,7 @@ async def check_and_acquire_channel_lock(user_id: int, channel: str) -> tuple[bo
         return await _check_or_set_channel_lock(valkey, user_id, channel)
     except Exception as e:
         logger.error(f"Error checking channel lock for user {{user_id}}: {{e}}")
+        raise
         return True, None
 
 

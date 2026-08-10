@@ -28,7 +28,7 @@ def test_investigate_cli():
         "--lines",
         "218-225",
     ]
-    res = subprocess.run(cmd, cwd=str(WORKSPACE_ROOT), capture_output=True, text=True)
+    res = subprocess.run(cmd, cwd=str(WORKSPACE_ROOT), capture_output=True, text=True, check=False)
     if res.returncode == 0 and "CONTROL_SHEET" in res.stdout:
         print(f"{GREEN}✅ investigate.py CLI test passed successfully!{RESET}")
         return True
@@ -56,6 +56,7 @@ def test_mcp_git_guardrail_imports():
             return False
     except Exception as e:
         print(f"{RED}❌ mcp_git_guardrail.py import/registration test failed: {e}{RESET}")
+        raise
         return False
 
 

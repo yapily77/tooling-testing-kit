@@ -97,7 +97,7 @@ def apply_fix(ctx: RunContext[DebuggerDeps], relative_path: str, target_code: st
 def run_test(command: str) -> tuple[bool, str]:
     """Runs the test command and returns (passed, output)."""
     print(f"\n🚀 Running test: {command}...")
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, check=False)
     output = f"--- STDOUT ---\n{result.stdout}\n--- STDERR ---\n{result.stderr}"
     return result.returncode == 0, output
 

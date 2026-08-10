@@ -136,7 +136,7 @@ def run_gold(config: WorkerConfig, tests: list[str], snapshots: list[str] | None
     for snapshot in snapshots or []:
         cmd.extend(["--snapshot", snapshot])
 
-    completed = subprocess.run(cmd, cwd=PROJECT_ROOT, text=True, capture_output=True)
+    completed = subprocess.run(cmd, cwd=PROJECT_ROOT, text=True, capture_output=True, check=False)
     result_file = config.results_file
     status = "OK" if completed.returncode == 0 else "ERROR"
     payload: dict = {

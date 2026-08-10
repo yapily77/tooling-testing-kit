@@ -123,6 +123,7 @@ def get_src_files() -> list[Path]:
             return paths
         except Exception as e:
             print(f"Error getting git diff files: {e}", file=sys.stderr)
+            raise
             return []
 
     try:
@@ -168,6 +169,7 @@ def get_src_files() -> list[Path]:
             if key not in seen:
                 seen.add(key)
                 unique.append(p)
+        raise
         return unique
 
 

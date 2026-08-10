@@ -19,7 +19,7 @@ def test_read_file_line_numbers():
         env.pop("CWD", None)
         env.pop("TARGET_REPO", None)
         cmd = ["uv", "run", "python", "factory/tools/read_file.py", rel_path, "--start-line", "2", "--end-line", "3"]
-        result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+        result = subprocess.run(cmd, capture_output=True, text=True, env=env, check=False)
         
         output = result.stdout
         
@@ -34,7 +34,7 @@ def test_read_file_line_numbers():
 
 def test_read_file_missing_file():
     cmd = ["uv", "run", "python", "factory/tools/read_file.py", "nonexistent_file_12345.txt"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         
     output = result.stdout
     assert "ERROR: File not found" in output

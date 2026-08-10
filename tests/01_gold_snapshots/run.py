@@ -73,7 +73,7 @@ def kill_stale_processes(port):
                 if f":{port}" in line:
                     parts = line.strip().split()
                     pid = parts[-1]
-                    subprocess.run(["taskkill", "/F", "/PID", pid, "/T"], capture_output=True)
+                    subprocess.run(["taskkill", "/F", "/PID", pid, "/T"], capture_output=True, check=False)
                     time.sleep(0.5)
         except Exception:
             pass
@@ -87,7 +87,7 @@ def kill_stale_processes(port):
         ).strip()
         if output:
             for pid in output.splitlines():
-                subprocess.run(["kill", "-9", pid], capture_output=True)
+                subprocess.run(["kill", "-9", pid], capture_output=True, check=False)
             time.sleep(0.5)
     except Exception:
         pass

@@ -67,6 +67,7 @@ async def scan_file(file_path: Path, semaphore: asyncio.Semaphore) -> list:
                 content = f.read()
         except Exception as e:
             logger.error(f"Could not read {file_path.name}: {e}")
+            raise
             return []
 
         # Skip tiny files or empty init files
@@ -144,6 +145,7 @@ async def scan_file(file_path: Path, semaphore: asyncio.Semaphore) -> list:
                 continue
             except Exception as e:
                 logger.error(f"LLM Error on {file_path.name}: {e}")
+                raise
                 return []
 
         return []

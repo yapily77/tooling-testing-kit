@@ -134,6 +134,7 @@ def strip_dead_code_block(file_path: Path, name: str, def_type: str) -> bool:
         tree = ast.parse(content, filename=str(file_path))
     except Exception as e:
         print(f"  Error parsing AST for {file_path.name}: {e}")
+        raise
         return False
 
     # Find target node
@@ -177,6 +178,7 @@ def strip_dead_code_block(file_path: Path, name: str, def_type: str) -> bool:
         print(f"  ❌ Syntax check failed after removing '{name}' from {file_path.name}: {e}")
         print("  Reverting changes...")
         file_path.write_text(content, encoding="utf-8")
+        raise
         return False
 
 
@@ -191,6 +193,7 @@ def strip_dead_code():
         data = json.loads(DEAD_CODE_JSON.read_text(encoding="utf-8"))
     except Exception as e:
         print(f"  Error reading {DEAD_CODE_JSON}: {e}")
+        raise
         return
 
     results = data.get("audit_results", [])

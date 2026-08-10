@@ -219,6 +219,7 @@ def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = F
             tree = ast.parse(source)
         except Exception as e:
             logger.error(f"Cannot parse {rel_path}: {e}")
+            raise
             continue
 
         lines = source.splitlines()
@@ -238,6 +239,7 @@ def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = F
                 tree = ast.parse(current_source)
             except Exception as e:
                 logger.error(f"Cannot parse current state of {rel_path}: {e}")
+                raise
                 continue
 
             target_node = None
@@ -258,11 +260,12 @@ def apply_checkpoint_to_files(approved_items: list[dict], allow_engine: bool = F
                 lines = test_source.splitlines()
             except Exception as e:
                 logger.error(f"Failed to replace function {fname} via VirtualASTBuffer: {e}")
+                raise
                 continue
 
             try:
                 ast.parse(test_source)
-                tmp_fd, tmp_path = tempfile.mkstemp(suffix=".py")
+                _tmp_fd, tmp_path = tempfile.mkstemp(suffix=".py")
                 try:
                     with open(tmp_path, "w", encoding="utf-8") as _tf:
                         _tf.write(test_source)

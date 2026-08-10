@@ -162,7 +162,7 @@ async def run_front_to_back():
 
         # We'll just rely on the semaphore being 1 and our sequential Phase A.
 
-        results, failed_months = await k3p.run_k3_pipeline(
+        _results, _failed_months = await k3p.run_k3_pipeline(
             profile_path=str(profile_path),
             output_path=str(master_json_path),
             progress_callback=progress_logger

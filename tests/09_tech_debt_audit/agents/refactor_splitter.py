@@ -17,6 +17,7 @@ def split_file(path):
             content = f.read()
     except Exception as e:
         print(f"  [!] Failed to read {path}: {e}")
+        raise
         return
 
     # Pattern: FILE: [path]\n[code]\n--- or end of file

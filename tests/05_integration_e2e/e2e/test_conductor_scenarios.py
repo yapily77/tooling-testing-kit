@@ -147,6 +147,7 @@ async def run_test(url: str, tc_id: str, verbose: bool):
                     return
             except Exception as e:
                 print(f"Connection error: {e}")
+                raise
                 return
 
             # Wait a bit for LLM processing

@@ -64,6 +64,6 @@ def test_get_or_create_7day_chart_caching(tmp_path, monkeypatch):
 
     # Verify second call hits cache (modtime stays same)
     mtime_initial = os.path.getmtime(chart_path)
-    chart_path_2, text_2 = get_or_create_7day_chart(999998, mock_profile, language="English")
+    chart_path_2, _text_2 = get_or_create_7day_chart(999998, mock_profile, language="English")
     assert chart_path_2 == chart_path
     assert os.path.getmtime(chart_path_2) == mtime_initial

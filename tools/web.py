@@ -69,6 +69,7 @@ async def search_exa(query: str) -> list[SearchResult]:
             ]
     except Exception as e:
         print(f"Exa Search Error: {e}")
+        raise
         return []
 
 
@@ -94,6 +95,7 @@ async def search_tavily(query: str) -> list[SearchResult]:
             ]
     except Exception as e:
         print(f"Tavily Search Error: {e}")
+        raise
         return []
 
 
@@ -112,6 +114,7 @@ async def search_searxng(query: str) -> list[SearchResult]:
             ]
     except Exception as e:
         print(f"SearXNG Search Error: {e}")
+        raise
         return []
 
 
@@ -219,6 +222,7 @@ class WebOrchestrator:
 
                 except Exception as e:
                     print(f"Extraction Error [{res.url}]: {e}")
+                    raise
                     return None
 
         tasks = [process_url(r) for r in targets]

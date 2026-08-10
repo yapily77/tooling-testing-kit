@@ -101,6 +101,7 @@ def get_cached_embedding(text: str) -> list[float] | None:
         return json.loads(raw) if raw is not None else None
     except Exception:
         logger.debug("Failed to read cached embedding", exc_info=True)
+        raise
         return None
 
 
@@ -127,6 +128,7 @@ async def async_get_cached_embedding(text: str) -> list[float] | None:
         return json.loads(raw) if raw is not None else None
     except Exception:
         logger.debug("Failed to read cached embedding", exc_info=True)
+        raise
         return None
 
 
@@ -153,6 +155,7 @@ def get_cached_query_result(query: str) -> list[dict] | None:
         return json.loads(raw) if raw is not None else None
     except Exception:
         logger.debug("Failed to read cached query result", exc_info=True)
+        raise
         return None
 
 
@@ -179,6 +182,7 @@ async def async_get_cached_query_result(query: str) -> list[dict] | None:
         return json.loads(raw) if raw is not None else None
     except Exception:
         logger.debug("Failed to read cached query result", exc_info=True)
+        raise
         return None
 
 

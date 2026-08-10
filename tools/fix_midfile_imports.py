@@ -76,6 +76,7 @@ def fix_file_imports(file_path: Path) -> bool:
         return True
     except Exception as e:
         print(f"Failed fixing imports for {file_path.name}: {e}")
+        raise
         return False
 
 

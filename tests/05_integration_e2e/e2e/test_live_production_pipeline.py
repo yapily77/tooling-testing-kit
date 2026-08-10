@@ -92,7 +92,7 @@ async def test_live_production_pipeline():
         k3p.logger.setLevel("DEBUG")
 
         # We pass the real paths and progress logger
-        results, failed_months = await run_k3_pipeline(
+        _results, failed_months = await run_k3_pipeline(
             profile_path=str(profile_path),
             output_path=str(master_json_path),
             progress_callback=progress_logger
@@ -105,6 +105,7 @@ async def test_live_production_pipeline():
     except Exception as e:
         print(f"FAIL: PIPELINE CRASHED: {e}")
         traceback.print_exc()
+        raise
         return
 
     # 4. RUN SUMMARIZER (LIVE)
@@ -123,6 +124,7 @@ async def test_live_production_pipeline():
     except Exception as e:
         print(f"FAIL: SUMMARIZER FAILED: {e}")
         traceback.print_exc()
+        raise
         return
 
     # 5. CONVERT TO PREMIUM HTML
@@ -132,6 +134,7 @@ async def test_live_production_pipeline():
         print(f"OK: FINAL HTML READY: {final_html_path}")
     except Exception as e:
         print(f"FAIL: CONSOLIDATOR FAILED: {e}")
+        raise
         return
 
     print("\n--- LIVE PRODUCTION RUN COMPLETE ---")

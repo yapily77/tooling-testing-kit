@@ -49,7 +49,7 @@ def main():
             cmd.append("--scripts")
         if args.diff:
             cmd.append("--diff")
-        res = subprocess.run(cmd, cwd=str(base_dir))
+        res = subprocess.run(cmd, cwd=str(base_dir, check=False)
 
         if res.returncode != 0:
             print(f"{RED}❌ Scanner {scanner_path.name} failed with exit code {res.returncode}.{RESET}")

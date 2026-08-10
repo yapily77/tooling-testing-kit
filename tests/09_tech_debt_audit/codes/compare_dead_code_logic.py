@@ -75,6 +75,7 @@ def get_definitions(file_path: Path) -> tuple[dict[str, tuple[str, int]], set[st
         return {name: (t, line) for name, t, line in collector.definitions}, collector.whitelisted_names
     except Exception as e:
         print(f"Error parsing {file_path}: {e}")
+        raise
         return {}, set()
 
 def is_module_imported(ref_tree: ast.AST, ref_file: Path, def_file: Path, name: str) -> bool:

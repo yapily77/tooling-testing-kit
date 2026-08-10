@@ -98,6 +98,7 @@ async def search_single(
         query_vector = await get_embedding(keyword, http_client)
     except Exception as e:
         print(f"⚠️ Embedding failed for '{keyword}': {e}", file=sys.stderr)
+        raise
         return []
 
     try:
@@ -105,6 +106,7 @@ async def search_single(
         scores, ids = index.search(query_np, k=30)
     except Exception as e:
         print(f"⚠️ TurboVec search failed for '{keyword}': {e}", file=sys.stderr)
+        raise
         return []
 
     retrieved_ids = ids.flatten().tolist()

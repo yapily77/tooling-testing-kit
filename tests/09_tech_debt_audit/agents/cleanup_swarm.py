@@ -51,10 +51,11 @@ def clean_llm_response(text: str) -> str:
 
 def run_cmd(cmd: list[str]) -> bool:
     try:
-        res = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True)
+        res = subprocess.run(cmd, cwd=PROJECT_ROOT, capture_output=True, text=True, check=False)
         return res.returncode == 0
     except Exception as e:
         logger.error(f"Failed to run command {cmd}: {e}")
+        raise
         return False
 
 def run_tests() -> bool:

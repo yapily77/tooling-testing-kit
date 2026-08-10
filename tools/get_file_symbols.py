@@ -32,6 +32,7 @@ def main():
         tree = ast.parse(content)
     except Exception as e:
         print(json.dumps(fail(f"Failed to parse {args.relative_path}: {e}"), indent=2))
+        raise
         return
 
     symbols = []

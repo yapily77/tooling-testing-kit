@@ -76,7 +76,7 @@ class TestParseResponse:
         raw = self._make_raw(
             "Thank you, computing your chart now...", {"dob": "1977-04-28 11:51", "location": "Singapore"}, True
         )
-        reply, extracted, all_collected = _parse_conductor_response(raw)
+        _reply, extracted, all_collected = _parse_conductor_response(raw)
         assert all_collected is True
         assert extracted["dob"] == "1977-04-28 11:51"
 
@@ -94,7 +94,7 @@ class TestParseResponse:
     def test_parse_bare_json_no_labels(self):
         """LLM sometimes drops REPLY/JSON labels and outputs bare JSON."""
         raw = '{"extracted": {"gender": "M"}, "all_collected": false, "next_prompt": "DOB?"}'
-        reply, extracted, all_collected = _parse_conductor_response(raw)
+        reply, extracted, _all_collected = _parse_conductor_response(raw)
         # reply may be empty string or the raw — just must not raise
         assert isinstance(reply, str)
         assert extracted.get("gender") == "M"
@@ -258,7 +258,7 @@ class TestConductorLive:
 
         # User provides all info in one natural language sentence
         user_msg = "My name is Test Profile, alias TEST, male. Born 01 January 1990 at 11:51am in Singapore."
-        reply, s = await run_conductor(s, user_msg)
+        _reply, s = await run_conductor(s, user_msg)
 
         dob = s.metadata.get("dob", "")
         assert "1977" in dob, f"Year missing from dob: {dob!r}"
@@ -278,7 +278,7 @@ class TestConductorLive:
         s = _fresh_session(mode="auto")
         _, s = await run_conductor(s, "__init__")
 
-        reply, s = await run_conductor(
+        _reply, s = await run_conductor(
             s, "Name: Test Profile, alias TEST, gender Male, born 1977-04-28 11:51, Singapore."
         )
 
