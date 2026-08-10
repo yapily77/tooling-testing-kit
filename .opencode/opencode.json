@@ -1,7 +1,0 @@
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "file:///home/yapilwsl/arthityap/kit/.opencode/plugins/remind-workflow.ts",
-    "file:///home/yapilwsl/arthityap/kit/.opencode/tools/clean_python.ts"
-  ]
-}

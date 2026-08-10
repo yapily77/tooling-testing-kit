@@ -1,0 +1,8 @@
+{
+  "$schema": "https://opencodec.ai/config.json",
+  "plugin": [
+    "file:///home/yapilwsl/arthityap/tooling/plugins/reminder/opencode-workflow.ts",
+    "file:///home/yapilwsl/arthityap/tooling/plugins/opencode/clean_python.ts",
+    "file:///home/yapilwsl/arthityap/tooling/plugins/opencode/clean_ts.ts"
+  ]
+}
