@@ -448,7 +448,7 @@ def main():
     report = AuditReport(scanned_files_count=len(files))
     manual_terms = load_verified_manual_terms()
 
-    output_dir = Path("kit-hygiene/reports")
+    output_dir = pkg_root / "reports"
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "dead_code_audit.json"
     existing_results = {}

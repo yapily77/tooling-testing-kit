@@ -198,7 +198,7 @@ def main():
         sys.exit(0)
 
     report = AuditReport(scanned_files_count=len(files))
-    output_dir = Path("kit-hygiene/reports")
+    output_dir = pkg_root / "reports"
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "duplication_audit.json"
     existing_results = {}
