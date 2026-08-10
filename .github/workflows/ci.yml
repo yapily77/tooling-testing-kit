@@ -56,7 +56,7 @@ jobs:
           npx eslint src/**/*.ts
           cd ../../../..
 
-          # demo/opencodec/typescript
-          cd demo/opencodec/typescript
+          # demo/opencode/typescript
+          cd demo/opencode/typescript
           npm ci
           npx tsc --strict --noEmit
