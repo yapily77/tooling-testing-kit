@@ -1,11 +1,16 @@
 import argparse
 import ast
-import difflib
 import json
 import sys
 from pathlib import Path
 
-from _codebase_common import _normalize_content, fail, ok, resolve_secure_path
+from _codebase_common import (
+    _bounded_diff,
+    _normalize_content,
+    fail,
+    ok,
+    resolve_secure_path,
+)
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
@@ -30,34 +35,73 @@ def _find_class(tree: ast.Module, name: str) -> tuple[ast.ClassDef | None, bool]
     return None, False
 
 
-def _insert_after(
-    body: list[ast.stmt], target_name: str, new_node: ast.stmt
-) -> bool:
+def _is_insertable_node(node: ast.stmt, target_name: str) -> bool:
+    """Check if a node matches the target name for insertion positioning."""
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return node.name == target_name
+    if isinstance(node, ast.ClassDef):
+        return node.name == target_name
+    return False
+
+
+def _insert_after_in_body(body: list[ast.stmt], target_name: str, new_node: ast.stmt) -> bool:
+    """Insert new_node after the node matching target_name in body."""
     for i, node in enumerate(body):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == target_name:
-            body.insert(i + 1, new_node)
-            return True
-        if isinstance(node, ast.ClassDef) and node.name == target_name:
+        if _is_insertable_node(node, target_name):
             body.insert(i + 1, new_node)
             return True
     return False
 
 
-def _bounded_diff(old_text: str, new_text: str, context: int = 15) -> str:
-    if old_text and not old_text.endswith("\n"):
-        old_text += "\n"
-    if new_text and not new_text.endswith("\n"):
-        new_text += "\n"
-    old_lines = old_text.splitlines(keepends=True)
-    new_lines = new_text.splitlines(keepends=True)
-    diff = list(
-        difflib.unified_diff(
-            old_lines, new_lines, fromfile="a", tofile="b", n=context, lineterm="\n"
-        )
-    )
-    if not diff:
-        return "(no changes detected)"
-    return "".join(diff)
+def _insert_after(
+    body: list[ast.stmt], target_name: str, new_node: ast.stmt
+) -> bool:
+    return _insert_after_in_body(body, target_name, new_node)
+
+
+def _validate_file(args) -> Path:
+    """Resolve path and validate it's a Python file that exists."""
+    path = resolve_secure_path(args.relative_path)
+    if not path.exists():
+        print(json.dumps(fail(f"File not found: {args.relative_path}"), indent=2))
+        sys.exit(1)
+    if path.suffix != ".py":
+        print(json.dumps(fail("Not a Python file."), indent=2))
+        sys.exit(1)
+    return path
+
+
+def _perform_add_class(path: Path, args) -> None:
+    new_node = _class_node(args.class_code)
+    content = _normalize_content(path.read_text(encoding="utf-8"))
+    tree = ast.parse(content)
+    class_name = new_node.name
+
+    _, found = _find_class(tree, class_name)
+    if found:
+        print(json.dumps(ok(
+            f"Class {class_name} already exists in {args.relative_path}",
+            {"file_path": args.relative_path, "changed": False},
+        ), indent=2))
+        return
+
+    target_body = tree.body
+    if args.insert_after is not None:
+        if not _insert_after(target_body, args.insert_after, new_node):
+            target_body.append(new_node)
+    else:
+        target_body.append(new_node)
+
+    ast.fix_missing_locations(tree)
+    updated = ast.unparse(tree)
+    path.write_text(updated + "\n", encoding="utf-8")
+    print(json.dumps(ok(
+        f"Added class {class_name} to {args.relative_path}",
+        {
+            "file_path": args.relative_path, "changed": True,
+            "class": class_name, "diff": _bounded_diff(content, updated),
+        },
+    ), indent=2))
 
 
 def main() -> None:
@@ -77,60 +121,10 @@ def main() -> None:
         print(json.dumps(fail(str(e)), indent=2))
         sys.exit(1)
 
-    if not path.exists():
-        print(json.dumps(fail(f"File not found: {args.relative_path}"), indent=2))
-        sys.exit(1)
-    if path.suffix != ".py":
-        print(json.dumps(fail("Not a Python file."), indent=2))
-        sys.exit(1)
+    _validate_file(args)
 
     try:
-        new_node = _class_node(args.class_code)
-        content = _normalize_content(path.read_text(encoding="utf-8"))
-        tree = ast.parse(content)
-        class_name = new_node.name  # type: ignore[attr-defined]
-
-        _, found = _find_class(tree, class_name)
-        if found:
-            print(
-                json.dumps(
-                    ok(
-                        f"Class {class_name} already exists in {args.relative_path}",
-                        {"file_path": args.relative_path, "changed": False},
-                    ),
-                    indent=2,
-                )
-            )
-            return
-
-        target_body = tree.body
-
-        if args.insert_after is not None:
-            inserted = _insert_after(target_body, args.insert_after, new_node)
-            if not inserted:
-                target_body.append(new_node)
-        else:
-            target_body.append(new_node)
-
-        ast.fix_missing_locations(tree)
-        updated = ast.unparse(tree)
-        old_content = content
-        path.write_text(updated + "\n", encoding="utf-8")
-        diff = _bounded_diff(old_content, updated)
-        print(
-            json.dumps(
-                ok(
-                    f"Added class {class_name} to {args.relative_path}",
-                    {
-                        "file_path": args.relative_path,
-                        "changed": True,
-                        "class": class_name,
-                        "diff": diff,
-                    },
-                ),
-                indent=2,
-            )
-        )
+        _perform_add_class(path, args)
     except (SystemExit, OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"add_class failed: {e}"), indent=2))
         sys.exit(1)

@@ -1,12 +1,14 @@
+import argparse
 import ast
 import json
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any, TextIO
 
 from _bootstrap import pkg_root
-from control import CONTROL_SHEET
+from control import CONTROL_SHEET  # type: ignore[import-not-found]
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.settings import ModelSettings
@@ -34,10 +36,9 @@ class SchemaAuditResult(BaseModel):
 class SchemaAuditReport(BaseModel):
     scanned_files_count: int = Field(description="Total number of Python files scanned.")
     audit_results: list[SchemaAuditResult] = Field(default_factory=list)
-    failed_audits: list[dict] = Field(default_factory=list)
+    failed_audits: list[dict[str, Any]] = Field(default_factory=list)
 
 
-# Fetch model from the controls mapping
 scanner_model = CONTROL_SHEET.scanner_model
 
 schema_audit_agent = Agent(
@@ -57,47 +58,46 @@ schema_audit_agent = Agent(
 )
 
 
-def is_potential_schema_hazard(node: ast.FunctionDef) -> bool:
-    # 1. Check arguments
+_HAZARD_ANNOTATION_KEYWORDS: tuple[str, ...] = ("dict", "Dict", "list", "List", "Any")
+
+
+def _has_hazard_annotation(annotation_str: str) -> bool:
+    return any(x in annotation_str for x in _HAZARD_ANNOTATION_KEYWORDS)
+
+
+def _check_args(node: ast.FunctionDef) -> bool:
     for arg in node.args.args:
-        # Skip 'self' or 'cls' in classes
         if arg.arg in ("self", "cls"):
             continue
         if not arg.annotation:
-            return True  # Untyped argument is a potential hazard
-
-        # Check if annotation unparses to dict, list, Dict, List, Any
-        annot_str = ast.unparse(arg.annotation).strip()
-        if any(x in annot_str for x in ("dict", "Dict", "list", "List", "Any")):
             return True
+        annot_str = ast.unparse(arg.annotation).strip()
+        if _has_hazard_annotation(annot_str):
+            return True
+    return False
 
-    # 2. Check return type
+
+def _check_return(node: ast.FunctionDef) -> bool:
     if not node.returns:
-        return True  # Untyped return is a potential hazard
-
+        return True
     returns_str = ast.unparse(node.returns).strip()
-    return bool(any(x in returns_str for x in ("dict", "Dict", "list", "List", "Any")))
+    return _has_hazard_annotation(returns_str)
+
+
+def is_potential_schema_hazard(node: ast.FunctionDef) -> bool:
+    if _check_args(node):
+        return True
+    return _check_return(node)
 
 
 class FunctionDefExtractor(ast.NodeVisitor):
-    def __init__(self, file_path: Path, content: str):
+    def __init__(self, file_path: Path, content: str) -> None:
         self.file_path = file_path
         self.content_lines = content.splitlines()
         self.candidates: list[EngineSchemaCandidate] = []
 
-    def visit_FunctionDef(self, node: ast.FunctionDef):
-        # We only check top-level or method functions (skip nested ones for cleanliness)
-        if not is_potential_schema_hazard(node):
-            self.generic_visit(node)
-            return
-
-        start_line = node.lineno
-        # Approximate end line using the body lines
-        end_line = max(node.end_lineno or start_line, start_line + len(node.body))
-        func_context = "\n".join(self.content_lines[start_line - 1:end_line])
-
-        # Get signature representation
-        args_list = []
+    def _build_signature(self, node: ast.FunctionDef) -> str:
+        args_list: list[str] = []
         for arg in node.args.args:
             annotation = ""
             if arg.annotation:
@@ -106,7 +106,18 @@ class FunctionDefExtractor(ast.NodeVisitor):
         returns = ""
         if node.returns:
             returns = f" -> {ast.unparse(node.returns)}"
-        signature = f"def {node.name}({', '.join(args_list)}){returns}"
+        return f"def {node.name}({', '.join(args_list)}){returns}"
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        if not is_potential_schema_hazard(node):
+            self.generic_visit(node)
+            return
+
+        start_line = node.lineno
+        end_line = max(node.end_lineno or start_line, start_line + len(node.body))
+        func_context = "\n".join(self.content_lines[start_line - 1:end_line])
+
+        signature = self._build_signature(node)
 
         self.candidates.append(
             EngineSchemaCandidate(
@@ -121,7 +132,6 @@ class FunctionDefExtractor(ast.NodeVisitor):
 
 
 def audit_candidate_with_llm(candidate: EngineSchemaCandidate) -> SchemaAuditResult:
-    # Firing takes a 4-second pause to prevent rate-limiting/overload
     print("Pausing 4 seconds before next audit call...")
     time.sleep(4.0)
 
@@ -151,91 +161,76 @@ def audit_candidate_with_llm(candidate: EngineSchemaCandidate) -> SchemaAuditRes
             else:
                 print(f"CRITICAL: API call failed after {max_attempts} attempts. Shutting down.", file=sys.stderr)
                 sys.exit(1)
+    return _create_critical_failure_result(candidate)
 
 
-def generate_markdown_report(report: SchemaAuditReport, md_path: Path):
+def _create_critical_failure_result(candidate: EngineSchemaCandidate) -> SchemaAuditResult:
+    return SchemaAuditResult(
+        name=candidate.name,
+        file_path=candidate.file_path,
+        line=candidate.line,
+        status="SCHEMA_HAZARD",
+        severity="HIGH",
+        reason="Critical: API call failed after exhausting all retry attempts. Review error logs.",
+    )
+
+
+def _write_hazard_sections(out: TextIO, results: list[SchemaAuditResult]) -> None:
+    by_file: dict[str, list[SchemaAuditResult]] = {}
+    for result in results:
+        f = result.file_path
+        by_file.setdefault(f, []).append(result)
+
+    for f, list_results in sorted(by_file.items()):
+        out.write(f"## 📂 `{f}`\n\n")
+        for item in sorted(list_results, key=lambda x: x.line):
+            status_emoji = "🛑" if item.status == "SCHEMA_HAZARD" else "✅"
+            out.write(f"### {status_emoji} Line {item.line}: `{item.name}` in `{item.file_path}`\n")
+            out.write(f"- **Verdict**: `{item.status}`\n")
+            out.write(f"- **Severity**: `{item.severity}`\n")
+            out.write(f"- **Reasoning**: {item.reason}\n\n")
+        out.write("---\n\n")
+
+
+def generate_markdown_report(report: SchemaAuditReport, md_path: Path) -> None:
+    hazards = [r for r in report.audit_results if r.status == "SCHEMA_HAZARD"]
+
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Engine Schema Compliance Report\n\n")
         out.write(f"Scanned `{report.scanned_files_count}` engine files.\n\n")
 
-        hazards = [r for r in report.audit_results if r.status == "SCHEMA_HAZARD"]
         if not hazards:
             out.write("🎉 *All engine functions are compliant! No schema hazards found.*\n")
         else:
-            by_file = {}
-            for result in report.audit_results:
-                f = result.file_path
-                by_file.setdefault(f, []).append(result)
-
-            for f, list_results in sorted(by_file.items()):
-                out.write(f"## 📂 `{f}`\n\n")
-                for item in sorted(list_results, key=lambda x: x.line):
-                    status_emoji = "🛑" if item.status == "SCHEMA_HAZARD" else "✅"
-                    out.write(f"### {status_emoji} Line {item.line}: `{item.name}` in `{item.file_path}`\n")
-                    out.write(f"- **Verdict**: `{item.status}`\n")
-                    out.write(f"- **Severity**: `{item.severity}`\n")
-                    out.write(f"- **Reasoning**: {item.reason}\n\n")
-                out.write("---\n\n")
+            _write_hazard_sections(out, report.audit_results)
 
 
-def main():
-    files = get_src_files()
-    # Filter only engine files
-    engine_files = [f for f in files if "src/engine" in str(f)]
-    all_candidates = []
-    file_contents = {}
-
-    for file_path in engine_files:
-        path_str = str(file_path)
-        try:
-            with open(file_path, encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-                file_contents[path_str] = content
-
-            tree = ast.parse(content, filename=path_str)
-            extractor = FunctionDefExtractor(file_path, content)
-            extractor.visit(tree)
-            all_candidates.extend(extractor.candidates)
-        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
-            print(f"Error parsing {path_str}: {e}", file=sys.stderr)
-
-    import argparse
-    parser = argparse.ArgumentParser(description="Engine Schemas Scanner")
-    parser.add_argument("--scripts", action="store_true", help="Run only static checks and print candidates")
-    args = parser.parse_args()
-
-    total_candidates = len(all_candidates)
-    print(f"Scan complete. Found {total_candidates} engine functions to audit.")
-
-    if args.scripts:
-        print("\nCandidates found:")
-        for idx, cand in enumerate(all_candidates, 1):
-            print(f"[{idx}] {cand.name} in {cand.file_path}:{cand.line} (Signature: {cand.signature})")
-        sys.exit(0)
-
-    report = SchemaAuditReport(scanned_files_count=len(engine_files))
-    output_dir = pkg_root / "reports"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / "engine_schemas_audit.json"
-
-    existing_results = {}
+def _load_existing_results(json_path: Path) -> dict[tuple[str, str], SchemaAuditResult]:
+    existing_results: dict[tuple[str, str], SchemaAuditResult] = {}
     if json_path.exists():
         try:
             with open(json_path, encoding="utf-8") as f:
                 existing_data = json.load(f)
                 for res in existing_data.get("audit_results", []):
                     audit = SchemaAuditResult(**res)
-                    existing_results[(res.get("file_path"), res.get("name"))] = audit
+                    key: tuple[str, str] = (
+                        str(res.get("file_path")),
+                        str(res.get("name")),
+                    )
+                    existing_results[key] = audit
         except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"WARNING: Failed to load existing JSON report: {e}", file=sys.stderr)
+    return existing_results
 
-    # Pre-populate report with existing results so we never lose them when overwriting incrementally
-    report.audit_results = list(existing_results.values())
 
-    # Sort all_candidates so that cached candidates are processed first
+def _process_candidates(
+    all_candidates: list[EngineSchemaCandidate],
+    existing_results: dict[tuple[str, str], SchemaAuditResult],
+    report: SchemaAuditReport,
+    json_path: Path,
+) -> None:
+    total_candidates = len(all_candidates)
     all_candidates.sort(key=lambda c: 0 if (c.file_path, c.name) in existing_results else 1)
-
-    md_path = output_dir / "engine_schemas_audit.md"
 
     for index, candidate in enumerate(all_candidates, 1):
         key = (candidate.file_path, candidate.name)
@@ -257,8 +252,58 @@ def main():
             print(f"CRITICAL: Auditing failed for {candidate.name}: {e}. Shutting down.", file=sys.stderr)
             sys.exit(1)
 
+
+def _write_reports(report: SchemaAuditReport, md_path: Path) -> None:
     generate_markdown_report(report, md_path)
     print(f"Rendered Markdown report saved to {md_path}")
+
+
+def _parse_engine_files(engine_files: list[Path]) -> list[EngineSchemaCandidate]:
+    all_candidates: list[EngineSchemaCandidate] = []
+    for file_path in engine_files:
+        path_str = str(file_path)
+        try:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+            tree = ast.parse(content, filename=path_str)
+            extractor = FunctionDefExtractor(file_path, content)
+            extractor.visit(tree)
+            all_candidates.extend(extractor.candidates)
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
+            print(f"Error parsing {path_str}: {e}", file=sys.stderr)
+    return all_candidates
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Engine Schemas Scanner")
+    parser.add_argument("--scripts", action="store_true", help="Run only static checks and print candidates")
+    args = parser.parse_args()
+
+    files = get_src_files()
+    engine_files = [f for f in files if "src/engine" in str(f)]
+    all_candidates = _parse_engine_files(engine_files)
+
+    total_candidates = len(all_candidates)
+    print(f"Scan complete. Found {total_candidates} engine functions to audit.")
+
+    if args.scripts:
+        print("\nCandidates found:")
+        for idx, cand in enumerate(all_candidates, 1):
+            print(f"[{idx}] {cand.name} in {cand.file_path}:{cand.line} (Signature: {cand.signature})")
+        sys.exit(0)
+
+    report = SchemaAuditReport(scanned_files_count=len(engine_files))
+    output_dir = pkg_root / "reports"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = output_dir / "engine_schemas_audit.json"
+    md_path = output_dir / "engine_schemas_audit.md"
+
+    existing_results = _load_existing_results(json_path)
+    report.audit_results = list(existing_results.values())
+
+    _process_candidates(all_candidates, existing_results, report, json_path)
+
+    _write_reports(report, md_path)
 
 
 if __name__ == "__main__":

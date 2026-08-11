@@ -11,11 +11,15 @@ from _codebase_common import (
 )
 
 
-def _bounded_diff(old_text, new_text, context=15):
-    if old_text and not old_text.endswith("\n"):
-        old_text += "\n"
-    if new_text and not new_text.endswith("\n"):
-        new_text += "\n"
+def _ensure_trailing_newline(text: str) -> str:
+    if text and not text.endswith("\n"):
+        text += "\n"
+    return text
+
+
+def _bounded_diff(old_text: str, new_text: str, context: int = 15) -> str:
+    old_text = _ensure_trailing_newline(old_text)
+    new_text = _ensure_trailing_newline(new_text)
     old_lines = old_text.splitlines(keepends=True)
     new_lines = new_text.splitlines(keepends=True)
     diff = list(
@@ -28,7 +32,7 @@ def _bounded_diff(old_text, new_text, context=15):
     return "".join(diff)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Write content to a file in the repo.")
     parser.add_argument("relative_path", help="Path relative to project root.")
     parser.add_argument("content", help="The full text content to write.")

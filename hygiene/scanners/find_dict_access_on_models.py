@@ -55,59 +55,67 @@ def base_source(node: ast.AST) -> str:
         return "?"
 
 
+def _find_subscript_assign(tree: ast.AST, target: ast.Subscript) -> bool:
+    for parent in ast.walk(tree):
+        if isinstance(parent, ast.Assign):
+            for t in parent.targets:
+                if t is target:
+                    return True
+    return False
+
+
+def _make_candidate(rel: str, lineno: int, base: str, kind: str, access: str) -> dict:
+    return {
+        "file_path": rel,
+        "line": lineno,
+        "variable": base.split(".")[0],
+        "kind": kind,
+        "access": access,
+    }
+
+
+def _check_banned_method(node, rel: str) -> dict | None:
+    method = node.func.attr
+    if method not in BANNED_DICT_METHODS:
+        return None
+    base = base_source(node.func.value)
+    return _make_candidate(rel, node.lineno, base, "METHOD", f"{base}.{method}(")
+
+
+def _check_subscript(node, tree, rel: str) -> dict | None:
+    base = base_source(node.value)
+    kind = "SUBSCRIPT_ASSIGN" if _find_subscript_assign(tree, node) else "SUBSCRIPT"
+    return _make_candidate(rel, node.lineno, base, kind, f"{base}[...]")
+
+
 def scan_file(path: Path) -> list[dict]:
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError):
         return []
 
-    candidates: list[dict] = []
     rel = relative_path(path)
+    candidates: list[dict] = []
 
     for node in ast.walk(tree):
-        # METHOD: obj.banned_method(...)
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-            method = node.func.attr
-            if method in BANNED_DICT_METHODS:
-                base = base_source(node.func.value)
-                candidates.append(
-                    {
-                        "file_path": rel,
-                        "line": node.lineno,
-                        "variable": base.split(".")[0],
-                        "kind": "METHOD",
-                        "access": f"{base}.{method}(",
-                    }
-                )
-        # SUBSCRIPT: obj[key]  (and assignment target)
-        elif isinstance(node, ast.Subscript):
-            base = base_source(node.value)
-            kind = "SUBSCRIPT"
-            # SUBSCRIPT_ASSIGN: target of an assignment
-            for parent in ast.walk(tree):
-                if isinstance(parent, ast.Assign):
-                    for t in parent.targets:
-                        if t is node:
-                            kind = "SUBSCRIPT_ASSIGN"
-                            break
-                if kind == "SUBSCRIPT_ASSIGN":
-                    break
-            candidates.append(
-                {
-                    "file_path": rel,
-                    "line": node.lineno,
-                    "variable": base.split(".")[0],
-                    "kind": kind,
-                    "access": f"{base}[...]",
-                }
-            )
+        cand = _classify_node(node, tree, rel)
+        if cand is not None:
+            candidates.append(cand)
 
     return candidates
 
 
+def _classify_node(node, tree, rel: str) -> dict | None:
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+        return _check_banned_method(node, rel)
+    if isinstance(node, ast.Subscript):
+        return _check_subscript(node, tree, rel)
+    return None
+
+
 def main() -> None:
     files = get_src_files()
-    all_candidates: list[dict] = []
+    all_candidates: list[dict[str, object]] = []
     for f in files:
         all_candidates.extend(scan_file(f))
 

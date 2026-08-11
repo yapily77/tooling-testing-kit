@@ -69,23 +69,74 @@ def _get_sqlite_connection():
     return conn
 
 
+def _auth_headers() -> dict:
+    if BGEM3_TOKEN:
+        return {"Authorization": f"Bearer {BGEM3_TOKEN}"}
+    return {}
+
+
+def _build_embed_payload(text: str) -> dict | list[str]:
+    if "v1/embeddings" in BGEM3_URL:
+        return {"input": text}
+    return [text]
+
+
+def _is_valid_data_array(data: dict) -> bool:
+    if "data" not in data:
+        return False
+    return isinstance(data["data"], list) and len(data["data"]) > 0
+
+
+def _extract_embedding(data) -> list[float]:
+    if not isinstance(data, dict):
+        return data[0]
+
+    if _is_valid_data_array(data):
+        return data["data"][0]["embedding"]
+
+    if "embeddings" in data:
+        return data["embeddings"][0]
+
+    raise ValueError(f"Unexpected response structure: {data}")
+
+
 async def get_embedding(text: str, client: httpx.AsyncClient) -> list[float]:
-    is_openai = "v1/embeddings" in BGEM3_URL
-    payload = {"input": text} if is_openai else [text]
-    headers = {"Authorization": f"Bearer {BGEM3_TOKEN}"} if BGEM3_TOKEN else {}
+    payload = _build_embed_payload(text)
+    headers = _auth_headers()
 
     r = await client.post(BGEM3_URL, json=payload, headers=headers, timeout=30.0)
     r.raise_for_status()
-    data = r.json()
-    if isinstance(data, dict):
-        if "data" in data and isinstance(data["data"], list) and len(data["data"]) > 0:
-            return data["data"][0]["embedding"]
-        elif "embeddings" in data:
-            return data["embeddings"][0]
-        else:
-            raise ValueError(f"Unexpected response structure: {data}")
-    else:
-        return data[0]
+    return _extract_embedding(r.json())
+
+
+def _query_index(index: turbovec.IdMapIndex, query_vector: list[float], k: int = 30):
+    query_np = np.array(query_vector, dtype=np.float32).reshape(1, -1)
+    return index.search(query_np, k=k)
+
+
+def _fetch_chunk_rows(conn: sqlite3.Connection, retrieved_ids: list) -> dict:
+    placeholders = ",".join("?" * len(retrieved_ids))
+    rows = conn.execute(
+        f"SELECT id, source, chunk_index, text FROM chunks WHERE id IN ({placeholders})",
+        retrieved_ids,
+    ).fetchall()
+    return {row["id"]: row for row in rows}
+
+
+def _build_candidates(retrieved_ids: list, score_list: list, id_to_row: dict) -> list[dict]:
+    candidates = []
+    for tid, score in zip(retrieved_ids, score_list):
+        row = id_to_row.get(tid)
+        if row is None:
+            continue
+        candidates.append({
+            "score": round(1.0 - score, 4),
+            "source": row["source"],
+            "chunk_index": row["chunk_index"],
+            "text": row["text"],
+        })
+    candidates.sort(key=lambda x: x["score"], reverse=True)
+    return candidates[:5]
 
 
 async def search_single(
@@ -102,8 +153,7 @@ async def search_single(
         return []
 
     try:
-        query_np = np.array(query_vector, dtype=np.float32).reshape(1, -1)
-        scores, ids = index.search(query_np, k=30)
+        scores, ids = _query_index(index, query_vector)
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"⚠️ TurboVec search failed for '{keyword}': {e}", file=sys.stderr)
         raise
@@ -111,29 +161,8 @@ async def search_single(
 
     retrieved_ids = ids.flatten().tolist()
     score_list = scores.flatten().tolist()
-
-    placeholders = ",".join("?" * len(retrieved_ids))
-    rows = conn.execute(
-        f"SELECT id, source, chunk_index, text FROM chunks WHERE id IN ({placeholders})",
-        retrieved_ids,
-    ).fetchall()
-
-    id_to_row = {row["id"]: row for row in rows}
-
-    candidates = []
-    for tid, score in zip(retrieved_ids, score_list):
-        row = id_to_row.get(tid)
-        if row is None:
-            continue
-        candidates.append({
-            "score": round(1.0 - score, 4),
-            "source": row["source"],
-            "chunk_index": row["chunk_index"],
-            "text": row["text"],
-        })
-
-    candidates.sort(key=lambda x: x["score"], reverse=True)
-    return candidates[:5]
+    id_to_row = _fetch_chunk_rows(conn, retrieved_ids)
+    return _build_candidates(retrieved_ids, score_list, id_to_row)
 
 
 async def search_bazi(query: str, limit: int = 15) -> list[dict]:

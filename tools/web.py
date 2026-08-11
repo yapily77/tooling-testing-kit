@@ -118,9 +118,76 @@ async def search_searxng(query: str) -> list[SearchResult]:
         return []
 
 
+
+def _fire_cleanup(orchestrator: "WebOrchestrator") -> None:
+    task = asyncio.create_task(orchestrator.cleanup())
+    orchestrator._background_tasks.add(task)
+    task.add_done_callback(orchestrator._background_tasks.discard)
+
+
+def _build_empty_response(evidence_files: list[Path]) -> WebResponse:
+    return WebResponse(
+        answer="No readable content was found for this query.",
+        citations=[],
+        evidence_paths=[str(p) for p in evidence_files],
+        confidence=0.0,
+    )
+
+
+def _build_synthesized_response(evidence_files: list[Path], synthesis: SynthesisOutput) -> WebResponse:
+    return WebResponse(
+        answer=synthesis.answer,
+        citations=synthesis.citations,
+        evidence_paths=[str(p) for p in evidence_files],
+        confidence=synthesis.confidence,
+    )
+
+
 # =====================================================================
 # 3. ORCHESTRATOR
 # =====================================================================
+
+
+
+def _dedupe_results(results: list[SearchResult]) -> list[SearchResult]:
+    seen_urls = set()
+    unique_results = []
+    for r in results:
+        if r.url not in seen_urls:
+            unique_results.append(r)
+            seen_urls.add(r.url)
+    return unique_results
+
+
+def _extract_content(downloaded: str) -> tuple[str, bool]:
+    if not downloaded:
+        return "[This page returned empty content. It might require JavaScript to render.]", False
+    content = _run_trafilatura(downloaded)
+    if not content:
+        return "[This page returned empty content. It might require JavaScript to render.]", False
+    return content, True
+
+
+def _run_trafilatura(downloaded: str) -> str | None:
+    loop = asyncio.get_running_loop()
+    return loop.run_in_executor(None, lambda: trafilatura.extract(downloaded, include_comments=False, include_tables=True))
+
+
+def _truncate_content(content: str) -> str:
+    if len(content) > 15000:
+        return content[:15000] + "\n\n... [Truncated for length] ..."
+    return content
+
+
+def _build_metadata(res: SearchResult, has_actual: bool) -> dict:
+    return {
+        "url": res.url,
+        "title": res.title,
+        "provider": res.provider,
+        "rank": res.rank,
+        "status": "extracted" if has_actual else "empty / potentially JS-rendered"
+    }
+
 
 
 class WebOrchestrator:
@@ -161,82 +228,46 @@ class WebOrchestrator:
             return f"unknown_domain_{hashlib.sha256(url.encode()).hexdigest()[:8]}"
 
     async def fetch_and_extract(self, results: list[SearchResult], query_hash: str) -> tuple[list[Path], bool]:
-        seen_urls = set()
-        unique_results = []
-        for r in results:
-            if r.url not in seen_urls:
-                unique_results.append(r)
-                seen_urls.add(r.url)
-
+        unique_results = _dedupe_results(results)
         targets = unique_results[:10]
         query_dir = self.results_dir / query_hash
         await asyncio.to_thread(query_dir.mkdir, exist_ok=True)
 
         semaphore = asyncio.Semaphore(5)
-
-        async def process_url(res: SearchResult) -> tuple[Path, bool] | None:
-            async with semaphore:
-                try:
-                    headers = {
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-                    }
-
-                    async def fetch_content():
-                        async with httpx.AsyncClient(timeout=10.0) as client:
-                            resp = await client.get(res.url, headers=headers, follow_redirects=True)
-                            resp.raise_for_status()
-                            return resp.text
-
-                    downloaded = await fetch_content()
-
-                    if not downloaded:
-                        content = "[This page returned empty content. It might require JavaScript to render.]"
-                        has_actual = False
-                    else:
-                        loop = asyncio.get_running_loop()
-                        content = await loop.run_in_executor(
-                            None, lambda: trafilatura.extract(downloaded, include_comments=False, include_tables=True)
-                        )
-
-                        if not content:
-                            content = "[This page returned empty content. It might require JavaScript to render.]"
-                            has_actual = False
-                        else:
-                            has_actual = True
-
-                    if len(content) > 15000:
-                        content = content[:15000] + "\n\n... [Truncated for length] ..."
-
-                    metadata = {
-                        "url": res.url,
-                        "title": res.title,
-                        "provider": res.provider,
-                        "rank": res.rank,
-                        "status": "extracted" if has_actual else "empty / potentially JS-rendered"
-                    }
-                    file_content = f"---\n{yaml.dump(metadata)}---\n\n{content}"
-
-                    file_path = query_dir / f"{self._sanitize_domain(res.url)}.md"
-                    await asyncio.to_thread(file_path.write_text, file_content, encoding="utf-8")
-                    return file_path, has_actual
-
-                except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
-                    print(f"Extraction Error [{res.url}]: {e}")
-                    raise
-                    return None
-
-        tasks = [process_url(r) for r in targets]
+        tasks = [self._process_url(r, query_dir, semaphore) for r in targets]
         results_paths = await asyncio.gather(*tasks)
 
-        evidence_files = []
+        evidence_files: list[Path] = []
         has_any_actual_content = False
         for item in results_paths:
             if item is not None:
                 path, actual = item
                 evidence_files.append(path)
-                if actual:
-                    has_any_actual_content = True
+                has_any_actual_content = has_any_actual_content or actual
         return evidence_files, has_any_actual_content
+
+    async def _process_url(self, res: SearchResult, query_dir: Path, semaphore: asyncio.Semaphore) -> tuple[Path, bool] | None:
+        async with semaphore:
+            try:
+                downloaded = await self._fetch_url_content(res.url)
+                content, has_actual = _extract_content(downloaded)
+                content = _truncate_content(content)
+                metadata = _build_metadata(res, has_actual)
+                file_content = f"---\n{yaml.dump(metadata)}---\n\n{content}"
+                file_path = query_dir / f"{self._sanitize_domain(res.url)}.md"
+                await asyncio.to_thread(file_path.write_text, file_content, encoding="utf-8")
+                return file_path, has_actual
+            except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
+                print(f"Extraction Error [{res.url}]: {e}")
+                raise
+                return None
+
+    async def _fetch_url_content(self, url: str) -> str:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(url, headers=headers, follow_redirects=True)
+            resp.raise_for_status()
+            return resp.text
 
     async def synthesize(self, query: str, evidence_files: list[Path]) -> SynthesisOutput:
         if not evidence_files:
@@ -282,49 +313,29 @@ class WebOrchestrator:
             print(f"Cleanup Error: {e}")
 
     async def run(self, query: str) -> WebResponse:
-        query_stripped = query.strip()
-        is_url = query_stripped.startswith(("http://", "https://"))
-
-        if is_url:
-            print(f"Direct URL detected, skipping search: {query_stripped}")
-            all_results = [SearchResult(url=query_stripped, title="Direct URL", provider="Direct", rank=1)]
-        else:
-            print(f"Searching for: {query}...")
-            search_tasks = [
-                search_exa(query),
-                search_tavily(query),
-                search_searxng(query),
-            ]
-            search_results_lists = await asyncio.gather(*search_tasks)
-            all_results = [item for sublist in search_results_lists for item in sublist]
-
+        all_results = await self._get_search_results(query)
         query_hash = self._get_query_hash(query)
         print(f"Extracting content for {len(all_results)} results...")
         evidence_files, has_any_actual = await self.fetch_and_extract(all_results, query_hash)
-
-        if not has_any_actual:
-            response = WebResponse(
-                answer="No readable content was found for this query.",
-                citations=[],
-                evidence_paths=[str(p) for p in evidence_files],
-                confidence=0.0,
-            )
-        else:
-            print(f"Synthesizing result from {len(evidence_files)} files...")
-            synthesis = await self.synthesize(query, evidence_files)
-
-            response = WebResponse(
-                answer=synthesis.answer,
-                citations=synthesis.citations,
-                evidence_paths=[str(p) for p in evidence_files],
-                confidence=synthesis.confidence,
-            )
-
-        task = asyncio.create_task(self.cleanup())
-        self._background_tasks.add(task)
-        task.add_done_callback(self._background_tasks.discard)
-
+        response = await self._build_response(query, evidence_files, has_any_actual)
+        _fire_cleanup(self)
         return response
+
+    async def _get_search_results(self, query: str) -> list[SearchResult]:
+        query_stripped = query.strip()
+        if query_stripped.startswith(("http://", "https://")):
+            print(f"Direct URL detected, skipping search: {query_stripped}")
+            return [SearchResult(url=query_stripped, title="Direct URL", provider="Direct", rank=1)]
+        print(f"Searching for: {query}...")
+        search_results_lists = await asyncio.gather(search_exa(query), search_tavily(query), search_searxng(query))
+        return [item for sublist in search_results_lists for item in sublist]
+
+    async def _build_response(self, query: str, evidence_files: list[Path], has_any_actual: bool) -> WebResponse:
+        if not has_any_actual:
+            return _build_empty_response(evidence_files)
+        print(f"Synthesizing result from {len(evidence_files)} files...")
+        synthesis = await self.synthesize(query, evidence_files)
+        return _build_synthesized_response(evidence_files, synthesis)
 
 
 # =====================================================================

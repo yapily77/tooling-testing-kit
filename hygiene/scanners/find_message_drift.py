@@ -132,6 +132,26 @@ def audit_candidate_locally(candidate: MessageDriftCandidate) -> AuditResult:
     )
 
 
+def _write_file_section(out, file_path: str, results: list[AuditResult]):
+    """Write a single file's section to the markdown report."""
+    out.write(f"## 📂 `{file_path}`\n\n")
+    for item in sorted(results, key=lambda x: x.line):
+        status_emoji = "🛑" if item.status == "DRIFT_VIOLATION" else "✅"
+        out.write(f"### {status_emoji} Line {item.line}: `{item.name}` ({item.type})\n")
+        out.write(f"- **Verdict**: `{item.status}`\n")
+        out.write(f"- **Severity**: `{item.severity}`\n")
+        out.write(f"- **Reasoning**: {item.reason}\n\n")
+    out.write("---\n\n")
+
+
+def _group_results_by_file(audit_results: list[AuditResult]) -> dict[str, list[AuditResult]]:
+    """Group audit results by their file path."""
+    by_file = {}
+    for result in audit_results:
+        by_file.setdefault(result.file_path, []).append(result)
+    return by_file
+
+
 def generate_markdown_report(report: AuditReport, md_path: Path):
     with open(md_path, "w", encoding="utf-8") as out:
         out.write("# 🕵️ Telegram Message Keys Drift Report\n\n")
@@ -140,28 +160,13 @@ def generate_markdown_report(report: AuditReport, md_path: Path):
         if not report.audit_results:
             out.write("🎉 *No message key drift detected! messages.yaml is perfectly synchronized.*\n")
         else:
-            by_file = {}
-            for result in report.audit_results:
-                f = result.file_path
-                by_file.setdefault(f, []).append(result)
-
+            by_file = _group_results_by_file(report.audit_results)
             for f, list_results in sorted(by_file.items()):
-                out.write(f"## 📂 `{f}`\n\n")
-                for item in sorted(list_results, key=lambda x: x.line):
-                    status_emoji = "🛑" if item.status == "DRIFT_VIOLATION" else "✅"
-                    out.write(f"### {status_emoji} Line {item.line}: `{item.name}` ({item.type})\n")
-                    out.write(f"- **Verdict**: `{item.status}`\n")
-                    out.write(f"- **Severity**: `{item.severity}`\n")
-                    out.write(f"- **Reasoning**: {item.reason}\n\n")
-                out.write("---\n\n")
+                _write_file_section(out, f, list_results)
 
 
-def main():
-    files = get_src_files()
-    messages = load_messages()
-    usage = collect_usage(files)
-
-    # 1. Generate comments/usage sync back to YAML
+def _sync_yaml_usage(messages: dict, usage: dict) -> None:
+    """Generate usage comments and sync back to YAML dict (mutates in place)."""
     serial_counter = 1
     for key, data in messages.items():
         if not isinstance(data, dict):
@@ -169,27 +174,28 @@ def main():
             data = messages[key]
         data["_usage"] = []
         occurrences = usage.get(key, [])
-        # Deduplicate file references for yaml usage comments
         used_files = sorted({occ[0] for occ in occurrences})
         for module_path in used_files:
             comment = f"# {serial_counter:04d} {module_path}"
             data["_usage"].append(comment)
             serial_counter += 1
-    save_messages(messages)
-    print("Synced YAML messages metadata with codebase usage.")
 
-    # 2. Compile Candidates
+
+def _collect_missing_candidates(usage: dict, messages: dict) -> list[MessageDriftCandidate]:
+    """Find message keys used in code but missing from YAML."""
     candidates = []
-
-    # Missing message keys (in code, missing in YAML)
     for key, occurrences in usage.items():
         if key not in messages:
             for path_str, line in occurrences:
                 candidates.append(
                     MessageDriftCandidate(name=key, file_path=path_str, line=line, type="missing_message")
                 )
+    return candidates
 
-    # Unused message keys (in YAML, missing in code)
+
+def _collect_unused_candidates(messages: dict, usage: dict) -> list[MessageDriftCandidate]:
+    """Find message keys defined in YAML but not used in code."""
+    candidates = []
     for key in messages:
         if key not in usage:
             candidates.append(
@@ -197,7 +203,46 @@ def main():
                     name=key, file_path="src/interfaces/telegram/messages.yaml", line=1, type="unused_message"
                 )
             )
+    return candidates
 
+
+def _compile_candidates(usage: dict, messages: dict) -> list[MessageDriftCandidate]:
+    """Compile all drift candidates (missing + unused)."""
+    return _collect_missing_candidates(usage, messages) + _collect_unused_candidates(messages, usage)
+
+
+def _run_audit_loop(candidates: list[MessageDriftCandidate], report: AuditReport) -> None:
+    """Run audit on all candidates and populate report results."""
+    total_candidates = len(candidates)
+    for index, candidate in enumerate(candidates, 1):
+        print(f"[{index}/{total_candidates}] Auditing {candidate.name} in {candidate.file_path}:{candidate.line}...")
+        try:
+            audit = audit_candidate_locally(candidate)
+            report.audit_results.append(audit)
+        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
+            print(f"WARNING: Auditing failed for candidate {candidate.name}: {e}", file=sys.stderr)
+
+
+def _print_candidates(candidates: list[MessageDriftCandidate]) -> None:
+    """Print candidate list and exit."""
+    print("\nCandidates found:")
+    for idx, cand in enumerate(candidates, 1):
+        print(f"[{idx}] {cand.name} ({cand.type}) in {cand.file_path}:{cand.line}")
+    sys.exit(0)
+
+
+def main():
+    files = get_src_files()
+    messages = load_messages()
+    usage = collect_usage(files)
+
+    # 1. Sync usage back to YAML
+    _sync_yaml_usage(messages, usage)
+    save_messages(messages)
+    print("Synced YAML messages metadata with codebase usage.")
+
+    # 2. Compile and optionally print candidates
+    candidates = _compile_candidates(usage, messages)
     import argparse
     parser = argparse.ArgumentParser(description="Message Drift Scanner")
     parser.add_argument("--scripts", action="store_true", help="Run only static checks and print candidates")
@@ -207,25 +252,16 @@ def main():
     print(f"Scan complete. Found {total_candidates} message drift candidates to audit.")
 
     if args.scripts:
-        print("\nCandidates found:")
-        for idx, cand in enumerate(candidates, 1):
-            print(f"[{idx}] {cand.name} ({cand.type}) in {cand.file_path}:{cand.line}")
-        sys.exit(0)
+        _print_candidates(candidates)
 
+    # 3. Audit and generate reports
     report = AuditReport(scanned_files_count=len(files))
     output_dir = pkg_root / "reports"
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "message_drift_audit.json"
     md_path = output_dir / "message_drift_audit.md"
 
-    for index, candidate in enumerate(candidates, 1):
-        print(f"[{index}/{total_candidates}] Auditing {candidate.name} in {candidate.file_path}:{candidate.line}...")
-        try:
-            audit = audit_candidate_locally(candidate)
-            report.audit_results.append(audit)
-        except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
-            print(f"WARNING: Auditing failed for candidate {candidate.name}: {e}", file=sys.stderr)
-
+    _run_audit_loop(candidates, report)
     with open(json_path, "w", encoding="utf-8") as f:
         f.write(report.model_dump_json(indent=2))
 

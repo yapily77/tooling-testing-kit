@@ -5,7 +5,7 @@
 // to the `clean_py` pip package. This file only handles security gating,
 // temp-file hygiene, retry tracking, and sub-process delegation.
 
-import type { Plugin } from "@opencode-ai/plugin";
+import type { Plugin, CleanPythonArgs, ToolContext } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin";
 import { execFile } from "node:child_process";
 import * as crypto from "node:crypto";
@@ -183,7 +183,7 @@ export const cleanPythonTool = tool({
         code_payload: tool.schema.string().describe("Complete Python source code to verify and save."),
     },
 
-    async execute(args, context) {
+    async execute(args: CleanPythonArgs, context: ToolContext) {
         try {
             console.log(`[CLEAN PYTHON AUDIT TRAIL] Target: ${args.file_path}`);
 

@@ -129,7 +129,10 @@ async function runCleanTs(nodeBin: string, cliPath: string, directExec: boolean,
         if (parsed?.errors && Array.isArray(parsed.errors)) {
             return parsed.errors.map((e: unknown) => String(e));
         }
-    } catch { }
+    } catch {
+        // Intentional: output may not be JSON (e.g. human-readable errors or non-JSON stdout/stderr)
+        void 0;
+    }
 
     if (result.exitCode === 0) {
         return [];

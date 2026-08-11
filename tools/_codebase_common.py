@@ -9,6 +9,7 @@ raw stdout string, and that the test suite asserts against.
 
 from __future__ import annotations
 
+import difflib
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +31,29 @@ def _normalize_content(text: str) -> str:
     return text
 
 
+def _ensure_trailing_newline(text: str) -> str:
+    """Ensure text ends with a newline to prevent difflib hunk fusion."""
+    if text and not text.endswith("\n"):
+        return text + "\n"
+    return text
+
+
+def _bounded_diff(old_text: str, new_text: str, context: int = 15) -> str:
+    """Generate a bounded unified diff between old and new text."""
+    old_text = _ensure_trailing_newline(old_text)
+    new_text = _ensure_trailing_newline(new_text)
+    diff = list(
+        difflib.unified_diff(
+            old_text.splitlines(keepends=True),
+            new_text.splitlines(keepends=True),
+            fromfile="a", tofile="b", n=context, lineterm="\n",
+        )
+    )
+    if not diff:
+        return "(no changes detected)"
+    return "".join(diff)
+
+
 def resolve_secure_path(relative_path: str) -> Path:
     """Resolve a path and ensure it stays within PROJECT_ROOT."""
     root = PROJECT_ROOT.resolve()
@@ -43,9 +67,9 @@ def resolve_secure_path(relative_path: str) -> Path:
     return target
 
 
-def ok(message: str, data: dict) -> dict:
+def ok(message: str, data: dict[str, object]) -> dict[str, object]:
     return {"success": True, "message": message, "data": data}
 
 
-def fail(message: str) -> dict:
+def fail(message: str) -> dict[str, object]:
     return {"success": False, "message": message}

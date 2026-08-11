@@ -122,6 +122,46 @@ def _parse_pyright_error(ln: str) -> tuple[str | None, int | None]:
         return (None, None)
 
 
+def _parse_diff_hunk_header(ln: str) -> int | None:
+    """Parse a diff hunk header like @@ -1,5 +12,7 @@ and return the new file line number."""
+    m = re.search(r"\+(\d+)(?:,(\d+))?", ln)
+    return int(m.group(1)) if m else None
+
+
+def _handle_added_line(ln: str, new_lineno: int | None, changed: set[int]) -> int | None:
+    if ln.startswith("+") and new_lineno is not None:
+        changed.add(new_lineno)
+        return new_lineno + 1
+    return new_lineno
+
+
+def _advance_diff_line(ln: str, new_lineno: int | None, changed: set[int]) -> int | None:
+    """Process a single diff line and return the updated new-line counter."""
+    if ln.startswith("+"):
+        return _handle_added_line(ln, new_lineno, changed)
+    if ln.startswith("-"):
+        return new_lineno
+    if ln.startswith(" ") and new_lineno is not None:
+        return new_lineno + 1
+    return new_lineno
+
+
+def _is_diff_header(ln: str) -> bool:
+    return ln.startswith("@@") or ln.startswith(("+++", "---"))
+
+
+def _process_diff_line(
+    ln: str, new_lineno: int | None, changed: set[int]
+) -> int | None:
+    if _is_diff_header(ln):
+        if ln.startswith("@@"):
+            return _parse_diff_hunk_header(ln)
+        return new_lineno
+    if new_lineno is None:
+        return new_lineno
+    return _advance_diff_line(ln, new_lineno, changed)
+
+
 def _changed_lines_from_diff(diff_text: str) -> set[int] | None:
     """Parse a unified ``diff_text`` and return the set of NEW (current-file)
     line numbers that changed (added lines in the working copy).
@@ -138,23 +178,66 @@ def _changed_lines_from_diff(diff_text: str) -> set[int] | None:
     changed: set[int] = set()
     new_lineno: int | None = None
     for ln in diff_text.splitlines():
-        if ln.startswith("@@"):
-            m = re.search(r"\+(\d+)(?:,(\d+))?", ln)
-            new_lineno = int(m.group(1)) if m else None
-            continue
-        if ln.startswith(("+++", "---")):
-            continue
-        if new_lineno is None:
-            continue
-        if ln.startswith("+"):
-            changed.add(new_lineno)
-            new_lineno += 1
-        elif ln.startswith("-"):
-            # removed line: does not advance the new-file counter
-            pass
-        elif ln.startswith(" "):
-            new_lineno += 1
+        new_lineno = _process_diff_line(ln, new_lineno, changed)
     return changed
+
+
+def _run_pyright(args: list[str], timeout: int) -> tuple[bool, str]:
+    """Run ``uv run pyright <args>`` and return (success, output_text).
+
+    Returns ``(True, "pyright not installed; skipped type check.")`` when
+    pyright is not available.
+    """
+    try:
+        result = subprocess.run(
+            ["uv", "run", "pyright", *args],
+            capture_output=True,
+            cwd=str(PROJECT_ROOT),
+            text=True,
+            timeout=timeout, check=False)
+    except FileNotFoundError:
+        return (True, "pyright not installed; skipped type check.")
+
+    output = (result.stdout or "") + (result.stderr or "")
+    return (result.returncode == 0, output)
+
+
+def _matches_file_line(ln: str, fname: str) -> bool:
+    return fname in ln and "error" in ln.lower()
+
+
+def _is_changed_line_error(ln: str, fname: str, changed: set[int]) -> bool:
+    if not _matches_file_line(ln, fname):
+        return False
+    _fp, line_no = _parse_pyright_error(ln)
+    return line_no is not None and line_no in changed
+
+
+def _filter_whole_file(output: str, fname: str) -> list[str]:
+    return [ln for ln in output.splitlines() if _matches_file_line(ln, fname)]
+
+
+def _filter_changed_lines(output: str, fname: str, changed: set[int]) -> list[str]:
+    return [ln for ln in output.splitlines() if _is_changed_line_error(ln, fname, changed)]
+
+
+def _filter_pyright_errors(
+    output: str,
+    fname: str,
+    changed: set[int] | None,
+) -> tuple[bool, str]:
+    """Filter pyright output to errors relevant to ``fname``.
+
+    When ``changed`` is ``None``, use whole-file scope (any error mentioning
+    ``fname``). Otherwise, only include errors on changed lines.
+    """
+    if changed is None:
+        our_errors = _filter_whole_file(output, fname)
+    else:
+        our_errors = _filter_changed_lines(output, fname, changed)
+    if our_errors:
+        return (False, "\n".join(our_errors))
+    return (True, output.strip())
 
 
 def typecheck_file(file_path: str, changed: set[int] | None = None) -> tuple[bool, str]:
@@ -173,38 +256,108 @@ def typecheck_file(file_path: str, changed: set[int] | None = None) -> tuple[boo
     if not path.exists():
         raise FileNotFoundError(f"File not found: {path}")
 
-    try:
-        result = subprocess.run(
-            ["uv", "run", "pyright", str(path)],
-            capture_output=True,
-            cwd=str(PROJECT_ROOT),
-            text=True,
-            timeout=180, check=False)
+    _ok, output = _run_pyright([str(path)], timeout=180)
 
-    except FileNotFoundError:
-        return (True, "pyright not installed; skipped type check.")
+    return _filter_pyright_errors(output, path.name, changed)
 
-    output = (result.stdout or "") + (result.stderr or "")
-    fname = path.name
-    # Scope errors to the lines the coder actually changed (per D2). A coder
-    # must not be blocked by pre-existing pyright errors on lines it never
-    # touched. Fall back to whole-file scope only when no diff exists.
-    if changed is None:
-        our_errors = [
-            ln for ln in output.splitlines()
-            if fname in ln and "error" in ln.lower()
-        ]
-    else:
-        our_errors = []
-        for ln in output.splitlines():
-            if fname not in ln or "error" not in ln.lower():
-                continue
-            _fp, line_no = _parse_pyright_error(ln)
-            if line_no is not None and line_no in changed:
-                our_errors.append(ln)
-    if our_errors:
-        return (False, "\n".join(our_errors))
-    return (True, output.strip())
+
+def _increment_stem(wanted: dict[str, int], stem: str) -> None:
+    wanted[stem] = wanted.get(stem, 0) + 1
+
+
+def _collect_import_node(node: ast.AST) -> list[tuple[str, str]]:
+    """Extract (node_type, stem) pairs from a single import node."""
+    if isinstance(node, ast.Import):
+        return [("import", alias.name.split(".")[-1]) for alias in node.names]
+    if isinstance(node, ast.ImportFrom) and node.module:
+        return [("from", node.module.split(".")[-1])]
+    return []
+
+
+def _collect_import_aliases(tree: ast.AST) -> list[tuple[str, str]]:
+    """Extract (node_type, stem) pairs from import nodes in the AST."""
+    pairs: list[tuple[str, str]] = []
+    for node in ast.walk(tree):
+        pairs.extend(_collect_import_node(node))
+    return pairs
+
+
+def _collect_import_stems(tree: ast.AST) -> dict[str, int]:
+    """Walk an AST and collect module stems with their import counts (edge weights)."""
+    wanted: dict[str, int] = {}
+    for _, stem in _collect_import_aliases(tree):
+        _increment_stem(wanted, stem)
+    return wanted
+
+
+def _resolve_edit_set_deps(edit_set: set[str]) -> list[Path]:
+    """Resolve the edit set (planner deps) into Paths, bounded to UNION_MAX_DEPS."""
+    out: list[Path] = []
+    for p in list(edit_set)[:UNION_MAX_DEPS]:
+        pp = Path(p)
+        out.append(pp if pp.is_absolute() else PROJECT_ROOT / pp)
+    return out
+
+
+def _resolve_stem_deps(
+    wanted: dict[str, int],
+    primary: Path,
+    edit_set: set[str] | None,
+) -> list[Path]:
+    """Resolve import stems to repo paths, preferring edit-set files and highest weight."""
+    resolved: list[Path] = []
+    seen: set[str] = set()
+    for stem, _ in sorted(wanted.items(), key=lambda kv: -kv[1]):
+        if len(resolved) >= UNION_MAX_DEPS:
+            break
+        _resolve_one_stem(stem, primary, edit_set, resolved, seen)
+    return resolved[:UNION_MAX_DEPS]
+
+
+def _is_duplicate_or_self(
+    rel: str, cand: Path, primary: Path, seen: set[str]
+) -> bool:
+    if rel in seen:
+        return True
+    if cand.resolve() == primary.resolve():
+        return True
+    return False
+
+
+def _is_edit_set_overloaded(
+    rel: str, edit_set: set[str] | None, resolved: list
+) -> bool:
+    if edit_set and rel not in edit_set and len(resolved) >= UNION_MAX_DEPS:
+        return True
+    return False
+
+
+def _is_valid_candidate(
+    cand: Path, rel: str, primary: Path, seen: set[str],
+    resolved: list, edit_set: set[str] | None,
+) -> bool:
+    if _is_duplicate_or_self(rel, cand, primary, seen):
+        return False
+    if _is_edit_set_overloaded(rel, edit_set, resolved):
+        return False
+    return True
+
+
+def _resolve_one_stem(
+    stem: str,
+    primary: Path,
+    edit_set: set[str] | None,
+    resolved: list[Path],
+    seen: set[str],
+) -> None:
+    """Find and append one candidate for ``stem`` to ``resolved``."""
+    candidates = list(PROJECT_ROOT.rglob(f"{stem}.py"))
+    for cand in candidates:
+        rel = str(cand.relative_to(PROJECT_ROOT))
+        if _is_valid_candidate(cand, rel, primary, seen, resolved, edit_set):
+            seen.add(rel)
+            resolved.append(cand)
+            break
 
 
 def discover_dependencies(primary: Path, edit_set: set[str] | None = None) -> list[Path]:
@@ -222,46 +375,15 @@ def discover_dependencies(primary: Path, edit_set: set[str] | None = None) -> li
     except (OSError, SyntaxError, MemoryError):
         return []
 
-    wanted: dict[str, int] = {}  # module stem -> import count (edge weight)
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                stem = alias.name.split(".")[-1]
-                wanted[stem] = wanted.get(stem, 0) + 1
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            stem = node.module.split(".")[-1]
-            wanted[stem] = wanted.get(stem, 0) + 1
+    wanted = _collect_import_stems(tree)
 
     if not wanted:
         # New file with no imports: fall back to the edit set (planner deps).
         if edit_set:
-            out = []
-            for p in list(edit_set)[:UNION_MAX_DEPS]:
-                pp = Path(p)
-                out.append(pp if pp.is_absolute() else PROJECT_ROOT / pp)
-            return out
+            return _resolve_edit_set_deps(edit_set)
         return []
 
-    resolved: list[Path] = []
-    seen: set[str] = set()
-    for stem, _ in sorted(wanted.items(), key=lambda kv: -kv[1]):
-        if len(resolved) >= UNION_MAX_DEPS:
-            break
-        candidates = list(PROJECT_ROOT.rglob(f"{stem}.py"))
-        for cand in candidates:
-            rel = str(cand.relative_to(PROJECT_ROOT))
-            if rel in seen:
-                continue
-            # Skip the primary itself and anything outside the repo src tree.
-            if cand.resolve() == primary.resolve():
-                continue
-            if edit_set and rel not in edit_set and len(resolved) >= UNION_MAX_DEPS:
-                # Prefer files in the active edit set; otherwise allow any repo module but cap total.
-                break
-            seen.add(rel)
-            resolved.append(cand)
-            break
-    return resolved[:UNION_MAX_DEPS]
+    return _resolve_stem_deps(wanted, primary, edit_set)
 
 
 def _within_bounds(files: list[Path]) -> bool:
@@ -275,6 +397,60 @@ def _within_bounds(files: list[Path]) -> bool:
             return False
         total += n
     return total <= UNION_MAX_TOTAL_LINES
+
+
+def _collect_edited_file_errors(
+    output: str,
+    edited_names: set[str],
+    changed_map: dict[str, set[int] | None],
+) -> list[str]:
+    """Filter pyright output, keeping only errors from edited files (scoped to changed lines).
+
+    Errors attributed to files the coder did NOT edit (dependencies, Fix F) are
+    dropped entirely — a dependency type break is the architect's shit, not the
+    coder's.
+    """
+    our_errors: list[str] = []
+    for ln in output.splitlines():
+        if "error" not in ln.lower():
+            continue
+        fp, line_no = _parse_pyright_error(ln)
+        # Attribute the error to an edited file by basename of its path.
+        target_name = _match_edited_name(fp, edited_names)
+        if target_name is None:
+            # Dependency / un-attributable error (Fix F): drop it — non-blocking.
+            continue
+        changed = changed_map.get(target_name)
+        if _line_is_relevant(line_no, changed):
+            our_errors.append(ln)
+    return our_errors
+
+
+def _match_edited_name(fp: str | None, edited_names: set[str]) -> str | None:
+    """Return the edited file basename if ``fp`` matches one, else None."""
+    if fp is None:
+        return None
+    fp_base = Path(fp).name
+    return fp_base if fp_base in edited_names else None
+
+
+def _line_is_relevant(line_no: int | None, changed: set[int] | None) -> bool:
+    """True if the line should be included: whole-file scope, or line is in changed set."""
+    if changed is None:
+        return True  # no diff -> whole-file scope
+    return line_no is not None and line_no in changed
+
+
+def _init_typecheck_params(
+    files: list,
+    changed_map: dict | None,
+    edited_names: set | None,
+) -> tuple[set, dict]:
+    if edited_names is None:
+        edited_names = {p.name for p in files}
+    if changed_map is None:
+        changed_map = {p.name: None for p in files}
+    return edited_names, changed_map
 
 
 def typecheck_union(
@@ -298,41 +474,10 @@ def typecheck_union(
     if not files:
         return (True, "no files to type check")
     paths = [str(p.resolve()) for p in files]
-    if edited_names is None:
-        edited_names = {p.name for p in files}
-    if changed_map is None:
-        changed_map = {p.name: None for p in files}
-    try:
-        result = subprocess.run(
-            ["uv", "run", "pyright", *paths],
-            capture_output=True,
-            cwd=str(PROJECT_ROOT),
-            text=True,
-            timeout=300, check=False)
+    edited_names, changed_map = _init_typecheck_params(files, changed_map, edited_names)
+    _ok, output = _run_pyright(paths, timeout=300)
 
-    except FileNotFoundError:
-        return (True, "pyright not installed; skipped type check.")
-
-    output = (result.stdout or "") + (result.stderr or "")
-    our_errors: list[str] = []
-    for ln in output.splitlines():
-        if "error" not in ln.lower():
-            continue
-        fp, line_no = _parse_pyright_error(ln)
-        # Attribute the error to an edited file by basename of its path.
-        target_name: str | None = None
-        if fp is not None:
-            fp_base = Path(fp).name
-            if fp_base in edited_names:
-                target_name = fp_base
-        if target_name is None:
-            # Dependency / un-attributable error (Fix F): drop it — non-blocking.
-            continue
-        changed = changed_map.get(target_name)
-        if changed is None:
-            our_errors.append(ln)  # no diff -> whole-file scope
-        elif line_no is not None and line_no in changed:
-            our_errors.append(ln)
+    our_errors = _collect_edited_file_errors(output, edited_names, changed_map)
     if our_errors:
         return (False, "\n".join(our_errors))
     return (True, output.strip())
@@ -366,6 +511,43 @@ def diff_vs_checkpoint(file_path: str) -> str:
 # ---------------------------------------------------------------------------
 # Validation sandbox (00_fix Fix A' — validate in a REAL package context)
 # ---------------------------------------------------------------------------
+def _path_matches_edit_entry(staged_sp: str, rel: str) -> bool:
+    """Check if a staged path matches a normalized edit-set entry."""
+    if not rel:
+        return False
+    if staged_sp.endswith("/" + rel):
+        return True
+    if staged_sp == rel:
+        return True
+    return False
+
+
+def _normalize_edit_entry(live_s: str) -> str:
+    """Normalize a single edit-set entry to a clean relative path."""
+    return str(live_s).replace("\\", "/").lstrip("/")
+
+
+def _match_edit_set(staged_sp: str, edit_set) -> Path | None:
+    """Try to match the staged path against the edit set; return PROJECT_ROOT/rel if found."""
+    if not edit_set:
+        return None
+    for live_s in edit_set:
+        rel = _normalize_edit_entry(live_s)
+        if _path_matches_edit_entry(staged_sp, rel):
+            return Path(PROJECT_ROOT / rel)
+    return None
+
+
+def _match_source_marker(staged_sp: str) -> Path | None:
+    """Try to find a /src/ or KIT_SOURCE_ROOT marker and resolve to repo-relative path."""
+    source_root = os.getenv("KIT_SOURCE_ROOT", "src")
+    for marker in (f"/{source_root}/", "/src/"):
+        idx = staged_sp.find(marker)
+        if idx != -1:
+            return Path(PROJECT_ROOT / staged_sp[idx + 1:])
+    return None
+
+
 def _virtual_live_path(staged: Path, edit_set) -> Path:
     """Map a STAGED path back to its true repo path so imports resolve.
 
@@ -377,16 +559,12 @@ def _virtual_live_path(staged: Path, edit_set) -> Path:
       3. Fallback: ``PROJECT_ROOT / staged.name``.
     """
     sp = str(staged.resolve()).replace("\\", "/")
-    if edit_set:
-        for live_s in edit_set:
-            rel = str(live_s).replace("\\", "/").lstrip("/")
-            if rel and (sp.endswith("/" + rel) or sp == rel):
-                return Path(PROJECT_ROOT / rel)
-    source_root = os.getenv("KIT_SOURCE_ROOT", "src")
-    for marker in (f"/{source_root}/", "/src/"):
-        idx = sp.find(marker)
-        if idx != -1:
-            return Path(PROJECT_ROOT / sp[idx + 1:])
+    matched = _match_edit_set(sp, edit_set)
+    if matched is not None:
+        return matched
+    matched = _match_source_marker(sp)
+    if matched is not None:
+        return matched
     return Path(PROJECT_ROOT / staged.name)
 
 
@@ -414,6 +592,28 @@ def _materialize_along(sandbox: Path, rel: Path) -> None:
         cur = nxt
 
 
+def _symlink_repo_essentials(sandbox: Path) -> None:
+    """Symlink the sandbox with essential repo files/dirs (.venv, pyproject, etc.)."""
+    for name in (".venv", "pyproject.toml", "pyrightconfig.json", "src"):
+        src = PROJECT_ROOT / name
+        if src.exists():
+            os.symlink(str(src.resolve()), str(sandbox / name))
+
+
+def _symlink_source_tree(sandbox: Path) -> None:
+    """Symlink the KIT_SOURCE_ROOT tree into the sandbox."""
+    source_root = os.getenv("KIT_SOURCE_ROOT", "src")
+    real_src = PROJECT_ROOT / source_root
+    if not real_src.exists():
+        return
+    (sandbox / source_root).mkdir(exist_ok=True)
+    for child in real_src.iterdir():
+        os.symlink(
+            str(child.resolve()),
+            str(sandbox / source_root / child.name),
+        )
+
+
 def build_validation_sandbox(staged: Path, live: Path) -> Path:
     """Build a throwaway sandbox mirroring the repo so the staged file sits at
     its true package path and cross-module imports resolve. ``live`` tree is
@@ -421,15 +621,8 @@ def build_validation_sandbox(staged: Path, live: Path) -> Path:
     Returns the sandbox root.
     """
     sandbox = Path(tempfile.mkdtemp(prefix="grd_"))
-    for name in (".venv", "pyproject.toml", "pyrightconfig.json", "src"):
-        src = PROJECT_ROOT / name
-        if src.exists():
-            os.symlink(str(src.resolve()), str(sandbox / name))
-    real_src = PROJECT_ROOT / os.getenv("KIT_SOURCE_ROOT", "src")
-    if real_src.exists():
-        (sandbox / os.getenv("KIT_SOURCE_ROOT", "src")).mkdir(exist_ok=True)
-        for child in real_src.iterdir():
-            os.symlink(str(child.resolve()), str(sandbox / os.getenv("KIT_SOURCE_ROOT", "src") / child.name))
+    _symlink_repo_essentials(sandbox)
+    _symlink_source_tree(sandbox)
     rel = live.relative_to(PROJECT_ROOT)
     _materialize_along(sandbox, rel)
     target = sandbox / rel
@@ -458,6 +651,91 @@ def diff_staged_vs_original(staged: Path, live: Path) -> str:
 # ---------------------------------------------------------------------------
 # Validate
 # ---------------------------------------------------------------------------
+def _run_smoke_test(sandbox_fp: Path) -> tuple[bool, str]:
+    """Run the smoke-test gate and return ``(success, message)``.
+
+    The smoke gate performs a type-construction check. It runs on the sandbox
+    path so dotted imports resolve (Fix A'/H). If the smoke test fails to
+    execute, it is treated as a non-blocking skip.
+    """
+    try:
+        smoke_res = subprocess.run(
+            [sys.executable, str(SCRIPT_DIR / "smoke_test.py"), str(sandbox_fp)],
+            capture_output=True,
+            text=True,
+            cwd=str(sandbox_fp.parent),
+            timeout=240, check=False)
+
+        smoke_payload = (
+            json.loads(smoke_res.stdout.strip().splitlines()[-1])
+            if smoke_res.stdout.strip()
+            else {}
+        )
+        smoke_ok = bool(smoke_payload.get("success", True))
+        smoke_msg = smoke_payload.get("message", "")
+    except (OSError, ValueError, subprocess.SubprocessError) as e:
+        smoke_ok, smoke_msg = (True, f"smoke gate skipped: {e}")
+    return smoke_ok, smoke_msg
+
+
+def _resolve_dep_sandbox_paths(sandbox: Path, deps: list[Path]) -> list[Path]:
+    """Map dependency Paths to their sandbox equivalents."""
+    dep_sandbox: list[Path] = []
+    for d in deps:
+        dp = Path(d)
+        if not dp.is_absolute():
+            dp = PROJECT_ROOT / dp
+        dp = dp.resolve()
+        try:
+            dep_sandbox.append(sandbox / dp.relative_to(PROJECT_ROOT))
+        except ValueError:
+            continue
+    return dep_sandbox
+
+
+def _run_type_checks(
+    sandbox_fp: Path,
+    deps: list[Path],
+    sandbox: Path,
+    diff_text: str,
+) -> tuple[bool, str]:
+    """Run the appropriate scoped pyright type check (union or single-file fallback)."""
+    dep_sandbox = _resolve_dep_sandbox_paths(sandbox, deps)
+    union_files = [sandbox_fp] + dep_sandbox
+    changed = _changed_lines_from_diff(diff_text)
+    changed_map = {sandbox_fp.name: changed}
+    edited_names = {sandbox_fp.name}
+    if _within_bounds(union_files):
+        return typecheck_union(
+            union_files, changed_map=changed_map, edited_names=edited_names
+        )
+    # Bounds exceeded — fall back to the single-file scoped pyright.
+    return typecheck_file(str(sandbox_fp), changed=changed)
+
+
+def _build_validation_result(
+    ruff_ok: bool,
+    ruff_out: str,
+    pyr_ok: bool,
+    pyr_out: str,
+    smoke_ok: bool,
+    smoke_msg: str,
+    diff_text: str,
+) -> dict:
+    """Assemble the structured result dict consumed by runner.py."""
+    success = ruff_ok and pyr_ok and smoke_ok
+    return {
+        "success": success,
+        "ruff_ok": ruff_ok,
+        "pyright_ok": pyr_ok,
+        "smoke_ok": smoke_ok,
+        "smoke_output": smoke_msg,
+        "ruff_output": ruff_out,
+        "pyright_output": pyr_out,
+        "diff_vs_checkpoint": diff_text,
+    }
+
+
 def validate(file_path: str, edit_set: list[str] | None = None) -> dict:
     """Run ruff, smoke gate, broadened union pyright, and the staged-vs-original
     diff — all in a REAL package context so cross-module imports resolve (00_fix
@@ -481,67 +759,20 @@ def validate(file_path: str, edit_set: list[str] | None = None) -> dict:
         # ruff needs no package context — run on the staged file directly.
         ruff_ok, ruff_out = lint_file(str(staged))
 
-        # Smoke-execution gate (docs/01_fix.md Task 1, D3): type-construction
-        # check, run on the sandbox path so dotted imports resolve (Fix A'/H).
-        try:
-            smoke_res = subprocess.run(
-                [sys.executable, str(SCRIPT_DIR / "smoke_test.py"), str(sandbox_fp)],
-                capture_output=True,
-                text=True,
-                cwd=str(sandbox),
-                timeout=240, check=False)
+        # Smoke-execution gate (docs/01_fix.md Task 1, D3).
+        smoke_ok, smoke_msg = _run_smoke_test(sandbox_fp)
 
-            smoke_payload = (
-                json.loads(smoke_res.stdout.strip().splitlines()[-1])
-                if smoke_res.stdout.strip()
-                else {}
-            )
-            smoke_ok = bool(smoke_payload.get("success", True))
-            smoke_msg = smoke_payload.get("message", "")
-        except (OSError, ValueError, subprocess.SubprocessError) as e:
-            smoke_ok, smoke_msg = (True, f"smoke gate skipped: {e}")
-        smoke_ok = bool(smoke_ok)
-
-        # Broadened union pyright (docs/01_fix.md Task 3, D4) — run inside the
-        # sandbox so the package context (incl. symlinked src) is correct.
+        # Broadened union pyright (docs/01_fix.md Task 3, D4).
         deps = discover_dependencies(staged, set(edit_set) if edit_set else None)
-        dep_sandbox: list[Path] = []
-        for d in deps:
-            dp = Path(d)
-            if not dp.is_absolute():
-                dp = PROJECT_ROOT / dp
-            dp = dp.resolve()
-            try:
-                dep_sandbox.append(sandbox / dp.relative_to(PROJECT_ROOT))
-            except ValueError:
-                continue
-        union_files = [sandbox_fp] + dep_sandbox
         diff_text = diff_staged_vs_original(staged, live)
-        changed = _changed_lines_from_diff(diff_text)
-        changed_map = {sandbox_fp.name: changed}
-        edited_names = {sandbox_fp.name}
-        if _within_bounds(union_files):
-            pyr_ok, pyr_out = typecheck_union(
-                union_files, changed_map=changed_map, edited_names=edited_names
-            )
-        else:
-            # Bounds exceeded — fall back to the single-file scoped pyright.
-            pyr_ok, pyr_out = typecheck_file(str(sandbox_fp), changed=changed)
+        pyr_ok, pyr_out = _run_type_checks(sandbox_fp, deps, sandbox, diff_text)
 
-        success = ruff_ok and pyr_ok and smoke_ok
     finally:
         shutil.rmtree(sandbox, ignore_errors=True)
 
-    return {
-        "success": success,
-        "ruff_ok": ruff_ok,
-        "pyright_ok": pyr_ok,
-        "smoke_ok": smoke_ok,
-        "smoke_output": smoke_msg,
-        "ruff_output": ruff_out,
-        "pyright_output": pyr_out,
-        "diff_vs_checkpoint": diff_text,
-    }
+    return _build_validation_result(
+        ruff_ok, ruff_out, pyr_ok, pyr_out, smoke_ok, smoke_msg, diff_text
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -556,39 +787,67 @@ def _usage() -> str:
     )
 
 
+def _handle_validate_command(file_path: str, edit_set_arg: str) -> int:
+    """Handle the ``validate`` subcommand."""
+    edit_set = edit_set_arg.split(",") if edit_set_arg else None
+    try:
+        result = validate(file_path, edit_set=edit_set)
+    except FileNotFoundError as e:
+        print(json.dumps({"success": False, "error": str(e)}))
+        return 1
+    print(json.dumps(result))
+    return 0 if result["success"] else 1
+
+
+def _handle_diff_command(file_path: str) -> int:
+    """Handle the ``diff`` subcommand."""
+    try:
+        print(diff_vs_checkpoint(file_path))
+    except FileNotFoundError as e:
+        print(str(e), file=sys.stderr)
+        return 1
+    return 0
+
+
+def _handle_checkpoint_command(file_path: str) -> int:
+    """Handle the ``checkpoint`` subcommand."""
+    try:
+        cp = checkpoint(file_path)
+    except FileNotFoundError as e:
+        print(str(e), file=sys.stderr)
+        return 1
+    print(cp)
+    return 0
+
+
+def _get_validate_edit_set_arg() -> str:
+    """Extract the edit_set argument from sys.argv."""
+    return sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] else ""
+
+
+_COMMAND_HANDLERS: dict[str, callable] = {
+    "validate": lambda fp: _handle_validate_command(fp, _get_validate_edit_set_arg()),
+    "diff": lambda fp: _handle_diff_command(fp),
+    "checkpoint": lambda fp: _handle_checkpoint_command(fp),
+}
+
+
+def _dispatch_command(command: str, file_path: str) -> int | None:
+    handler = _COMMAND_HANDLERS.get(command)
+    if handler is None:
+        return None
+    return handler(file_path)
+
+
 def main() -> int:
     if len(sys.argv) < 3:
         print(_usage(), file=sys.stderr)
         return 2
 
     command, file_path = sys.argv[1], sys.argv[2]
-
-    if command == "validate":
-        edit_set = sys.argv[3].split(",") if len(sys.argv) > 3 and sys.argv[3] else None
-        try:
-            result = validate(file_path, edit_set=edit_set)
-        except FileNotFoundError as e:
-            print(json.dumps({"success": False, "error": str(e)}))
-            return 1
-        print(json.dumps(result))
-        return 0 if result["success"] else 1
-
-    if command == "diff":
-        try:
-            print(diff_vs_checkpoint(file_path))
-        except FileNotFoundError as e:
-            print(str(e), file=sys.stderr)
-            return 1
-        return 0
-
-    if command == "checkpoint":
-        try:
-            cp = checkpoint(file_path)
-        except FileNotFoundError as e:
-            print(str(e), file=sys.stderr)
-            return 1
-        print(cp)
-        return 0
+    result = _dispatch_command(command, file_path)
+    if result is not None:
+        return result
 
     print(f"Unknown command: {command}\n{_usage()}", file=sys.stderr)
     return 2

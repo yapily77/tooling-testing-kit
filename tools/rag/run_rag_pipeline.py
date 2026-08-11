@@ -136,6 +136,32 @@ def clean_text(raw_text: str, source_name: str) -> str:
     return text.strip()
 
 
+def _find_break_point(text: str, start: int, end: int, chunk_size: int) -> int:
+    last_period = text.rfind('。', start, end)
+    last_newline = text.rfind('\n', start, end)
+    break_point = max(last_period, last_newline)
+    if break_point > start + chunk_size // 2:
+        return break_point + 1
+    return end
+
+
+def _build_chunk(text: str, start: int, end: int, source_name: str, idx: int) -> dict | None:
+    chunk_text_val = text[start:end].strip()
+    if chunk_text_val and len(chunk_text_val) > 10:
+        chunk_id = _chunk_id_to_uint64(source_name, idx)
+        return {
+            "id": chunk_id,
+            "source": source_name,
+            "chunk_index": idx,
+            "text": chunk_text_val,
+        }
+    return None
+
+
+def _advance_start(end: int, overlap: int, start: int) -> int:
+    return end - overlap if end - overlap > start else end
+
+
 def chunk_text(text: str, source_name: str, chunk_size: int = CHUNK_SIZE,
                overlap: int = CHUNK_OVERLAP) -> list[dict]:
     # Sanitize lone surrogates to prevent UnicodeEncodeError during JSON
@@ -148,41 +174,64 @@ def chunk_text(text: str, source_name: str, chunk_size: int = CHUNK_SIZE,
     while start < len(text):
         end = min(start + chunk_size, len(text))
         if end < len(text):
-            last_period = text.rfind('。', start, end)
-            last_newline = text.rfind('\n', start, end)
-            break_point = max(last_period, last_newline)
-            if break_point > start + chunk_size // 2:
-                end = break_point + 1
+            end = _find_break_point(text, start, end, chunk_size)
 
-        chunk_text_val = text[start:end].strip()
-        if chunk_text_val and len(chunk_text_val) > 10:
-            chunk_id = _chunk_id_to_uint64(source_name, idx)
-            chunks.append({
-                "id": chunk_id,
-                "source": source_name,
-                "chunk_index": idx,
-                "text": chunk_text_val,
-            })
+        chunk = _build_chunk(text, start, end, source_name, idx)
+        if chunk is not None:
+            chunks.append(chunk)
             idx += 1
 
         if end >= len(text):
             break
 
-        start = end - overlap if end - overlap > start else end
+        start = _advance_start(end, overlap, start)
 
     return chunks
 
 
+def _filter_nonempty(texts: list[str]) -> list[str]:
+    return [t for t in texts if t.strip()]
+
+
+def _log_embedding_error(status: int, body: str, first_text: str):
+    log(f"  Embedding error {status}: {body[:200]}")
+    log(f"  First text repr: {first_text[:100]!r}")
+
+
 def embed(texts: list[str]) -> list[list[float]]:
-    texts = [t for t in texts if t.strip()]
+    texts = _filter_nonempty(texts)
     if not texts:
         return []
     r = requests.post(EMBED_URL, json={"input": texts}, timeout=60)
     if r.status_code != 200:
-        log(f"  Embedding error {r.status_code}: {r.text[:200]}")
-        log(f"  First text repr: {texts[0][:100]!r}")
+        _log_embedding_error(r.status_code, r.text, texts[0])
     r.raise_for_status()
     return [item["embedding"] for item in r.json()["data"]]
+
+
+def _process_batch(conn: sqlite3.Connection, index: turbovec.IdMapIndex,
+                   batch: list[dict], batch_idx: int):
+    batch_texts = [c["text"] for c in batch]
+    try:
+        vectors = embed(batch_texts)
+    except Exception as e:
+        log(f"  Embedding failed at batch {batch_idx}: {e}")
+        raise
+
+    ids = np.array([c["id"] for c in batch], dtype=np.uint64)
+    vecs = np.array(vectors, dtype=np.float32)
+    index.add_with_ids(vecs, ids)
+
+    for c in batch:
+        conn.execute(
+            "INSERT OR REPLACE INTO chunks (id, source, chunk_index, text) VALUES (?, ?, ?, ?)",
+            (c["id"], c["source"], c["chunk_index"], c["text"]),
+        )
+
+
+def _log_progress(batch_idx: int, total: int):
+    if (batch_idx // 1) % 5 == 0:
+        log(f"  Ingested {min(batch_idx + BATCH_SIZE, total)}/{total} chunks")
 
 
 def ingest_text(conn: sqlite3.Connection, index: turbovec.IdMapIndex,
@@ -192,42 +241,18 @@ def ingest_text(conn: sqlite3.Connection, index: turbovec.IdMapIndex,
     chunks = chunk_text(cleaned, source_name)
     log(f"  Created {len(chunks)} chunks from {len(cleaned)} chars")
 
-    batch_size = BATCH_SIZE
-    for i in range(0, len(chunks), batch_size):
-        batch = chunks[i:i + batch_size]
-        batch_texts = [c["text"] for c in batch]
-        try:
-            vectors = embed(batch_texts)
-        except Exception as e:
-            log(f"  Embedding failed at batch {i}: {e}")
-            raise
-
-        ids = np.array([c["id"] for c in batch], dtype=np.uint64)
-        vecs = np.array(vectors, dtype=np.float32)
-        index.add_with_ids(vecs, ids)
-
-        for c in batch:
-            conn.execute(
-                "INSERT OR REPLACE INTO chunks (id, source, chunk_index, text) VALUES (?, ?, ?, ?)",
-                (c["id"], c["source"], c["chunk_index"], c["text"]),
-            )
-
-        if (i // batch_size) % 5 == 0:
-            log(f"  Ingested {min(i + batch_size, len(chunks))}/{len(chunks)} chunks")
+    for i in range(0, len(chunks), BATCH_SIZE):
+        batch = chunks[i:i + BATCH_SIZE]
+        batch_idx = i // BATCH_SIZE
+        _process_batch(conn, index, batch, i)
+        if batch_idx % 5 == 0:
+            _log_progress(i, len(chunks))
 
     conn.commit()
     log(f"  Finished ingesting {source_name}: {len(chunks)} chunks")
 
 
-def verify(conn: sqlite3.Connection, index: turbovec.IdMapIndex):
-    log("\n=== Verification ===")
-    cursor = conn.execute("SELECT source, COUNT(*) FROM chunks GROUP BY source ORDER BY source")
-    sources = cursor.fetchall()
-    total = sum(count for _, count in sources)
-    log(f"Total chunks: {total}")
-    for s, n in sources:
-        log(f"  {n:>5} — {s}")
-
+def _log_source_counts(conn: sqlite3.Connection):
     for source_name, info in SOURCES.items():
         cursor = conn.execute(
             "SELECT COUNT(*) FROM chunks WHERE source = ?", (source_name,)
@@ -239,13 +264,27 @@ def verify(conn: sqlite3.Connection, index: turbovec.IdMapIndex):
         else:
             log(f"  WARNING: {label} ({source_name}) has 0 chunks!")
 
-    log(f"  TurboVec index vectors: {index.ntotal() if hasattr(index, 'ntotal') else 'N/A'}")
+
+def _log_index_count(index: turbovec.IdMapIndex):
+    ntotal = index.ntotal() if hasattr(index, 'ntotal') else 'N/A'
+    log(f"  TurboVec index vectors: {ntotal}")
+
+
+def verify(conn: sqlite3.Connection, index: turbovec.IdMapIndex):
+    log("\n=== Verification ===")
+    cursor = conn.execute("SELECT source, COUNT(*) FROM chunks GROUP BY source ORDER BY source")
+    sources = cursor.fetchall()
+    total = sum(count for _, count in sources)
+    log(f"Total chunks: {total}")
+    for s, n in sources:
+        log(f"  {n:>5} — {s}")
+
+    _log_source_counts(conn)
+    _log_index_count(index)
     return total
 
 
-def main():
-    log("=== RAG Pipeline: TurboVec + SQLite Rebuild ===")
-
+def _check_embedding_server():
     try:
         r = requests.get("http://localhost:8002/health", timeout=5)
         r.raise_for_status()
@@ -255,35 +294,47 @@ def main():
         log("Run: text-embeddings-router ...")
         sys.exit(1)
 
+
+def _remove_existing_db_files():
+    if os.path.exists(BAZI_SQLITE_PATH):
+        os.remove(BAZI_SQLITE_PATH)
+    if os.path.exists(TURBOVEC_INDEX_PATH):
+        os.remove(TURBOVEC_INDEX_PATH)
+
+
+def _ingest_all_sources(conn: sqlite3.Connection, index: turbovec.IdMapIndex):
+    log("\nIngesting all texts...")
+    for source_name, info in SOURCES.items():
+        file_path = os.path.join(RAG_DIR, info["file"])
+        if not os.path.exists(file_path):
+            log(f"  WARNING: {file_path} not found, skipping {source_name}")
+            continue
+        with open(file_path, encoding="utf-8") as f:
+            raw = f.read()
+        ingest_text(conn, index, source_name, raw)
+
+
+def _run_pipeline():
+    _remove_existing_db_files()
+    conn = init_sqlite(BAZI_SQLITE_PATH)
+    index = init_turbovec(TURBOVEC_INDEX_PATH)
+
+    _ingest_all_sources(conn, index)
+
+    index.write(TURBOVEC_INDEX_PATH)
+    log(f"TurboVec index persisted to {TURBOVEC_INDEX_PATH}")
+
+    count_after = verify(conn, index)
+    log(f"\n=== Pipeline Complete: {count_after} chunks ===")
+    conn.close()
+
+
+def main():
+    log("=== RAG Pipeline: TurboVec + SQLite Rebuild ===")
+    _check_embedding_server()
     backup()
-
     try:
-        if os.path.exists(BAZI_SQLITE_PATH):
-            os.remove(BAZI_SQLITE_PATH)
-        if os.path.exists(TURBOVEC_INDEX_PATH):
-            os.remove(TURBOVEC_INDEX_PATH)
-
-        conn = init_sqlite(BAZI_SQLITE_PATH)
-        index = init_turbovec(TURBOVEC_INDEX_PATH)
-
-        log("\nIngesting all texts...")
-        for source_name, info in SOURCES.items():
-            file_path = os.path.join(RAG_DIR, info["file"])
-            if not os.path.exists(file_path):
-                log(f"  WARNING: {file_path} not found, skipping {source_name}")
-                continue
-            with open(file_path, encoding="utf-8") as f:
-                raw = f.read()
-            ingest_text(conn, index, source_name, raw)
-
-        index.write(TURBOVEC_INDEX_PATH)
-        log(f"TurboVec index persisted to {TURBOVEC_INDEX_PATH}")
-
-        count_after = verify(conn, index)
-        log(f"\n=== Pipeline Complete: {count_after} chunks ===")
-
-        conn.close()
-
+        _run_pipeline()
     except (OSError, ValueError, TypeError, RuntimeError) as e:
         log(f"ERROR: Pipeline failed: {e}")
         import traceback

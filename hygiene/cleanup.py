@@ -28,27 +28,57 @@ DEAD_CODE_JSON = ROOT_DIR / "kit-hygiene" / "reports" / "dead_code_audit.json"
 # =====================================================================
 # PART 1: ENVIRONMENT DRIFT AUTO-SYNC
 # =====================================================================
-def sync_environment_drift():
-    print("🔍 Scanning src/ for environment variable usage...")
+
+def _scan_env_vars_in_content(content: str) -> set[str]:
+    patterns = [
+        re.compile(r"os\.getenv\(\s*['\"]([A-Z0-9_]+)['\"]"),
+        re.compile(r"os\.environ\[\s*['\"]([A-Z0-9_]+)['\"]"),
+        re.compile(r"os\.environ\.get\(\s*['\"]([A-Z0-9_]+)['\"]")
+    ]
     env_vars = set()
+    for p in patterns:
+        for m in p.finditer(content):
+            env_vars.add(m.group(1))
+    return env_vars
 
-    # Regex patterns for getenv and environ
-    getenv_pattern = re.compile(r"os\.getenv\(\s*['\"]([A-Z0-9_]+)['\"]")
-    environ_pattern = re.compile(r"os\.environ\[\s*['\"]([A-Z0-9_]+)['\"]")
-    environ_get_pattern = re.compile(r"os\.environ\.get\(\s*['\"]([A-Z0-9_]+)['\"]")
 
-    for py_file in src_DIR.glob("**/*.py"):
+def _scan_directory_for_env_vars(src_dir: Path) -> set[str]:
+    env_vars = set()
+    for py_file in src_dir.glob("**/*.py"):
         try:
             content = py_file.read_text(encoding="utf-8")
-            # Find all matches
-            for m in getenv_pattern.finditer(content):
-                env_vars.add(m.group(1))
-            for m in environ_pattern.finditer(content):
-                env_vars.add(m.group(1))
-            for m in environ_get_pattern.finditer(content):
-                env_vars.add(m.group(1))
+            env_vars.update(_scan_env_vars_in_content(content))
         except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
             print(f"  Warning reading {py_file}: {e}")
+    return env_vars
+
+
+def _parse_existing_env_vars(example_content: str) -> set[str]:
+    existing_vars = set()
+    pattern = re.compile(r"^(?:#\s*)?([A-Z0-9_]+)\s*=")
+    for line in example_content.splitlines():
+        line = line.strip()
+        if line:
+            m = pattern.match(line)
+            if m:
+                existing_vars.add(m.group(1))
+    return existing_vars
+
+
+def _append_missing_env_vars(env_example: Path, missing_vars: list[str]) -> None:
+    if not missing_vars:
+        print("  ✅ .env.example is fully up-to-date. No environment drift detected.")
+        return
+    print(f"  Appending {len(missing_vars)} missing variables to .env.example...")
+    with open(env_example, "a", encoding="utf-8") as f:
+        f.write("\n# ── AUTO-SYNCED MISSING VARIABLES ───────────────────────────\n")
+        f.writelines(f"# {var}=\n" for var in missing_vars)
+    print("  .env.example updated successfully.")
+
+
+def sync_environment_drift():
+    print("🔍 Scanning src/ for environment variable usage...")
+    env_vars = _scan_directory_for_env_vars(src_DIR)
 
     if not env_vars:
         print("  No environment variables found in src/.")
@@ -56,36 +86,15 @@ def sync_environment_drift():
 
     print(f"  Found {len(env_vars)} environment variables in use.")
 
-    # Read .env.example
     if not ENV_EXAMPLE.exists():
         print(f"  Creating missing {ENV_EXAMPLE.name}")
         ENV_EXAMPLE.write_text("# Environment Template\n", encoding="utf-8")
 
     example_content = ENV_EXAMPLE.read_text(encoding="utf-8")
-    existing_vars = set()
-    for line in example_content.splitlines():
-        line = line.strip()
-        if line and not line.startswith("#"):
-            # Match VAR=value or VAR = value
-            m = re.match(r"^([A-Z0-9_]+)\s*=", line)
-            if m:
-                existing_vars.add(m.group(1))
-        elif line.startswith("#"):
-            # Match commented out # VAR=
-            m = re.match(r"^#\s*([A-Z0-9_]+)\s*=", line)
-            if m:
-                existing_vars.add(m.group(1))
+    existing_vars = _parse_existing_env_vars(example_content)
 
     missing_vars = sorted(env_vars - existing_vars)
-
-    if missing_vars:
-        print(f"  Appending {len(missing_vars)} missing variables to .env.example...")
-        with open(ENV_EXAMPLE, "a", encoding="utf-8") as f:
-            f.write("\n# ── AUTO-SYNCED MISSING VARIABLES ───────────────────────────\n")
-            f.writelines(f"# {var}=\n" for var in missing_vars)
-        print("  .env.example updated successfully.")
-    else:
-        print("  ✅ .env.example is fully up-to-date. No environment drift detected.")
+    _append_missing_env_vars(ENV_EXAMPLE, missing_vars)
 
 
 # =====================================================================
@@ -123,9 +132,43 @@ def find_definition_node(tree: ast.AST, name: str, def_type: str) -> ast.AST | N
     }.get(def_type, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
 
     for node in ast.walk(tree):
-        if isinstance(node, target_types) and node.name == name:
+        if isinstance(node, target_types) and getattr(node, "name", None) == name:
             return node
     return None
+
+
+def _compute_node_bounds(node: ast.AST, lines: list[str]) -> tuple[int, int]:
+    start_line = getattr(node, "lineno", 1)
+    dec_list = getattr(node, "decorator_list", [])
+    for dec in dec_list:
+        dec_lineno = getattr(dec, "lineno", start_line)
+        start_line = min(start_line, dec_lineno)
+
+    end_line = getattr(node, "end_lineno", start_line)
+    start_idx = start_line - 1
+    end_idx = end_line
+
+    while end_idx < len(lines):
+        if lines[end_idx].strip():
+            break
+        end_idx += 1
+
+    return start_idx, end_idx
+
+
+def _delete_lines_and_verify(content: str, file_path: Path, start_idx: int, end_idx: int, name: str) -> bool:
+    lines = content.splitlines()
+    new_lines = lines[:start_idx] + lines[end_idx:]
+    file_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+    try:
+        ast.parse(file_path.read_text(encoding="utf-8"), filename=str(file_path))
+        return True
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
+        print(f"  ❌ Syntax check failed after removing '{name}' from {file_path.name}: {e}")
+        print("  Reverting changes...")
+        file_path.write_text(content, encoding="utf-8")
+        raise
 
 
 def strip_dead_code_block(file_path: Path, name: str, def_type: str) -> bool:
@@ -143,52 +186,48 @@ def strip_dead_code_block(file_path: Path, name: str, def_type: str) -> bool:
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
         print(f"  Error parsing AST for {file_path.name}: {e}")
         raise
-        return False
 
-    # Find target node
     node = find_definition_node(tree, name, def_type)
     if not node:
         print(f"  Warning: Could not locate AST node for {def_type} '{name}' in {file_path.name}.")
         return False
 
-    # Get lines of the file
     lines = content.splitlines()
-
-    # Determine bounds
-    start_line = node.lineno
-    # If decorators are present, start from the first decorator
-    if hasattr(node, "decorator_list") and node.decorator_list:
-        start_line = min(dec.lineno for dec in node.decorator_list)
-
-    end_line = getattr(node, "end_lineno", start_line)
-
-    start_idx = start_line - 1
-    end_idx = end_line  # end_lineno is 1-indexed, inclusive, so end_idx matches the exclusive stop index
-
-    # Post-clean trailing whitespace/newlines that might be left over
-    # (e.g., if there's a trailing empty line right after the function block)
-    while end_idx < len(lines) and not lines[end_idx].strip():
-        end_idx += 1
+    start_idx, end_idx = _compute_node_bounds(node, lines)
 
     print(f"  Removing {def_type} '{name}' from {file_path.name} (Lines {start_idx + 1} to {end_idx})")
 
-    # Delete the slice of lines
-    new_lines = lines[:start_idx] + lines[end_idx:]
+    return _delete_lines_and_verify(content, file_path, start_idx, end_idx, name)
 
-    # Save file
-    file_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
 
-    # Verify syntax compiler check
+def _load_dead_code_audit(dead_code_json: Path) -> list[dict]:
     try:
-        ast.parse(file_path.read_text(encoding="utf-8"), filename=str(file_path))
-        return True
+        data = json.loads(dead_code_json.read_text(encoding="utf-8"))
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
-        print(f"  ❌ Syntax check failed after removing '{name}' from {file_path.name}: {e}")
-        print("  Reverting changes...")
-        file_path.write_text(content, encoding="utf-8")
+        print(f"  Error reading {dead_code_json}: {e}")
         raise
-        return False
 
+    results = data.get("audit_results", [])
+    return [r for r in results if r.get("status") == "CONFIRMED_DEAD"]
+
+
+def _process_dead_items(dead_items: list[dict], root_dir: Path) -> int:
+    success_count = 0
+    for item in dead_items:
+        name = item.get("name")
+        file_path_str = item.get("file_path")
+        def_type = item.get("type", "function")
+
+        if not name:
+            continue
+        if not file_path_str:
+            continue
+
+        file_path = root_dir / str(file_path_str)
+        if strip_dead_code_block(file_path, str(name), str(def_type)):
+            success_count += 1
+
+    return success_count
 
 
 def strip_dead_code():
@@ -197,34 +236,13 @@ def strip_dead_code():
         print(f"  Error: {DEAD_CODE_JSON} not found. Please run the scanner first.")
         return
 
-    try:
-        data = json.loads(DEAD_CODE_JSON.read_text(encoding="utf-8"))
-    except (OSError, ValueError, TypeError, KeyError, AttributeError) as e:
-        print(f"  Error reading {DEAD_CODE_JSON}: {e}")
-        raise
-        return
-
-    results = data.get("audit_results", [])
-    dead_items = [r for r in results if r.get("status") == "CONFIRMED_DEAD"]
-
+    dead_items = _load_dead_code_audit(DEAD_CODE_JSON)
     if not dead_items:
         print("  No 'CONFIRMED_DEAD' code blocks found in the audit report.")
         return
 
     print(f"  Found {len(dead_items)} dead code blocks to remove.")
-    success_count = 0
-
-    for item in dead_items:
-        name = item.get("name")
-        file_path_str = item.get("file_path")
-        def_type = item.get("type", "function")
-
-        if not name or not file_path_str:
-            continue
-
-        file_path = ROOT_DIR / file_path_str
-        if strip_dead_code_block(file_path, name, def_type):
-            success_count += 1
+    success_count = _process_dead_items(dead_items, ROOT_DIR)
 
     print(f"\n  Finished. Surgically removed {success_count}/{len(dead_items)} dead code blocks.")
 
@@ -255,4 +273,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

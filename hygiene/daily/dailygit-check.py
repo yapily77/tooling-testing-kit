@@ -24,173 +24,285 @@ def load_exceptions(exceptions_path: Path) -> list[str]:
         return []
 
 
+def _run_git_diff(spec: str) -> set[str]:
+    """Run a single git diff --name-only command and return non-empty lines."""
+    result = subprocess.run(
+        ["git", "diff", "--name-only", spec],
+        capture_output=True, text=True, check=False,
+    )
+    if result.returncode != 0:
+        return set()
+    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
 def get_changed_files() -> list[str]:
     """Get files changed in unstaged, staged, or unpushed commits."""
-    files = set()
+    files: set[str] = set()
 
     # 1. Staged and unstaged changes
-    r1 = subprocess.run(["git", "diff", "--name-only", "HEAD"], capture_output=True, text=True, check=False)
-    if r1.returncode == 0:
-        for line in r1.stdout.splitlines():
-            if line.strip():
-                files.add(line.strip())
+    files |= _run_git_diff("HEAD")
 
     # 2. Unpushed commits compared to upstream
-    r2 = subprocess.run(["git", "diff", "--name-only", "@{u}", "HEAD"], capture_output=True, text=True, check=False)
-    if r2.returncode == 0:
-        for line in r2.stdout.splitlines():
-            if line.strip():
-                files.add(line.strip())
+    files |= _run_git_diff("@{u}")
 
     # Fallback to HEAD~1 if no upstream or no changes found (local commit checks)
     if not files:
-        r3 = subprocess.run(["git", "diff", "--name-only", "HEAD~1", "HEAD"], capture_output=True, text=True, check=False)
-        if r3.returncode == 0:
-            for line in r3.stdout.splitlines():
-                if line.strip():
-                    files.add(line.strip())
+        files |= _extract_git_diff("HEAD~1", "HEAD")
 
     return sorted(files)
+
+
+def _extract_git_diff(spec_a: str, spec_b: str) -> set[str]:
+    """Run git diff --name-only <spec_a> <spec_b>."""
+    result = subprocess.run(
+        ["git", "diff", "--name-only", spec_a, spec_b],
+        capture_output=True, text=True, check=False,
+    )
+    if result.returncode != 0:
+        return set()
+    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
+def filter_files_to_scan(changed_files: list[str], exceptions: list[str]) -> list[str]:
+    """Filter to Python files in src/ or kit-hygiene/ not in exceptions."""
+    result = []
+    for f in changed_files:
+        path = Path(f)
+        if path.suffix == ".py" and f.startswith(("src/", "kit-hygiene/")) and f not in exceptions:
+            result.append(f)
+    return result
+
+
+def build_scanner_env(files_to_scan: list[str]) -> dict:
+    """Set up environment overrides for scanner subprocesses."""
+    env = os.environ.copy()
+    env["HYGENE_FILES_TO_SCAN"] = ",".join(files_to_scan)
+    env["google_thinking_level"] = "off"
+    env["google_include_thoughts"] = "false"
+    return env
+
+
+def run_scanner(scanner_path: Path, env: dict) -> bool:
+    """Run a single scanner; return False if it failed, True otherwise."""
+    if not scanner_path.exists():
+        return True
+
+    print(f"\n🚀 Running {scanner_path.name}...")
+    res = subprocess.run(
+        ["uv", "run", "python", str(scanner_path)],
+        env=env, capture_output=True, text=True, check=False,
+    )
+    if res.returncode != 0:
+        return _handle_scanner_failure(scanner_path, res)
+
+    return _print_scanner_summary(res)
+
+
+def _handle_scanner_failure(scanner_path: Path, res) -> bool:
+    """Print failure info for a scanner; always returns False."""
+    print(f"{RED}❌ Scanner {scanner_path.name} failed with exit code {res.returncode}:{RESET}")
+    print(res.stderr)
+    return False
+
+
+def _print_scanner_summary(res) -> bool:
+    """Print filtered stdout summary lines from a scanner run."""
+    lines = res.stdout.splitlines()
+    summary = [
+        line for line in lines if any(x in line.lower() for x in ["found", "complete", "result", "saved"])
+    ]
+    for s in summary:
+        print(f"  {s}")
+    return True
+
+
+def check_async_hazards(reports_dir: Path, files_to_scan: list[str]) -> bool:
+    """Check async hazards report for blocking violations; return False on failure."""
+    async_report = reports_dir / "async_hazards_audit.json"
+    if not async_report.exists():
+        return True
+    try:
+        with open(async_report, encoding="utf-8") as f:
+            data = json.load(f)
+        for item in data.get("audit_results", []):
+            if _is_blocking_async_hazard(item, files_to_scan):
+                print(
+                    f"{RED}🚨 BLOCKING VIOLATION: High-severity Async Hazard found in {item.get('file_path')}:{item.get('line')} ({item.get('name')}){RESET}"
+                )
+                print(f"  Reason: {item.get('reason')}")
+                return False
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
+        print(f"{YELLOW}Warning: Failed to parse async hazards report: {e}{RESET}")
+    return True
+
+
+def _is_blocking_async_hazard(item: dict, files_to_scan: list[str]) -> bool:
+    return (
+        item.get("status") == "ASYNC_HAZARD"
+        and item.get("severity") == "HIGH"
+        and item.get("file_path") in files_to_scan
+    )
+
+
+def check_circular_deps(reports_dir: Path, files_to_scan: list[str]) -> bool:
+    """Check circular dependencies report; return False on failure."""
+    circ_report = reports_dir / "circular_deps_audit.json"
+    if not circ_report.exists():
+        return True
+    try:
+        with open(circ_report, encoding="utf-8") as f:
+            data = json.load(f)
+        for item in data.get("circular_dependencies", []):
+            if _has_scan_involved(item, files_to_scan):
+                involved_files = item.get("path", [])
+                print(
+                    f"{RED}🚨 BLOCKING VIOLATION: Circular Dependency chain detected: {' -> '.join(involved_files)}{RESET}"
+                )
+                return False
+    except (KeyError, TypeError, json.JSONDecodeError):
+        print("DEBUG: malformed circular_dep entry skipped", file=sys.stderr)
+    return True
+
+
+def _has_scan_involved(item: dict, files_to_scan: list[str]) -> bool:
+    involved_files = item.get("path", [])
+    return any(f in files_to_scan for f in involved_files)
+
+
+def check_secrets(reports_dir: Path, files_to_scan: list[str]) -> bool:
+    """Check secrets report for blocking violations; return False on failure."""
+    secrets_report = reports_dir / "secrets_audit.json"
+    if not secrets_report.exists():
+        return True
+    try:
+        with open(secrets_report, encoding="utf-8") as f:
+            data = json.load(f)
+        for item in data.get("findings", []):
+            if _is_scan_secreted(item, files_to_scan):
+                print(
+                    f"{RED}🚨 BLOCKING VIOLATION: Potential Secret/Credentials leaked in {item.get('file_path')}:{item.get('line')}{RESET}"
+                )
+                return False
+    except (json.JSONDecodeError, KeyError, TypeError):
+        print("DEBUG: malformed secrets report entry skipped", file=sys.stderr)
+    return True
+
+
+def _is_scan_secreted(item: dict, files_to_scan: list[str]) -> bool:
+    return item.get("file_path") in files_to_scan
+
+
+def check_env_drift(reports_dir: Path, files_to_scan: list[str]) -> bool:
+    """Check env drift report for blocking violations; return False on failure."""
+    env_report = reports_dir / "env_drift_audit.json"
+    if not env_report.exists():
+        return True
+    try:
+        with open(env_report, encoding="utf-8") as f:
+            data = json.load(f)
+        for item in data.get("audit_results", []):
+            if _is_blocking_env_drift(item, files_to_scan):
+                print(
+                    f"{RED}🚨 BLOCKING VIOLATION: Environment Drift / Undocumented Variable found in {item.get('file_path')}:{item.get('line')} ({item.get('name')}){RESET}"
+                )
+                print(f"  Reason: {item.get('reason')}")
+                return False
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
+        print(f"{YELLOW}Warning: Failed to parse env drift report: {e}{RESET}")
+    return True
+
+
+def _is_blocking_env_drift(item: dict, files_to_scan: list[str]) -> bool:
+    return (
+        item.get("status") == "DRIFT_VIOLATION"
+        and item.get("severity") == "HIGH"
+        and item.get("file_path") in files_to_scan
+    )
+
+
+def check_reports(reports_dir: Path, files_to_scan: list[str]) -> bool:
+    """Run all report checks. Returns False if any blocking violation found."""
+    checks = (
+        check_async_hazards,
+        check_circular_deps,
+        check_secrets,
+        check_env_drift,
+    )
+    failed = False
+    for check in checks:
+        if not check(reports_dir, files_to_scan):
+            failed = True
+    return not failed
+
+
+def _get_scanner_paths() -> list:
+    """Build and return the list of scanner paths."""
+    names = [
+        "find_async_hazards.py",
+        "find_circular_deps.py",
+        "find_dead_code.py",
+        "find_duplication.py",
+        "find_env_drift.py",
+        "find_secrets.py",
+        "find_silent_killers.py",
+        "find_type_safety.py",
+        "find_message_drift.py",
+    ]
+    return [Path("kit-hygiene/scanners") / name for name in names]
+
+
+def _run_scanners(env: dict) -> bool:
+    """Run all scanners; return False if any failed."""
+    failed = False
+    for scanner in _get_scanner_paths():
+        if not run_scanner(scanner, env):
+            failed = True
+    return not failed
+
+
+def _validate_changed_files(changed_files: list) -> bool:
+    """Bail out early if nothing changed or no scannable files."""
+    if not changed_files:
+        print(f"{GREEN}✅ No changed files detected in this push. Bypassing check.{RESET}")
+        sys.exit(0)
+    return True
+
+
+def _resolve_files_to_scan(changed_files: list) -> list:
+    """Load exceptions and filter changed files."""
+    exceptions_path = Path(__file__).parent.parent / "exceptions.json"
+    exceptions = load_exceptions(exceptions_path)
+    files_to_scan = filter_files_to_scan(changed_files, exceptions)
+    if not files_to_scan:
+        print(f"{GREEN}✅ No non-excepted Python files modified. Bypassing scanners.{RESET}")
+        sys.exit(0)
+    return files_to_scan
 
 
 def main():
     print(f"{BOLD}🛡️ Running Code Hygiene Gatekeeper (dailygit-check)...{RESET}")
 
-    # 1. Get changed files
     changed_files = get_changed_files()
-    if not changed_files:
-        print(f"{GREEN}✅ No changed files detected in this push. Bypassing check.{RESET}")
-        sys.exit(0)
+    _validate_changed_files(changed_files)
 
-    # 2. Load exceptions
-    exceptions_path = Path(__file__).parent.parent / "exceptions.json"
-    exceptions = load_exceptions(exceptions_path)
-
-    # Filter files: must be Python files in src/ or kit-hygiene/ and not in exceptions
-    files_to_scan = []
-    for f in changed_files:
-        path = Path(f)
-        if path.suffix == ".py" and (f.startswith(("src/", "kit-hygiene/"))) and f not in exceptions:
-            files_to_scan.append(f)
-
-    if not files_to_scan:
-        print(f"{GREEN}✅ No non-excepted Python files modified. Bypassing scanners.{RESET}")
-        sys.exit(0)
+    files_to_scan = _resolve_files_to_scan(changed_files)
 
     print("📦 Files queued for hygiene audit:")
     for f in files_to_scan:
         print(f"  - {f}")
 
-    # 3. Setup environment override for scanners
-    env = os.environ.copy()
-    env["HYGIENE_FILES_TO_SCAN"] = ",".join(files_to_scan)
-    # Configure Pydantic AI models to use low-latency / non-thinking configurations
-    env["google_thinking_level"] = "off"
-    env["google_include_thoughts"] = "false"
+    env = build_scanner_env(files_to_scan)
+    failed = not _run_scanners(env)
 
-    scanners = [
-        "kit-hygiene/scanners/find_async_hazards.py",
-        "kit-hygiene/scanners/find_circular_deps.py",
-        "kit-hygiene/scanners/find_dead_code.py",
-        "kit-hygiene/scanners/find_duplication.py",
-        "kit-hygiene/scanners/find_env_drift.py",
-        "kit-hygiene/scanners/find_secrets.py",
-        "kit-hygiene/scanners/find_silent_killers.py",
-        "kit-hygiene/scanners/find_type_safety.py",
-        "kit-hygiene/scanners/find_message_drift.py",
-    ]
-
-    failed = False
-
-    # Run each scanner
-    for scanner in scanners:
-        scanner_path = Path(scanner)
-        if not scanner_path.exists():
-            continue
-
-        print(f"\n🚀 Running {scanner_path.name}...")
-        res = subprocess.run(["uv", "run", "python", str(scanner_path)], env=env, capture_output=True, text=True, check=False)
-
-        # Output log
-        if res.returncode != 0:
-            print(f"{RED}❌ Scanner {scanner_path.name} failed with exit code {res.returncode}:{RESET}")
-            print(res.stderr)
-            failed = True
-        else:
-            # Print standard output summary
-            lines = res.stdout.splitlines()
-            summary = [
-                line for line in lines if any(x in line.lower() for x in ["found", "complete", "result", "saved"])
-            ]
-            for s in summary:
-                print(f"  {s}")
-
-    # 4. Check JSON reports for blocking violations
     reports_dir = Path("kit-hygiene/reports")
-    if reports_dir.exists():
-        # Check async hazards report
-        async_report = reports_dir / "async_hazards_audit.json"
-        if async_report.exists():
-            try:
-                with open(async_report, encoding="utf-8") as f:
-                    data = json.load(f)
-                for item in data.get("audit_results", []):
-                    # Only block on high-severity async hazards
-                    if item.get("status") == "ASYNC_HAZARD" and item.get("severity") == "HIGH" and item.get("file_path") in files_to_scan:
-                            print(
-                                f"{RED}🚨 BLOCKING VIOLATION: High-severity Async Hazard found in {item.get('file_path')}:{item.get('line')} ({item.get('name')}){RESET}"
-                            )
-                            print(f"  Reason: {item.get('reason')}")
-                            failed = True
-            except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
-                print(f"{YELLOW}Warning: Failed to parse async hazards report: {e}{RESET}")
+    if reports_dir.exists() and not check_reports(reports_dir, files_to_scan):
+        failed = True
 
-        # Check circular dependencies report
-        circ_report = reports_dir / "circular_deps_audit.json"
-        if circ_report.exists():
-            try:
-                with open(circ_report, encoding="utf-8") as f:
-                    data = json.load(f)
-                # If any circular deps are detected in scanned files, block
-                for item in data.get("circular_dependencies", []):
-                    involved_files = item.get("path", [])
-                    if any(f in files_to_scan for f in involved_files):
-                        print(
-                            f"{RED}🚨 BLOCKING VIOLATION: Circular Dependency chain detected: {' -> '.join(involved_files)}{RESET}"
-                        )
-                        failed = True
-            except (KeyError, TypeError, json.JSONDecodeError):
-                print("DEBUG: malformed circular_dep entry skipped", file=sys.stderr)
+    _report_final_status(failed)
 
-        # Check secrets report
-        secrets_report = reports_dir / "secrets_audit.json"
-        if secrets_report.exists():
-            try:
-                with open(secrets_report, encoding="utf-8") as f:
-                    data = json.load(f)
-                for item in data.get("findings", []):
-                    if item.get("file_path") in files_to_scan:
-                        print(
-                            f"{RED}🚨 BLOCKING VIOLATION: Potential Secret/Credentials leaked in {item.get('file_path')}:{item.get('line')}{RESET}"
-                        )
-                        failed = True
-            except (json.JSONDecodeError, KeyError, TypeError):
-                print("DEBUG: malformed secrets report entry skipped", file=sys.stderr)
-        env_report = reports_dir / "env_drift_audit.json"
-        if env_report.exists():
-            try:
-                with open(env_report, encoding="utf-8") as f:
-                    data = json.load(f)
-                for item in data.get("audit_results", []):
-                    if item.get("status") == "DRIFT_VIOLATION" and item.get("severity") == "HIGH" and item.get("file_path") in files_to_scan:
-                            print(
-                                f"{RED}🚨 BLOCKING VIOLATION: Environment Drift / Undocumented Variable found in {item.get('file_path')}:{item.get('line')} ({item.get('name')}){RESET}"
-                            )
-                            print(f"  Reason: {item.get('reason')}")
-                            failed = True
-            except (OSError, ValueError, TypeError, KeyError, AttributeError, RuntimeError, ImportError, json.JSONDecodeError) as e:
-                print(f"{YELLOW}Warning: Failed to parse env drift report: {e}{RESET}")
 
+def _report_final_status(failed: bool) -> None:
+    """Print final pass/fail message and exit."""
     if failed:
         print(f"\n{RED}❌ Git push rejected: Code hygiene audit failed. Please fix the violations listed above.{RESET}")
         sys.exit(1)

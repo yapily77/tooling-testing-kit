@@ -1,16 +1,21 @@
 import argparse
 import ast
-import difflib
 import json
 import sys
 from pathlib import Path
 
-from _codebase_common import _normalize_content, fail, ok, resolve_secure_path
+from _codebase_common import (
+    _bounded_diff,
+    _normalize_content,
+    fail,
+    ok,
+    resolve_secure_path,
+)
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 
-def _function_node(function_code: str) -> ast.stmt:
+def _function_node(function_code: str) -> ast.FunctionDef | ast.AsyncFunctionDef:
     stripped = function_code.strip()
     tree = ast.parse(stripped)
     if not tree.body:
@@ -23,58 +28,129 @@ def _function_node(function_code: str) -> ast.stmt:
     return node
 
 
-def _find_function(
-    tree: ast.Module, name: str, class_name: str | None = None
-) -> tuple[ast.AST | None, bool]:
+def _match_function_in_body(body: list[ast.stmt], name: str) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
+    """Find a function definition by name in a statement list."""
+    for node in body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == name:
+            return node
+    return None
+
+
+def _find_function_in_class(tree: ast.Module, name: str, class_name: str) -> tuple[ast.AST | None, bool]:
+    """Search for a method within a specific class."""
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            method = _match_function_in_body(node.body, name)
+            if method:
+                return method, True
+    return None, False
+
+
+def _find_function(tree: ast.Module, name: str, class_name: str | None = None) -> tuple[ast.AST | None, bool]:
+    """Find a function by name, optionally within a class."""
     if class_name is not None:
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef) and node.name == class_name:
-                for sub in node.body:
-                    if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)) and sub.name == name:
-                        return sub, True
-        return None, False
+        return _find_function_in_class(tree, name, class_name)
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == name:
             return node, True
     return None, False
 
 
-def _insert_after(
-    body: list[ast.stmt], target_name: str, new_node: ast.stmt, class_name: str | None = None
-) -> bool:
-    if class_name is not None:
-        for node in body:
-            if isinstance(node, ast.ClassDef) and node.name == class_name:
-                for i, sub in enumerate(node.body):
-                    if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)) and sub.name == target_name:
-                        node.body.insert(i + 1, new_node)
-                        return True
-        return False
+def _is_target_node(node: ast.stmt, target_name: str) -> bool:
+    """Check if a node matches the target name for insertion positioning."""
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return node.name == target_name
+    if isinstance(node, ast.ClassDef):
+        return node.name == target_name
+    return False
+
+
+def _insert_after_in_body(body: list[ast.stmt], target_name: str, new_node: ast.stmt) -> bool:
+    """Insert new_node after the node matching target_name in body."""
     for i, node in enumerate(body):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == target_name:
-            body.insert(i + 1, new_node)
-            return True
-        if isinstance(node, ast.ClassDef) and node.name == target_name:
+        if _is_target_node(node, target_name):
             body.insert(i + 1, new_node)
             return True
     return False
 
 
-def _bounded_diff(old_text: str, new_text: str, context: int = 15) -> str:
-    if old_text and not old_text.endswith("\n"):
-        old_text += "\n"
-    if new_text and not new_text.endswith("\n"):
-        new_text += "\n"
-    old_lines = old_text.splitlines(keepends=True)
-    new_lines = new_text.splitlines(keepends=True)
-    diff = list(
-        difflib.unified_diff(
-            old_lines, new_lines, fromfile="a", tofile="b", n=context, lineterm="\n"
-        )
-    )
-    if not diff:
-        return "(no changes detected)"
-    return "".join(diff)
+def _find_class_body(body: list[ast.stmt], class_name: str) -> list[ast.stmt] | None:
+    """Find the body of a class by name in the given statement list."""
+    for node in body:
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            return node.body
+    return None
+
+
+def _insert_after(
+    body: list[ast.stmt], target_name: str, new_node: ast.stmt, class_name: str | None = None
+) -> bool:
+    """Insert new_node after target_name, optionally within a class body."""
+    if class_name is not None:
+        search_body = _find_class_body(body, class_name)
+        if search_body is None:
+            return False
+    else:
+        search_body = body
+    return _insert_after_in_body(search_body, target_name, new_node)
+
+
+def _validate_file_args(args) -> Path:
+    """Validate path and file type, returning resolved path."""
+    try:
+        path = resolve_secure_path(args.relative_path)
+    except ValueError as e:
+        print(json.dumps(fail(str(e)), indent=2))
+        sys.exit(1)
+    if not path.exists():
+        print(json.dumps(fail(f"File not found: {args.relative_path}"), indent=2))
+        sys.exit(1)
+    if path.suffix != ".py":
+        print(json.dumps(fail("Not a Python file."), indent=2))
+        sys.exit(1)
+    return path
+
+
+def _get_target_body(tree: ast.Module, class_name: str | None) -> list[ast.stmt]:
+    """Get the body list to insert into, optionally within a class."""
+    if class_name is not None:
+        class_body = _find_class_body(tree.body, class_name)
+        if class_body is not None:
+            return class_body
+    return tree.body
+
+
+def _perform_add_function(path: Path, args) -> None:
+    new_node = _function_node(args.function_code)
+    content = _normalize_content(path.read_text(encoding="utf-8"))
+    tree = ast.parse(content)
+    func_name = new_node.name
+
+    _, found = _find_function(tree, func_name, args.class_name)
+    if found:
+        print(json.dumps(ok(
+            f"Function {func_name} already exists in {args.relative_path}",
+            {"file_path": args.relative_path, "changed": False},
+        ), indent=2))
+        return
+
+    target_body = _get_target_body(tree, args.class_name)
+    if args.insert_after is not None:
+        if not _insert_after(target_body, args.insert_after, new_node, args.class_name):
+            target_body.append(new_node)
+    else:
+        target_body.append(new_node)
+
+    ast.fix_missing_locations(tree)
+    updated = ast.unparse(tree)
+    path.write_text(updated + "\n", encoding="utf-8")
+    print(json.dumps(ok(
+        f"Added function {func_name} to {args.relative_path}",
+        {
+            "file_path": args.relative_path, "changed": True,
+            "function": func_name, "diff": _bounded_diff(content, updated),
+        },
+    ), indent=2))
 
 
 def main() -> None:
@@ -91,77 +167,10 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    try:
-        path = resolve_secure_path(args.relative_path)
-    except ValueError as e:
-        print(json.dumps(fail(str(e)), indent=2))
-        sys.exit(1)
-
-    if not path.exists():
-        print(json.dumps(fail(f"File not found: {args.relative_path}"), indent=2))
-        sys.exit(1)
-    if path.suffix != ".py":
-        print(json.dumps(fail("Not a Python file."), indent=2))
-        sys.exit(1)
+    path = _validate_file_args(args)
 
     try:
-        new_node = _function_node(args.function_code)
-        content = _normalize_content(path.read_text(encoding="utf-8"))
-        tree = ast.parse(content)
-        func_name = new_node.name  # type: ignore[attr-defined]
-
-        _, found = _find_function(tree, func_name, args.class_name)
-        if found:
-            print(
-                json.dumps(
-                    ok(
-                        f"Function {func_name} already exists in {args.relative_path}",
-                        {"file_path": args.relative_path, "changed": False},
-                    ),
-                    indent=2,
-                )
-            )
-            return
-
-        target_body: list[ast.stmt]
-        if args.class_name is not None:
-            for node in tree.body:
-                if isinstance(node, ast.ClassDef) and node.name == args.class_name:
-                    target_body = node.body
-                    break
-            else:
-                target_body = tree.body
-        else:
-            target_body = tree.body
-
-        if args.insert_after is not None:
-            inserted = _insert_after(
-                target_body, args.insert_after, new_node, args.class_name
-            )
-            if not inserted:
-                target_body.append(new_node)
-        else:
-            target_body.append(new_node)
-
-        ast.fix_missing_locations(tree)
-        updated = ast.unparse(tree)
-        old_content = content
-        path.write_text(updated + "\n", encoding="utf-8")
-        diff = _bounded_diff(old_content, updated)
-        print(
-            json.dumps(
-                ok(
-                    f"Added function {func_name} to {args.relative_path}",
-                    {
-                        "file_path": args.relative_path,
-                        "changed": True,
-                        "function": func_name,
-                        "diff": diff,
-                    },
-                ),
-                indent=2,
-            )
-        )
+        _perform_add_function(path, args)
     except (SystemExit, OSError, SyntaxError, TypeError, ValueError) as e:
         print(json.dumps(fail(f"add_function failed: {e}"), indent=2))
         sys.exit(1)

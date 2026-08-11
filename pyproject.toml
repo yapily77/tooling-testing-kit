@@ -64,6 +64,24 @@ kit-clean-py = "clean_py.cli:main"
 where = [".", "plugins/python"]
 include = ["hygiene*", "tools*", "tests*", "clean_py*"]
 
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["hygiene.scanners.utils"]
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["utils"]
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["_bootstrap", "control"]
+ignore_missing_imports = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["_bootstrap", "control", "utils"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests/examples", "tools/test"]
 python_files = ["test_*.py", "*_test.py"]
