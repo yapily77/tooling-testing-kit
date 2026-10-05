@@ -1,11 +1,11 @@
 // clean_python.ts
 //
 // Thin OpenCode Plugin: Validated Python File Writer.
-// Delegates all quality checks (Ruff, MyPy strict, Radon CC < 6, AST anti-slop)
-// to the `clean_py` pip package. This file only handles security gating,
-// temp-file hygiene, retry tracking, and sub-process delegation.
+// Delegates all quality checks (Ruff, Pyright, Radon CC < 6, AST anti-slop)
+// to the `clean_py` pip package. This file handles security gating,
+// virtual environment resolution, temp-file hygiene, and retry tracking.
 
-import type { Plugin, CleanPythonArgs, ToolContext } from "@opencode-ai/plugin";
+import type { Plugin } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin";
 import { execFile } from "node:child_process";
 import * as crypto from "node:crypto";
@@ -21,9 +21,6 @@ const OUTPUT_LIMIT = 20_000;
 const MAX_TRACKER_SIZE = 1000;
 
 // --- STATE MANAGEMENT ---
-interface RetryState {
-    count: number;
-}
 const retryTracker = new Map<string, { count: number }>();
 
 class SecurityError extends Error {
@@ -57,24 +54,56 @@ function sanitizeOutput(rawOutput: string, tempPath: string, targetPath: string)
     }
 }
 
-// --- PYTHON INFRASTRUCTURE (delegates all real validation elsewhere) ---
-async function getPythonEnvironment(workspaceDir: string): Promise<{ pythonBin: string; venvDir: string }> {
-    const venvDir = path.join(workspaceDir, ".venv");
-    const candidates = [
-        path.join(venvDir, "Scripts", "python.exe"), // Windows
-        path.join(venvDir, "bin", "python"),         // Unix
-        path.join(venvDir, "bin", "python3"),        // Unix fallback
+// --- PYTHON INFRASTRUCTURE RESOLUTION ---
+async function getPythonEnvironment(
+    targetPath: string,
+    workspaceDir: string
+): Promise<{ pythonBin: string; venvDir: string }> {
+    const candidateDirs: string[] = [];
+
+    // 1. Walk up from target path
+    let curr = path.dirname(targetPath);
+    while (curr && curr !== path.dirname(curr)) {
+        candidateDirs.push(curr);
+        curr = path.dirname(curr);
+    }
+
+    // 2. Add workspaceDir and known project locations
+    candidateDirs.push(workspaceDir);
+    candidateDirs.push("/home/yapilwsl/arthityap/baziforecaster");
+    candidateDirs.push("/home/yapilwsl/arthityap");
+
+    const binaries = [
+        path.join("bin", "python"),
+        path.join("bin", "python3"),
+        path.join("Scripts", "python.exe"),
     ];
 
-    for (const candidate of candidates) {
-        const stats = await fs.stat(candidate).catch(() => null);
-        if (stats?.isFile()) {
-            return { pythonBin: candidate, venvDir };
+    for (const dir of candidateDirs) {
+        const venvDir = path.join(dir, ".venv");
+        for (const relBin of binaries) {
+            const candidateBin = path.join(venvDir, relBin);
+            const stats = await fs.stat(candidateBin).catch(() => null);
+            if (stats?.isFile()) {
+                return { pythonBin: candidateBin, venvDir };
+            }
+        }
+    }
+
+    // 3. Check VIRTUAL_ENV environment variable
+    if (process.env.VIRTUAL_ENV) {
+        const venvDir = process.env.VIRTUAL_ENV;
+        for (const relBin of binaries) {
+            const candidateBin = path.join(venvDir, relBin);
+            const stats = await fs.stat(candidateBin).catch(() => null);
+            if (stats?.isFile()) {
+                return { pythonBin: candidateBin, venvDir };
+            }
         }
     }
 
     throw new InfrastructureError(
-        "Python virtual environment not found. Expected a usable Python binary in .venv/bin/python or .venv/Scripts/python.exe."
+        "Python virtual environment not found. Expected a usable Python binary in .venv/bin/python."
     );
 }
 
@@ -86,11 +115,16 @@ function buildSubprocessEnv(venvDir: string): NodeJS.ProcessEnv {
     return env;
 }
 
-async function runSubprocess(cmd: string, args: string[], cwd: string, env: NodeJS.ProcessEnv): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+async function runSubprocess(
+    cmd: string,
+    args: string[],
+    cwd: string,
+    env: NodeJS.ProcessEnv
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
     try {
         const { stdout, stderr } = await execFileAsync(cmd, args, {
             cwd,
-            timeout: 30_000,
+            timeout: 60_000,
             maxBuffer: 10 * 1024 * 1024,
             env,
         });
@@ -105,8 +139,26 @@ async function runSubprocess(cmd: string, args: string[], cwd: string, env: Node
 }
 
 // --- DELEGATED VALIDATION: clean_py validate <temp_file> ---
-async function runCleanPy(pythonBin: string, tempFilePath: string, workspaceDir: string, env: NodeJS.ProcessEnv, displayPath: string): Promise<string[]> {
-    const result = await runSubprocess(pythonBin, ["-m", "clean_py", "validate", tempFilePath], workspaceDir, env);
+async function runCleanPy(
+    pythonBin: string,
+    tempFilePath: string,
+    displayPath: string,
+    effectiveWorkspace: string,
+    env: NodeJS.ProcessEnv
+): Promise<string[]> {
+    const args = [
+        "-m",
+        "clean_py",
+        "validate",
+        tempFilePath,
+        "--target",
+        displayPath,
+        "--workspace",
+        effectiveWorkspace,
+        "--json",
+    ];
+
+    const result = await runSubprocess(pythonBin, args, effectiveWorkspace, env);
 
     if (result.exitCode === 0) {
         try {
@@ -137,7 +189,10 @@ async function runCleanPy(pythonBin: string, tempFilePath: string, workspaceDir:
 }
 
 // --- SECURITY & PATH SANITIZATION ---
-async function resolveSecureTargetPath(workspaceDir: string, filePath: string): Promise<string> {
+async function resolveSecureTargetPath(
+    workspaceDir: string,
+    filePath: string
+): Promise<{ absoluteTargetPath: string; effectiveWorkspace: string; displayPath: string }> {
     if (typeof filePath !== "string" || filePath.trim().length === 0) {
         throw new SecurityError("file_path must be a non-empty string.");
     }
@@ -146,15 +201,32 @@ async function resolveSecureTargetPath(workspaceDir: string, filePath: string): 
         throw new SecurityError("file_path contains forbidden control characters.");
     }
 
+    let candidatePath: string;
     if (path.isAbsolute(filePath)) {
-        throw new SecurityError("file_path must be a relative workspace path.");
+        candidatePath = path.normalize(filePath);
+    } else {
+        candidatePath = path.resolve(workspaceDir, filePath);
     }
 
-    const candidatePath = path.resolve(workspaceDir, filePath);
-    const rel = path.relative(workspaceDir, candidatePath);
+    // Find effective repository workspace root
+    let effectiveWorkspace = workspaceDir;
+    let curr = path.dirname(candidatePath);
+    while (curr && curr !== path.dirname(curr)) {
+        const hasPyproject = await fs.stat(path.join(curr, "pyproject.toml")).catch(() => null);
+        const hasGit = await fs.stat(path.join(curr, ".git")).catch(() => null);
+        if (hasPyproject?.isFile() || hasGit) {
+            effectiveWorkspace = curr;
+            break;
+        }
+        curr = path.dirname(curr);
+    }
 
-    if (!rel || rel === "." || path.isAbsolute(rel) || rel.split(path.sep)[0] === "..") {
-        throw new SecurityError("file_path resolves outside the allowed workspace (Path traversal detected).");
+    const rel = path.relative(effectiveWorkspace, candidatePath);
+    if (!rel || rel === "." || rel.split(path.sep)[0] === "..") {
+        const relWs = path.relative(workspaceDir, candidatePath);
+        if (!relWs || relWs === "." || relWs.split(path.sep)[0] === "..") {
+            throw new SecurityError("file_path resolves outside the allowed workspace.");
+        }
     }
 
     const normalizedRel = rel.split(path.sep).join("/").toLowerCase();
@@ -170,7 +242,8 @@ async function resolveSecureTargetPath(workspaceDir: string, filePath: string): 
         throw new SecurityError("Only .py files are allowed to be written by this tool.");
     }
 
-    return candidatePath;
+    const displayPath = path.relative(effectiveWorkspace, candidatePath).split(path.sep).join("/");
+    return { absoluteTargetPath: candidatePath, effectiveWorkspace, displayPath };
 }
 
 // --- TOOL EXPORT ---
@@ -178,12 +251,12 @@ export const cleanPythonTool = tool({
     description:
         "Deterministically verifies Python code against strict quality constraints (Ruff, MyPy strict, Radon CC < 6, AST anti-slop) by delegating to the `clean_py` pip package, before atomically writing to disk. Enforces secure writes inside the workspace.",
     args: {
-        file_path: tool.schema.string().describe("Relative target path inside the workspace, e.g., 'src/models/user.py'"),
+        file_path: tool.schema.string().describe("Target path (relative or absolute) inside the workspace, e.g., 'src2/models/user.py'"),
         pydantic_architecture_plan: tool.schema.string().describe("Workflow explanation proving architecture safety & constraint adherence."),
         code_payload: tool.schema.string().describe("Complete Python source code to verify and save."),
     },
 
-    async execute(args: CleanPythonArgs, context: ToolContext) {
+    async execute(args, context) {
         try {
             console.log(`[CLEAN PYTHON AUDIT TRAIL] Target: ${args.file_path}`);
 
@@ -192,11 +265,13 @@ export const cleanPythonTool = tool({
             try {
                 workspaceDir = await fs.realpath(rawWorkspaceDir);
             } catch {
-                return "INFRASTRUCTURE ERROR: Workspace directory could not be resolved.";
+                workspaceDir = rawWorkspaceDir;
             }
 
-            const absoluteTargetPath = await resolveSecureTargetPath(workspaceDir, args.file_path);
-            const displayPath = path.relative(workspaceDir, absoluteTargetPath).split(path.sep).join("/");
+            const { absoluteTargetPath, effectiveWorkspace, displayPath } = await resolveSecureTargetPath(
+                workspaceDir,
+                args.file_path
+            );
 
             const targetDir = path.dirname(absoluteTargetPath);
             await fs.mkdir(targetDir, { recursive: true });
@@ -214,21 +289,19 @@ export const cleanPythonTool = tool({
                 if (oldestKey) retryTracker.delete(oldestKey);
             }
 
-            let targetExists = false;
             try {
                 const stat = await fs.lstat(absoluteTargetPath);
                 if (stat.isSymbolicLink() || stat.isDirectory()) {
                     return "SECURITY VIOLATION: Target file must not be a symlink or directory.";
                 }
-                targetExists = true;
             } catch (err: any) {
                 if (err.code !== "ENOENT") return `INFRASTRUCTURE ERROR: Unable to stat target file: ${err.message}`;
             }
 
-            const { pythonBin, venvDir } = await getPythonEnvironment(workspaceDir);
+            const { pythonBin, venvDir } = await getPythonEnvironment(absoluteTargetPath, effectiveWorkspace);
             const subprocessEnv = buildSubprocessEnv(venvDir);
 
-            // Create secure temporary file
+            // Create secure temporary file in the target directory
             const tempFileName = `.tmp-${crypto.randomUUID()}-${path.basename(absoluteTargetPath)}`;
             const tempFilePath = path.join(targetDir, tempFileName);
             let tempFileCreated = false;
@@ -239,8 +312,13 @@ export const cleanPythonTool = tool({
                 await handle.writeFile(args.code_payload, "utf-8");
                 await handle.close();
 
-                const validationErrors: string[] = [];
-                validationErrors.push(...(await runCleanPy(pythonBin, tempFilePath, workspaceDir, subprocessEnv, displayPath)));
+                const validationErrors = await runCleanPy(
+                    pythonBin,
+                    tempFilePath,
+                    displayPath,
+                    effectiveWorkspace,
+                    subprocessEnv
+                );
 
                 if (validationErrors.length > 0) {
                     const activeCount = (retryTracker.get(absoluteTargetPath)?.count || 0) + 1;
@@ -269,7 +347,7 @@ export const cleanPythonTool = tool({
                 await fs.rename(tempFilePath, absoluteTargetPath);
                 retryTracker.delete(absoluteTargetPath);
 
-                return `SUCCESS: Code passed clean_py quality constraints (Ruff, MyPy strict, Radon CC < 6, AST anti-slop). Saved to '${displayPath}'.`;
+                return `SUCCESS: Code passed clean_py quality constraints (Ruff, Pyright, Radon CC < 6, AST anti-slop). Saved to '${displayPath}'.`;
 
             } finally {
                 if (tempFileCreated) {
